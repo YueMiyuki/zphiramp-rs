@@ -6,7 +6,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::{Duration, Instant};
 
 use support::server::{Reply, Request, Server};
-use zphira_common::gson::JsonElement;
+use zphira_common::time::Timestamp;
 use zphira_phira::{ChartInfo, Options, PhiraClient, PhiraError};
 
 async fn bounded<F: Future>(future: F) -> F::Output {
@@ -79,8 +79,8 @@ async fn request_shapes_match_java() {
         assert_eq!((me.id, me.name.as_deref()), (1, Some("user1")));
         assert_eq!(me.rks, 12.5);
         assert_eq!(
-            me.last_login.as_ref().map(|t| t.to_string()),
-            Some("2026-10-01T12:00Z".into())
+            me.last_login,
+            Some(Timestamp::parse("2026-10-01T12:00:00Z").unwrap())
         );
         phira.user_by_id(77).await.unwrap();
         phira.chart(42).await.unwrap();
@@ -152,24 +152,11 @@ async fn login_posts_a_json_body() {
         Some(body.len().to_string().as_str())
     );
     assert!(body.starts_with("{\n  \""), "{body:?}");
-    assert!(
-        body.contains("\\u003c")
-            && body.contains("\\u0026")
-            && body.contains("\\u003d")
-            && body.contains("\\u0027"),
-        "{body}"
-    );
-    let parsed = JsonElement::parse(&body).unwrap();
+    let parsed: serde_json::Value = serde_json::from_str(&body).unwrap();
     let object = parsed.as_object().unwrap();
     assert_eq!(object.len(), 2);
-    assert_eq!(
-        object.get("email").unwrap().get_as_string().as_deref(),
-        Some("player@example.com")
-    );
-    assert_eq!(
-        object.get("password").unwrap().get_as_string().as_deref(),
-        Some("pw<&>'=\"\\ü")
-    );
+    assert_eq!(object["email"], "player@example.com");
+    assert_eq!(object["password"], "pw<&>'=\"\\ü");
 }
 
 #[tokio::test]
@@ -601,21 +588,31 @@ async fn undecodable_answers_are_not_retried() {
 }
 
 #[tokio::test]
-async fn gson_reading_rules_apply_to_upstream_bodies() {
+async fn upstream_bodies_are_strict_json_and_read_every_date_form() {
     let server = Server::start(|_, _| {
-        Reply::ok("{id: '5', name: 12, rks: \"3.5\", banned: \"TRUE\", extra: [1,{}], joined: \"2026-01-02T03:04:05.5+08:00\"}")
+        Reply::ok(r#"{"id":5,"name":"x","rks":3.5,"banned":true,"extra":[1,{}],"joined":"2026-01-02T03:04:05.5+08:00","lastLogin":"2026-01-02T03:04Z"}"#)
     })
     .await;
     let phira = client(&server, fast());
     let user = bounded(phira.user_by_id(5)).await.unwrap();
     assert_eq!(
         (user.id, user.name.as_deref(), user.rks, user.banned),
-        (5, Some("12"), 3.5, true)
+        (5, Some("x"), 3.5, true)
     );
     assert_eq!(
-        user.joined.as_ref().map(|t| t.to_string()),
-        Some("2026-01-02T03:04:05.500+08:00".to_owned())
+        user.joined,
+        Some(Timestamp::parse("2026-01-02T03:04:05.5+08:00").unwrap())
     );
+    assert_eq!(
+        user.last_login,
+        Some(Timestamp::parse("2026-01-02T03:04:00Z").unwrap())
+    );
+
+    let server = Server::start(|_, _| Reply::ok("{id: '5'}")).await;
+    let phira = client(&server, fast());
+    let error = bounded(phira.user_by_id(5)).await.unwrap_err();
+    assert!(error.status().is_none() && !error.is_transport(), "{error}");
+    assert_eq!(server.request_count(), 1);
 }
 
 #[tokio::test]
@@ -663,35 +660,42 @@ async fn authorization_is_not_forwarded_to_another_origin() {
 }
 
 #[tokio::test]
-async fn at_most_four_redirects_are_followed() {
-    for (hops, ok) in [(0usize, true), (1, true), (4, true), (5, false), (6, false)] {
-        let base = Arc::new(std::sync::OnceLock::<String>::new());
-        let b = base.clone();
-        let origin = Server::start(move |request, _| {
-            let remaining = match request.target.strip_prefix("/hop/") {
-                Some(n) => n.parse::<usize>().unwrap(),
-                None => hops,
-            };
-            if remaining == 0 {
-                Reply::json(&chart_json(7, "x"))
-            } else {
-                Reply::redirect(302, &format!("{}hop/{}", b.get().unwrap(), remaining - 1))
-            }
-        })
-        .await;
-        base.set(origin.base_url()).unwrap();
-        let phira = client(&origin, fast());
-        let result = bounded(phira.chart(7)).await;
-        if ok {
-            assert_eq!(result.unwrap().id, 7, "{hops} redirects");
-            assert_eq!(origin.request_count(), hops + 1);
-        } else {
-            let error = result.unwrap_err();
-            assert_eq!(error.status(), Some(302), "{hops} redirects");
-            assert!(error.to_string().starts_with("HTTP 302: "), "{error}");
-            assert_eq!(origin.request_count(), 5, "{hops} redirects");
+async fn redirect_chains_are_followed_and_a_loop_ends_in_an_error() {
+    let base = Arc::new(std::sync::OnceLock::<String>::new());
+    let b = base.clone();
+    let origin = Server::start(move |request, _| {
+        let remaining = match request.target.strip_prefix("/hop/") {
+            Some(n) => n.parse::<usize>().unwrap(),
+            None => 5,
+        };
+        match remaining {
+            0 => Reply::json(&chart_json(7, "x")),
+            n => Reply::redirect(302, &format!("{}hop/{}", b.get().unwrap(), n - 1)),
         }
-    }
+    })
+    .await;
+    base.set(origin.base_url()).unwrap();
+    let phira = client(&origin, fast());
+    assert_eq!(bounded(phira.chart(7)).await.unwrap().id, 7);
+    assert_eq!(origin.request_count(), 6);
+
+    let looping = Server::start(|request, _| {
+        Reply::redirect(
+            302,
+            &format!("http://{}/again", request.header("host").unwrap()),
+        )
+    })
+    .await;
+    let phira = client(
+        &looping,
+        Options {
+            max_attempts: 1,
+            ..fast()
+        },
+    );
+    let error = bounded(phira.chart(7)).await.unwrap_err();
+    assert!(error.is_transport(), "{error}");
+    assert!(looping.request_count() <= 12, "{}", looping.request_count());
 }
 
 #[tokio::test]

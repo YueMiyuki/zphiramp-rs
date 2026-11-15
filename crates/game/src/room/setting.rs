@@ -59,7 +59,7 @@ impl RoomSetting {
         }
     }
 
-    pub(crate) fn normalize_builder_admins(ids: &[i32]) -> Vec<i32> {
+    pub(crate) fn normalize_admins(ids: &[i32]) -> Vec<i32> {
         let mut out = ids.to_vec();
         out.sort_unstable();
         out.dedup();

@@ -5,9 +5,9 @@ use http::header::{CONTENT_DISPOSITION, HeaderValue};
 use http::{Response, StatusCode};
 use serde::{Deserialize, Serialize};
 
+use super::non_blank;
 use crate::auth::require_admin;
 use crate::body::body_or_null;
-use crate::java;
 use crate::reply::{self, APPLICATION_JSON, Failure};
 use crate::request::Ctx;
 use crate::state::AppState;
@@ -58,12 +58,10 @@ pub(super) async fn import(
 ) -> Result<Response<Body>, Failure> {
     require_admin(state, ctx).await?;
     let kind = require_kind(ctx)?;
-    let merge = java::blank_to_null(ctx.query_param("merge"))
-        .is_some_and(|v| v.eq_ignore_ascii_case("true"))
-        || java::blank_to_null(ctx.query_param("mode"))
-            .is_some_and(|v| v.eq_ignore_ascii_case("merge"));
+    let merge = non_blank(ctx.query_param("merge")).is_some_and(|v| v.eq_ignore_ascii_case("true"))
+        || non_blank(ctx.query_param("mode")).is_some_and(|v| v.eq_ignore_ascii_case("merge"));
     let document = ctx.body_string().await?;
-    if java::is_blank(&document) {
+    if document.trim().is_empty() {
         return Err(Failure::bad_request("内容为空"));
     }
     let result = transfer::import(state, kind, document, merge)
@@ -116,7 +114,7 @@ pub(super) async fn restore(
     let body: Option<RestoreBody> = body_or_null(ctx).await?;
     let name = body
         .and_then(|b| b.backup)
-        .filter(|name| !java::is_blank(name))
+        .filter(|name| !name.trim().is_empty())
         .ok_or_else(|| Failure::bad_request("请指定要恢复的备份"))?;
     let result = transfer::restore(state, kind, &name)
         .await

@@ -3,13 +3,12 @@ use std::sync::Arc;
 use axum::body::Body;
 use http::Response;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use zphira_catalog::PoolCategory;
-use zphira_common::gson::JsonElement;
 
-use super::path_int;
+use super::{or_null, path_int};
 use crate::auth::require_admin;
-use crate::body::{body_or_null, category, int_list, primitive};
-use crate::java;
+use crate::body::{body_or_null, category};
 use crate::reply::{self, Failure};
 use crate::request::Ctx;
 use crate::state::AppState;
@@ -41,11 +40,10 @@ pub(super) async fn list(state: &Arc<AppState>, ctx: &mut Ctx) -> Result<Respons
 #[derive(Deserialize, Default)]
 #[serde(default)]
 struct PoolCreateBody {
-    #[serde(deserialize_with = "primitive")]
     id: i32,
     #[serde(rename = "chartIds")]
-    chart_ids: Option<Vec<Option<i32>>>,
-    category: Option<JsonElement>,
+    chart_ids: Option<Vec<i32>>,
+    category: Option<String>,
     #[serde(rename = "sizeLimit")]
     size_limit: Option<i32>,
     #[serde(rename = "roundsPerStay")]
@@ -60,8 +58,8 @@ pub(super) async fn create(
 ) -> Result<Response<Body>, Failure> {
     require_admin(state, ctx).await?;
     let body: PoolCreateBody = body_or_null(ctx).await?.ok_or_else(Failure::bad_format)?;
-    let category = category(body.category.as_ref())?;
-    let chart_ids = int_list(body.chart_ids)?;
+    let category = category(body.category.as_deref())?;
+    let chart_ids = body.chart_ids;
     state
         .pools
         .add_pool_with(
@@ -77,7 +75,7 @@ pub(super) async fn create(
     tracing::info!(
         "HTTP create pool: {} charts={}",
         body.id,
-        java::list_to_string(chart_ids.as_deref())
+        chart_ids.map_or_else(|| "null".to_owned(), |ids| format!("{ids:?}"))
     );
     reply::ok()
 }
@@ -85,7 +83,7 @@ pub(super) async fn create(
 #[derive(Deserialize, Default)]
 #[serde(default)]
 struct PoolUpdateBody {
-    category: Option<JsonElement>,
+    category: Option<String>,
     #[serde(rename = "sizeLimit")]
     size_limit: Option<i32>,
     #[serde(rename = "roundsPerStay")]
@@ -102,7 +100,7 @@ pub(super) async fn update(
     require_admin(state, ctx).await?;
     let pool_id = path_int(ctx, "id")?;
     let body: PoolUpdateBody = body_or_null(ctx).await?.ok_or_else(Failure::bad_format)?;
-    let category = category(body.category.as_ref())?;
+    let category = category(body.category.as_deref())?;
     state
         .pools
         .update_pool(
@@ -119,10 +117,10 @@ pub(super) async fn update(
         "HTTP update pool {}: category={} sizeLimit={} roundsPerStay={} order={} submissionOpen={}",
         pool_id,
         category_name(category),
-        java::opt_to_string(body.size_limit),
-        java::opt_to_string(body.rounds_per_stay),
-        java::opt_to_string(body.order),
-        java::opt_to_string(body.submission_open)
+        or_null(body.size_limit),
+        or_null(body.rounds_per_stay),
+        or_null(body.order),
+        or_null(body.submission_open)
     );
     reply::ok()
 }
@@ -130,9 +128,8 @@ pub(super) async fn update(
 #[derive(Deserialize, Default)]
 #[serde(default)]
 struct PoolBatchBody {
-    #[serde(deserialize_with = "primitive")]
     count: i32,
-    category: Option<JsonElement>,
+    category: Option<String>,
     #[serde(rename = "sizeLimit")]
     size_limit: Option<i32>,
     #[serde(rename = "roundsPerStay")]
@@ -155,7 +152,7 @@ pub(super) async fn batch_create(
     if body.count < 1 {
         return Err(Failure::bad_format());
     }
-    let category = category(body.category.as_ref())?;
+    let category = category(body.category.as_deref())?;
     let created = state
         .pools
         .create_empty_pools(body.count, category, body.size_limit, body.rounds_per_stay)
@@ -185,7 +182,7 @@ pub(super) async fn remove(
 #[derive(Deserialize, Default)]
 #[serde(default)]
 struct ChartAddBody {
-    #[serde(rename = "chartId", deserialize_with = "primitive")]
+    #[serde(rename = "chartId")]
     chart_id: i32,
 }
 
@@ -209,12 +206,12 @@ pub(super) async fn chart_add(
 #[serde(default)]
 pub(super) struct ChartIdsBody {
     #[serde(rename = "chartIds")]
-    pub(super) chart_ids: Option<Vec<Option<i32>>>,
+    pub(super) chart_ids: Option<Vec<i32>>,
 }
 
 impl ChartIdsBody {
     pub(super) fn required(body: Option<Self>) -> Result<Vec<i32>, Failure> {
-        let ids = int_list(body.and_then(|b| b.chart_ids))?.unwrap_or_default();
+        let ids = body.and_then(|b| b.chart_ids).unwrap_or_default();
         if ids.is_empty() {
             return Err(Failure::bad_format());
         }
@@ -266,17 +263,15 @@ pub(super) async fn chart_remove(
 }
 
 pub(crate) async fn require_favorite_body(ctx: &mut Ctx) -> Result<Option<i32>, Failure> {
-    let body = ctx.body_string().await?;
-    if java::is_blank(&body) {
-        return Err(Failure::bad_format());
-    }
-    let Ok(JsonElement::Object(object)) = JsonElement::parse(&body) else {
-        return Err(Failure::bad_format());
-    };
-    match object.get("favoriteId") {
+    let body: Option<Value> = body_or_null(ctx).await?;
+    match body.as_ref().and_then(|b| b.get("favoriteId")) {
+        Some(Value::Null) => Ok(None),
+        Some(value) => value
+            .as_i64()
+            .and_then(|id| i32::try_from(id).ok())
+            .map(Some)
+            .ok_or_else(Failure::bad_format),
         None => Err(Failure::bad_format()),
-        Some(JsonElement::Null) => Ok(None),
-        Some(value) => value.get_as_int().map(Some).ok_or_else(Failure::bad_format),
     }
 }
 
@@ -295,7 +290,7 @@ pub(super) async fn favorite(
     tracing::info!(
         "HTTP pool {} favorite set to {}",
         pool_id,
-        java::opt_to_string(favorite_id)
+        or_null(favorite_id)
     );
     reply::ok()
 }
@@ -303,7 +298,6 @@ pub(super) async fn favorite(
 #[derive(Deserialize, Default)]
 #[serde(default)]
 struct PoolDefaultBody {
-    #[serde(deserialize_with = "primitive")]
     enabled: bool,
 }
 

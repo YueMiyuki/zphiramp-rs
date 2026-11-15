@@ -5,7 +5,7 @@ use std::time::Duration;
 
 use tokio::sync::Notify;
 use zphira_catalog::{ChartIndex, ChartPool};
-use zphira_common::args::ServerArgs;
+use zphira_common::cli::ServerArgs;
 use zphira_common::i18n::I18n;
 use zphira_ledger::{Points, RoundRecords};
 

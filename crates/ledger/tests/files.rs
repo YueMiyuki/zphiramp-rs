@@ -2,8 +2,8 @@ mod support;
 
 use std::path::Path;
 
+use serde_json::Value;
 use support::{ManualClock, read_fixture};
-use zphira_common::gson;
 use zphira_ledger::{
     Admins, ImportMode, PlayerResult, PointAward, Points, RoundRecord, RoundRecords,
 };
@@ -18,33 +18,25 @@ fn read(dir: &Path, name: &str) -> String {
     std::fs::read_to_string(dir.join(name)).unwrap()
 }
 
-#[test]
-fn both_generators_agree_byte_for_byte() {
-    assert_eq!(
-        read_fixture("gson_points.json"),
-        read_fixture("points_java.json")
-    );
-    assert_eq!(
-        read_fixture("gson_records.json"),
-        read_fixture("records_java.json")
-    );
-    assert_eq!(
-        read_fixture("gson_admins.json"),
-        read_fixture("admins_java.json")
-    );
+fn value(text: &str) -> Value {
+    serde_json::from_str(text).unwrap()
+}
+
+fn points(dir: &Path) -> Points {
+    Points::load_with_clock(dir, ManualClock::new(T0).clock()).unwrap()
 }
 
 #[test]
-fn points_round_trip() {
-    let gson_file = read_fixture("gson_points.json");
+fn points_file_of_the_java_server_loads_and_is_written_back_the_same() {
+    let java = read_fixture("points_java.json");
     let dir = tempfile::tempdir().unwrap();
-    put(dir.path(), "player-points.json", &gson_file);
-    let points = Points::load_with_clock(dir.path(), ManualClock::new(T0).clock()).unwrap();
-    assert_eq!(points.len(), 8);
-    assert_eq!(points.export().unwrap(), gson_file);
+    put(dir.path(), "player-points.json", &java);
+    let loaded = points(dir.path());
+    assert_eq!(loaded.len(), 8);
+    assert_eq!(value(&loaded.export().unwrap()), value(&java));
 
     let fresh = tempfile::tempdir().unwrap();
-    let rust = Points::load_with_clock(fresh.path(), ManualClock::new(T0).clock()).unwrap();
+    let rust = points(fresh.path());
     let award = |id, name: Option<&str>, gained| PointAward {
         player_id: id,
         name: name.map(str::to_owned),
@@ -61,29 +53,37 @@ fn points_round_trip() {
         award(-4, Some("Neg"), 100),
     ]);
     rust.flush().unwrap();
-    assert_eq!(read(fresh.path(), "player-points.json"), gson_file);
+    let written = read(fresh.path(), "player-points.json");
+    assert_eq!(value(&written), value(&java));
 
-    assert!(gson_file.contains("\"9\": {\n    \"points\": 0\n  }"));
-    assert!(gson_file.contains("Zed\\u003c\\u003e\\u0026\\u0027"));
-
-    let empty = Points::load(fresh.path().join("none")).unwrap();
-    assert_eq!(
-        empty.export().unwrap(),
-        read_fixture("gson_points_empty.json")
+    assert!(
+        written.starts_with("{\n  \"-4\": {\n    \"name\": \"Neg\",\n    \"points\": 100\n  },")
     );
+    assert!(written.contains("\"9\": {\n    \"points\": 0\n  }"));
+    let keys: Vec<i64> = value(&written)
+        .as_object()
+        .unwrap()
+        .keys()
+        .map(|k| k.parse().unwrap())
+        .collect();
+    assert!(
+        keys.windows(2).all(|w| w[0] < w[1]),
+        "sorted by player id: {keys:?}"
+    );
+
+    assert_eq!(points(&fresh.path().join("none")).export().unwrap(), "{}");
 }
 
 #[test]
-fn round_records_round_trip_with_the_design_shape() {
-    let gson_file = read_fixture("gson_records.json");
+fn round_records_file_of_the_java_server_loads_and_is_written_back_the_same() {
+    let java = read_fixture("records_java.json");
     let dir = tempfile::tempdir().unwrap();
-    put(dir.path(), "round-records.json", &gson_file);
-    let records = RoundRecords::load(dir.path()).unwrap();
-    assert_eq!(records.len(), 5);
-    assert_eq!(records.export().unwrap(), gson_file);
+    put(dir.path(), "round-records.json", &java);
+    let loaded = RoundRecords::load(dir.path()).unwrap();
+    assert_eq!(loaded.len(), 5);
+    assert_eq!(value(&loaded.export().unwrap()), value(&java));
 
-    let parsed: Vec<RoundRecord> = gson::from_str(&gson_file).unwrap();
-    assert_eq!(parsed.len(), 5);
+    let parsed: Vec<RoundRecord> = serde_json::from_str(&java).unwrap();
     let first = &parsed[0];
     assert_eq!(first.id, "room-a-1700000000000-1");
     assert_eq!(first.room_id, "room-a");
@@ -113,6 +113,7 @@ fn round_records_round_trip_with_the_design_shape() {
     assert!(parsed[2].results.is_empty());
     assert_eq!(parsed[3].results[2].std, f64::from(12_345_678.0_f32));
     assert_eq!(parsed[3].results[0].accuracy, f64::from(0.999_999_94_f32));
+    assert_eq!(parsed[3].results[0].std, f64::from(1.0e-4_f32));
 
     let fresh = tempfile::tempdir().unwrap();
     let rust = RoundRecords::load(fresh.path()).unwrap();
@@ -120,65 +121,97 @@ fn round_records_round_trip_with_the_design_shape() {
         rust.append(record);
     }
     rust.flush().unwrap();
-    assert_eq!(read(fresh.path(), "round-records.json"), gson_file);
+    let written = read(fresh.path(), "round-records.json");
+    assert_eq!(value(&written), value(&java));
+    assert!(
+        written.starts_with("[\n  {\n    \"id\": \"room-a-1700000000000-1\",\n    \"room_id\"")
+    );
+    let second = &value(&written)[1];
+    assert!(
+        second.get("chart_name").is_none(),
+        "an absent name is left out"
+    );
 
-    let empty = RoundRecords::load(fresh.path().join("none")).unwrap();
     assert_eq!(
-        empty.export().unwrap(),
-        read_fixture("gson_records_empty.json")
+        RoundRecords::load(fresh.path().join("none"))
+            .unwrap()
+            .export()
+            .unwrap(),
+        "[]"
     );
 }
 
 #[test]
-fn admins_round_trip() {
-    let gson_file = read_fixture("gson_admins.json");
+fn admins_file_of_the_java_server_loads_and_is_written_back_the_same() {
+    let java = read_fixture("admins_java.json");
     let dir = tempfile::tempdir().unwrap();
-    put(dir.path(), "admins.json", &gson_file);
+    put(dir.path(), "admins.json", &java);
     let admins = Admins::load(dir.path()).unwrap();
     assert_eq!(admins.list(), vec![3, 5, 9]);
-    assert_eq!(admins.export().unwrap(), gson_file);
+    assert_eq!(admins.export().unwrap(), java);
 
     let fresh = tempfile::tempdir().unwrap();
     let rust = Admins::load(fresh.path()).unwrap();
-    assert_eq!(
-        read(fresh.path(), "admins.json"),
-        read_fixture("gson_admins_empty.json")
-    );
+    assert_eq!(read(fresh.path(), "admins.json"), "[]");
     for id in [9, 3, 5] {
         rust.add(id).unwrap();
     }
-    assert_eq!(read(fresh.path(), "admins.json"), gson_file);
+    assert_eq!(read(fresh.path(), "admins.json"), java);
 }
 
 #[test]
-fn an_import_of_a_java_file_is_the_same_as_loading_it() {
+fn importing_the_files_of_the_java_server_is_loading_them() {
     let dir = tempfile::tempdir().unwrap();
-    let points = Points::load(dir.path()).unwrap();
-    let report = points
-        .import(&read_fixture("gson_points.json"), ImportMode::Replace)
+    let p = points(dir.path());
+    let report = p
+        .import(&read_fixture("points_java.json"), ImportMode::Replace)
         .unwrap();
     assert_eq!(report.total, 8);
     assert_eq!(
-        read(dir.path(), "player-points.json"),
-        read_fixture("gson_points.json")
+        value(&read(dir.path(), "player-points.json")),
+        value(&read_fixture("points_java.json"))
     );
 
     let records = RoundRecords::load(dir.path()).unwrap();
     let report = records
-        .import(&read_fixture("gson_records.json"), ImportMode::Replace)
+        .import(&read_fixture("records_java.json"), ImportMode::Replace)
         .unwrap();
     assert_eq!(report.total, 5);
     assert_eq!(
-        read(dir.path(), "round-records.json"),
-        read_fixture("gson_records.json")
+        value(&read(dir.path(), "round-records.json")),
+        value(&read_fixture("records_java.json"))
     );
 
     let admins = Admins::load(dir.path()).unwrap();
     admins
-        .import(&read_fixture("gson_admins.json"), ImportMode::Replace)
+        .import(&read_fixture("admins_java.json"), ImportMode::Replace)
         .unwrap();
     assert_eq!(
         read(dir.path(), "admins.json"),
-        read_fixture("gson_admins.json")
+        read_fixture("admins_java.json")
+    );
+}
+
+#[test]
+fn files_have_the_java_layout() {
+    let dir = tempfile::tempdir().unwrap();
+    let p = points(dir.path());
+    p.add_points(1, "a<b>", 1);
+    p.flush().unwrap();
+    assert_eq!(
+        read(dir.path(), "player-points.json"),
+        "{\n  \"1\": {\n    \"name\": \"a<b>\",\n    \"points\": 1\n  }\n}"
+    );
+    let records = RoundRecords::load(dir.path()).unwrap();
+    records.append(RoundRecord {
+        id: "a".to_owned(),
+        room_id: "r".to_owned(),
+        results: vec![],
+        ..Default::default()
+    });
+    records.flush().unwrap();
+    assert_eq!(
+        read(dir.path(), "round-records.json"),
+        "[\n  {\n    \"id\": \"a\",\n    \"room_id\": \"r\",\n    \"chart_id\": 0,\n    \"started_at\": 0,\n    \"finished_at\": 0,\n    \"results\": []\n  }\n]"
     );
 }

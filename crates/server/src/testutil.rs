@@ -8,8 +8,7 @@ use tokio::sync::Notify;
 use zphira_catalog::{
     BoxFuture, CatalogConfig, ChartIndex, ChartPool, Sleeper, Submissions, Upstream, UpstreamError,
 };
-use zphira_common::args::ServerArgs;
-use zphira_common::gson;
+use zphira_common::cli::ServerArgs;
 use zphira_common::i18n::I18n;
 use zphira_game::{GameContext, GameDeps, GameOptions, GameUpstream};
 use zphira_ledger::{Admins, Points, RoundRecords};
@@ -26,7 +25,7 @@ pub fn chart(
     votes: i32,
 ) -> Arc<ChartInfo> {
     Arc::new(
-        gson::from_str(&format!(
+        serde_json::from_str(&format!(
             r#"{{"id":{id},"name":"{name}","level":"{level}","difficulty":17.5,"tags":["{tag}"],"rating":{rating},"ratingCount":{votes}}}"#
         ))
         .unwrap(),
@@ -202,7 +201,7 @@ impl Fixture {
             index_rows.push(format!(
                 "\"{}\":{}",
                 c.id,
-                gson::to_string_compact(&**c).unwrap()
+                serde_json::to_string(&**c).unwrap()
             ));
         }
         std::fs::write(

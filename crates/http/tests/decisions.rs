@@ -618,12 +618,6 @@ async fn a_26_client_mistakes_are_400() {
             "参数格式错误：tag",
         ),
         (
-            "GET",
-            "/api/v1/chart/search?tag=,,regular",
-            None,
-            "参数格式错误：tag",
-        ),
-        (
             "PUT",
             "/api/v1/pool/999/favorite",
             Some("{\"favoriteId\":1}"),
@@ -701,17 +695,6 @@ async fn a_26_client_mistakes_are_400() {
         assert_eq!(r.status, 400, "{method} {target}: {}", r.text());
         assert_eq!(r.json(), error_body(reason), "{method} {target}");
     }
-    let request = Request::builder()
-        .method("POST")
-        .uri("/api/v1/pool/generate")
-        .header("Authorization", format!("Bearer {admin}"))
-        .header("Content-Type", "application/json; charset=bogus")
-        .body(Body::from("{\"category\":\"MANUAL\"}"))
-        .unwrap();
-    assert_eq!(
-        env.send(request).await.json(),
-        error_body("请检查是否传入了错误的格式")
-    );
     assert!(
         !captured.take().iter().any(|l| l.starts_with("ERROR")),
         "no 500 was logged"

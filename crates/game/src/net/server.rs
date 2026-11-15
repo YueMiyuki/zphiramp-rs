@@ -5,7 +5,7 @@ use std::time::Duration;
 
 use bytes::{Buf, BytesMut};
 use futures_util::StreamExt;
-use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite};
+use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 use tokio::sync::mpsc;
 use tokio::time::Instant;
 use tokio_util::codec::FramedRead;
@@ -14,7 +14,7 @@ use zphira_protocol::{
     PipelineAction, ServerBoundPacket, ServerCodec, decode_handshake,
 };
 
-use super::addr::{ip_port, java_socket_address, normalize_ip};
+use super::addr::{ip_port, normalize_ip};
 use super::conn::{Conn, ConnectState};
 use super::proxy::{self, ProxyHeader};
 use crate::context::GameContext;
@@ -26,6 +26,10 @@ pub const AUTHENTICATED_READ_TIMEOUT_FLOOR: u64 = 600;
 const HANDLER_QUEUE: usize = 64;
 
 const WRITER_GRACE: Duration = Duration::from_secs(10);
+
+const CLOSE_DRAIN: Duration = Duration::from_secs(2);
+
+const CLOSE_DRAIN_BYTES: usize = 64 * 1024;
 
 struct Slots<'a> {
     ctx: &'a GameContext,
@@ -42,7 +46,7 @@ impl Drop for Slots<'_> {
     }
 }
 
-fn java_io_message(e: &io::Error) -> String {
+fn io_error_text(e: &io::Error) -> String {
     match e.kind() {
         io::ErrorKind::ConnectionReset => "Connection reset".to_owned(),
         io::ErrorKind::BrokenPipe => "Broken pipe".to_owned(),
@@ -78,6 +82,31 @@ enum Early {
     Killed,
 }
 
+/// Closing a socket with unread input sends a reset, so the peer's leftovers are read first.
+async fn drain_input<R: AsyncRead + Unpin>(reader: &mut R) {
+    let deadline = Instant::now() + CLOSE_DRAIN;
+    let mut scratch = vec![0u8; 4096];
+    let mut total = 0;
+    while total < CLOSE_DRAIN_BYTES {
+        tokio::select! {
+            () = tokio::time::sleep_until(deadline) => return,
+            read = reader.read(&mut scratch) => match read {
+                Ok(0) | Err(_) => return,
+                Ok(n) => total += n,
+            },
+        }
+    }
+}
+
+async fn close_cleanly<R, W>(mut reader: R, mut writer: W)
+where
+    R: AsyncRead + Unpin,
+    W: AsyncWrite + Unpin,
+{
+    let _ = tokio::time::timeout(Duration::from_secs(1), writer.shutdown()).await;
+    drain_input(&mut reader).await;
+}
+
 impl GameContext {
     pub async fn serve_connection<S>(&self, stream: S, peer: SocketAddr)
     where
@@ -95,80 +124,17 @@ impl GameContext {
         let (mut reader, writer) = tokio::io::split(stream);
         let mut buf = BytesMut::with_capacity(512);
 
-        let mut real = SocketAddr::new(normalize_ip(peer.ip()), peer.port());
-        if svc.args.proxy_protocol {
-            let original = java_socket_address(peer);
-            let deadline = (accepted_at + svc.options.proxy_header_timeout).min(pre_auth_deadline);
-            loop {
-                match proxy::parse(&buf) {
-                    Ok(ProxyHeader::Source { source, consumed }) => {
-                        buf.advance(consumed);
-                        real = SocketAddr::new(normalize_ip(source.ip()), source.port());
-                        break;
-                    }
-                    Ok(ProxyHeader::Incomplete) => {}
-                    Err(message) => {
-                        tracing::warn!(
-                            "Disconnecting {} on HAProxy handshaking: {}",
-                            original,
-                            message
-                        );
-                        return;
-                    }
-                }
-                let message = match read_more(&mut reader, &mut buf, deadline, &kill).await {
-                    Early::Read(Ok(true)) => continue,
-                    Early::Read(Ok(false)) => {
-                        "Connection closed before proxy protocol handshake".to_owned()
-                    }
-                    Early::Read(Err(e)) => java_io_message(&e),
-                    Early::Deadline => "Proxy protocol handshake timeout".to_owned(),
-                    Early::Killed => return,
-                };
-                tracing::warn!(
-                    "Disconnecting {} on HAProxy handshaking: {}",
-                    original,
-                    message
-                );
-                return;
-            }
-        }
-
-        let addr = ip_port(real);
-        if let Err(reason) = self.inner.limiter.accept(real.ip()) {
-            tracing::warn!("Refusing connection from {}: {}", addr, reason);
-            return;
-        }
-        slots.limited = Some(real.ip());
-        tracing::info!("Establishing a connection from {}", addr);
-
-        let handshake_deadline = if svc.args.proxy_protocol {
-            pre_auth_deadline
-        } else {
-            (accepted_at + svc.options.handshake_timeout).min(pre_auth_deadline)
-        };
-        let version = loop {
-            match decode_handshake(&mut buf) {
-                Ok(Some(version)) => break version,
-                Ok(None) => {}
-                Err(e) => {
-                    tracing::warn!("Disconnecting {} on Phira handshaking: {}", addr, e);
-                    return;
-                }
-            }
-            let message = match read_more(&mut reader, &mut buf, handshake_deadline, &kill).await {
-                Early::Read(Ok(true)) => continue,
-                Early::Read(Ok(false)) => HandshakeError::ConnectionClosed.to_string(),
-                Early::Read(Err(e)) => java_io_message(&e),
-                Early::Deadline => HandshakeError::Timeout.to_string(),
-                Early::Killed => return,
-            };
-            tracing::warn!("Disconnecting {} on Phira handshaking: {}", addr, message);
+        let opened = self
+            .open(&mut reader, &mut buf, peer, accepted_at, &kill, &mut slots)
+            .await;
+        let Some((addr, version)) = opened else {
+            drop(slots);
+            close_cleanly(reader, writer).await;
             return;
         };
         tracing::info!("Receive client version {} from {}", version, addr);
 
-        let conn = Arc::new(Conn::new(self.next_id(), addr.clone(), kill.child_token()));
+        let conn = Arc::new(Conn::new(self.next_id(), addr, kill.child_token()));
         let writer_task = tokio::spawn(conn.clone().run_writer(writer));
         let (packets, mut queue) = mpsc::channel::<ServerBoundPacket>(HANDLER_QUEUE);
         let handler = {
@@ -264,7 +230,7 @@ impl GameContext {
         tracing::info!("Client disconnected: {} ({})", conn.addr, conn.state());
         drop(slots);
         drop(packets);
-        drop(framed);
+        let mut reader = framed.into_inner();
         // The packet in progress completes before the close handler runs.
         let _ = handler.await;
         self.on_connection_closed(&conn);
@@ -275,18 +241,101 @@ impl GameContext {
         {
             writer_task.abort();
         }
+        drain_input(&mut reader).await;
+    }
+
+    /// The PROXY header, the connection limit and the version byte; `None` once the socket is to be closed.
+    async fn open<R: AsyncRead + Unpin>(
+        &self,
+        reader: &mut R,
+        buf: &mut BytesMut,
+        peer: SocketAddr,
+        accepted_at: Instant,
+        kill: &tokio_util::sync::CancellationToken,
+        slots: &mut Slots<'_>,
+    ) -> Option<(String, u8)> {
+        let svc = self.svc();
+        let pre_auth_deadline = accepted_at + svc.options.pre_auth_deadline;
+        let mut real = SocketAddr::new(normalize_ip(peer.ip()), peer.port());
+        if svc.args.proxy_protocol {
+            let original = ip_port(peer);
+            let deadline = (accepted_at + svc.options.proxy_header_timeout).min(pre_auth_deadline);
+            loop {
+                match proxy::parse(buf) {
+                    Ok(ProxyHeader::Source { source, consumed }) => {
+                        buf.advance(consumed);
+                        real = SocketAddr::new(normalize_ip(source.ip()), source.port());
+                        break;
+                    }
+                    Ok(ProxyHeader::Incomplete) => {}
+                    Err(message) => {
+                        tracing::warn!(
+                            "Disconnecting {} on HAProxy handshaking: {}",
+                            original,
+                            message
+                        );
+                        return None;
+                    }
+                }
+                let message = match read_more(reader, buf, deadline, kill).await {
+                    Early::Read(Ok(true)) => continue,
+                    Early::Read(Ok(false)) => {
+                        "Connection closed before proxy protocol handshake".to_owned()
+                    }
+                    Early::Read(Err(e)) => io_error_text(&e),
+                    Early::Deadline => "Proxy protocol handshake timeout".to_owned(),
+                    Early::Killed => return None,
+                };
+                tracing::warn!(
+                    "Disconnecting {} on HAProxy handshaking: {}",
+                    original,
+                    message
+                );
+                return None;
+            }
+        }
+
+        let addr = ip_port(real);
+        if let Err(reason) = self.inner.limiter.accept(real.ip()) {
+            tracing::warn!("Refusing connection from {}: {}", addr, reason);
+            return None;
+        }
+        slots.limited = Some(real.ip());
+        tracing::info!("Establishing a connection from {}", addr);
+
+        let handshake_deadline = if svc.args.proxy_protocol {
+            pre_auth_deadline
+        } else {
+            (accepted_at + svc.options.handshake_timeout).min(pre_auth_deadline)
+        };
+        let version = loop {
+            match decode_handshake(buf) {
+                Ok(Some(version)) => break version,
+                Ok(None) => {}
+                Err(e) => {
+                    tracing::warn!("Disconnecting {} on Phira handshaking: {}", addr, e);
+                    return None;
+                }
+            }
+            let message = match read_more(reader, buf, handshake_deadline, kill).await {
+                Early::Read(Ok(true)) => continue,
+                Early::Read(Ok(false)) => HandshakeError::ConnectionClosed.to_string(),
+                Early::Read(Err(e)) => io_error_text(&e),
+                Early::Deadline => HandshakeError::Timeout.to_string(),
+                Early::Killed => return None,
+            };
+            tracing::warn!("Disconnecting {} on Phira handshaking: {}", addr, message);
+            return None;
+        };
+        Some((addr, version))
     }
 
     fn on_read_error(&self, conn: &Arc<Conn>, error: CodecError) {
         match error {
             CodecError::Protocol(e) => match e.pipeline_action() {
-                PipelineAction::CloseSilently => {
+                PipelineAction::Close => {
                     tracing::debug!("{}: closing on malformed packet ({})", conn.addr, e);
                     conn.close();
-                }
-                PipelineAction::ExceptionCaught => {
-                    tracing::error!(error = %e, "{}: exception encountered", conn.addr);
-                    conn.close_as(ConnectState::Error);
                 }
                 PipelineAction::WarnAndClose => {
                     tracing::warn!("Closing {}, {}", conn.addr, e);
@@ -294,12 +343,12 @@ impl GameContext {
                 }
             },
             CodecError::Io(e) => {
-                tracing::info!("{}: {}", conn.addr, java_io_message(&e));
+                tracing::info!("{}: {}", conn.addr, io_error_text(&e));
                 conn.close_as(ConnectState::Error);
             }
             CodecError::Handshake(e) => {
-                tracing::error!(error = %e, "{}: exception encountered", conn.addr);
-                conn.close_as(ConnectState::Error);
+                tracing::debug!("{}: closing on malformed packet ({})", conn.addr, e);
+                conn.close();
             }
         }
     }

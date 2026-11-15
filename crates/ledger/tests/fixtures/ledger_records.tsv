@@ -120,26 +120,3 @@ size_over_cap	1003
 size_after_append	1000
 newest_after_append	after-cap
 oldest_after_append	m4
-load_empty_file		OK 0 
-load_null_doc	null	OK 0 
-load_empty_arr	[]	OK 0 
-load_ok_full	[{"id":"a","room_id":"r","chart_id":7,"chart_name":"c","started_at":5,"finished_at":6,"results":[{"player_id":3,"player_name":"p","rank":1,"score":10,"accuracy":0.5,"std":0.25,"gained_points":100,"total_points":100}]}]	OK 1 a
-load_missing_fields	[{"id":"a"}]	OK 1 a
-load_empty_row	[{}]	OK 1 null
-load_null_primitive	[{"id":"a","chart_id":null}]	ERR com.google.gson.JsonParseException: null is not allowed as value for record component 'chartId' of primitive type; at path $[0].chart_id
-load_null_string	[{"id":null,"room_id":null,"chart_name":null}]	OK 1 null
-load_string_ints	[{"id":"a","chart_id":"7","started_at":"5","results":[{"player_id":"3","score":"10","accuracy":"0.5"}]}]	OK 1 a
-load_float_int	[{"id":"a","chart_id":7.0}]	OK 1 a
-load_float_frac	[{"id":"a","chart_id":7.5}]	ERR com.google.gson.JsonSyntaxException: java.lang.NumberFormatException: Expected an int but was 7.5 at line 1 column 26 path $[0].chart_id
-load_element_null	[null]	ERR java.lang.NullPointerException: null
-load_object_top	{}	ERR com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_ARRAY but was BEGIN_OBJECT at line 1 column 2 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#unexpected-json-structure
-load_results_not_list	[{"id":"a","results":{}}]	ERR com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_ARRAY but was BEGIN_OBJECT at line 1 column 23 path $[0].results\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#unexpected-json-structure
-load_results_null	[{"id":"a","results":null}]	OK 1 a
-load_results_null_element	[{"id":"a","results":[null]}]	OK 1 a
-load_results_null_primitive	[{"id":"a","results":[{"player_id":null}]}]	ERR com.google.gson.JsonParseException: null is not allowed as value for record component 'playerId' of primitive type; at path $[0].results[0].player_id
-load_dup_ids	[{"id":"a","chart_id":1},{"id":"a","chart_id":2}]	OK 2 a,a
-load_unknown_fields	[{"id":"a","zzz":{"q":1},"results":[{"player_id":3,"q":[]}]}]	OK 1 a
-load_camel_case_keys	[{"id":"a","roomId":"r","chartId":7}]	OK 1 a
-load_doubles	[{"id":"a","results":[{"player_id":1,"accuracy":1,"std":1e-5},{"player_id":2,"accuracy":"0.1","std":123456789.5}]}]	OK 1 a
-load_truncated	[{"id":"a"	ERR com.google.gson.JsonSyntaxException: java.io.EOFException: End of input at line 1 column 11 path $[0].id
-load_trailing_garbage	[] x	ERR com.google.gson.JsonSyntaxException: JSON document was not fully consumed.

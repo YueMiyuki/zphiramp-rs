@@ -116,9 +116,9 @@ async fn create_paths_and_log() {
 
 #[tokio::test]
 async fn create_at_the_room_limit_is_400() {
-    let args = zphira_common::args::ServerArgs {
+    let args = zphira_common::cli::ServerArgs {
         max_rooms: 1,
-        ..zphira_common::args::ServerArgs::default()
+        ..zphira_common::cli::ServerArgs::default()
     };
     let env = Env::build_with_args(HttpConfig::default(), |_| {}, args).await;
     assert_eq!(create(&env, "a", "{}").await, json!({"ok":true}));
@@ -487,7 +487,7 @@ async fn pool_switch_and_favorite() {
     let r = call("/api/v1/room/nope/pool/switch", "{\"poolId\":0}").await;
     assert_eq!((r.status.as_u16(), r.json()), (404, error_body(NOT_FOUND)));
     assert_eq!(
-        call("/api/v1/room/r2/pool/favorite", "{\"favoriteId\":\"99\"}")
+        call("/api/v1/room/r2/pool/favorite", "{\"favoriteId\":99}")
             .await
             .json(),
         json!({"ok":true})

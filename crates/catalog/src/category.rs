@@ -28,8 +28,10 @@ impl PoolCategory {
     }
 
     pub fn parse_ignore_case(raw: &str) -> Option<Self> {
-        let trimmed = raw.trim_matches(|c: char| c <= ' ');
-        Self::from_name(&trimmed.to_uppercase())
+        let raw = raw.trim();
+        Self::ALL
+            .into_iter()
+            .find(|c| c.name().eq_ignore_ascii_case(raw))
     }
 }
 

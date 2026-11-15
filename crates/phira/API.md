@@ -2,16 +2,17 @@
 
 ## Models (`zphira_phira::model`, re-exported at the root)
 
-All derive `Debug, Clone, Serialize, Deserialize` with `#[serde(default)]`. Nullable fields are
-`Option`. JSON keys are the snake_case field names, except `lastLogin`, `loginBanned`,
-`followerCount`, `followingCount`, `stableRequest`, `ratingCount`, `chartUpdated`, `bestStd`,
-`fullCombo` and `stdScore`.
+All derive `Debug, Clone, Serialize, Deserialize` with `#[serde(default)]`; `Timestamp` is
+`zphira_common::time::Timestamp`. Nullable fields are `Option` and are left out when written, as in the
+data files. Input is strict JSON (`serde_json`). JSON keys are the snake_case field names, except
+`lastLogin`, `loginBanned`, `followerCount`, `followingCount`, `stableRequest`, `ratingCount`,
+`chartUpdated`, `bestStd`, `fullCombo` and `stdScore`.
 
 ```rust
 pub struct UserInfo {
     pub id: i32, pub name: Option<String>, pub avatar: Option<String>,
     pub language: Option<String>, pub bio: Option<String>, pub exp: i32, pub rks: f64,
-    pub joined: Option<JavaOffsetDateTime>, pub last_login: Option<JavaOffsetDateTime>,
+    pub joined: Option<Timestamp>, pub last_login: Option<Timestamp>,
     pub roles: i32, pub banned: bool, pub login_banned: bool,
     pub follower_count: i32, pub following_count: i32, pub email: Option<String>,
 }
@@ -24,8 +25,8 @@ pub struct ChartInfo {
     pub stable_request: bool, pub illustration: Option<String>, pub preview: Option<String>,
     pub file: Option<String>, pub uploader: i32, pub tags: Option<Vec<String>>,
     pub rating: f32, pub rating_count: i32,
-    pub created: Option<JavaOffsetDateTime>, pub updated: Option<JavaOffsetDateTime>,
-    pub chart_updated: Option<JavaOffsetDateTime>,
+    pub created: Option<Timestamp>, pub updated: Option<Timestamp>,
+    pub chart_updated: Option<Timestamp>,
     /* private */ duration_seconds: DurationCell,
 }
 impl ChartInfo {
@@ -40,7 +41,7 @@ pub struct GameRecord {
     pub id: i32, pub player: i32, pub chart: i32, pub score: i32, pub accuracy: f32,
     pub perfect: i32, pub good: i32, pub bad: i32, pub miss: i32, pub speed: f32,
     pub max_combo: i32, pub best: bool, pub best_std: bool, pub mods: i32,
-    pub full_combo: bool, pub time: Option<JavaOffsetDateTime>, pub std: f32, pub std_score: f32,
+    pub full_combo: bool, pub time: Option<Timestamp>, pub std: f32, pub std_score: f32,
 }
 
 pub struct LoginResult { pub id: i32, pub token: Option<String>,
@@ -50,10 +51,9 @@ pub struct ChartListPage { pub count: i32, pub results: Option<Vec<Arc<ChartInfo
 
 - `duration_seconds` is written as the optional integer `duration_seconds` (left out by the pretty
   writer when unknown, `null` in the compact one) and cloned by value.
-- `GameRecord` is read with a hand-written `Deserialize`: `bestStd`/`best_std`,
-  `fullCombo`/`full_combo` and `stdScore`/`std_score` are the same field and the last key wins.
-  `max_combo` is read from `max_combo` only. It is written as `bestStd`, `fullCombo`, `stdScore`.
-- A `null` element inside `tags` or `ChartListPage::results` makes the document a decode error.
+- `GameRecord` also reads `best_std`, `full_combo` and `std_score` for `bestStd`, `fullCombo` and
+  `stdScore`. `max_combo` is read from `max_combo` only. It is written as `bestStd`, `fullCombo`,
+  `stdScore`.
 
 ## Client
 
@@ -100,8 +100,7 @@ pub struct Options {
 - A non-2xx answer is a `PhiraError` whose `Display` is `HTTP <status>: <body>`.
 - Transport errors, 5xx and 429 are retried up to `max_attempts` times, waiting `retry_delay * n`
   after the n-th failure; any other status fails at once. Probe requests are not retried.
-- Redirects are followed up to four times and never from https to http; the 3xx answer is then
-  the error.
+- Redirects are followed up to ten times.
 - API requests send `User-Agent: JPhira/1` and `Accept: application/json`, plus
   `Authorization: Bearer <token>` for `user_by_token` and a JSON body for `login`. The probe's
   range requests send `User-Agent` and `Range` only.

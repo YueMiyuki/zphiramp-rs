@@ -358,13 +358,13 @@ impl Env {
     }
 
     pub async fn build(config: HttpConfig, setup: impl FnOnce(&Path)) -> Env {
-        Self::build_with_args(config, setup, zphira_common::args::ServerArgs::default()).await
+        Self::build_with_args(config, setup, zphira_common::cli::ServerArgs::default()).await
     }
 
     pub async fn build_with_args(
         config: HttpConfig,
         setup: impl FnOnce(&Path),
-        args: zphira_common::args::ServerArgs,
+        args: zphira_common::cli::ServerArgs,
     ) -> Env {
         let dir = tempfile::tempdir().unwrap();
         copy_dir(&fixtures().join("seed"), dir.path());

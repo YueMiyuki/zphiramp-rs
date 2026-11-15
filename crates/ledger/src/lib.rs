@@ -11,7 +11,7 @@ mod writer;
 
 pub use admins::{Admins, RemoveOutcome};
 pub use error::LedgerError;
-pub use import::{BackupFn, ImportError, ImportMode, ImportReport, ImportResult, MAX_IMPORT_CHARS};
+pub use import::{BackupFn, ImportError, ImportMode, ImportReport, ImportResult, MAX_IMPORT_BYTES};
 pub use points::{PointAward, PointSummary, Points, RankEntry};
 pub use records::{
     MAX_RECORDS, PlayerResult, PlayerRound, PlayerRoundView, RecordView, ResultView, RoundRecord,

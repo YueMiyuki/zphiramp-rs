@@ -163,10 +163,9 @@ async fn a20_empty_pool_at_restore_is_kept_and_skipped() {
     assert_eq!(w.ctx.restore_rooms().await, 1);
     w.ctx.mark_rooms_dirty();
     assert!(w.ctx.flush_rooms().await);
-    let saved: Vec<zphira_game::SavedRoom> = zphira_common::gson::from_str(
-        &std::fs::read_to_string(w.data().join("rooms.json")).unwrap(),
-    )
-    .unwrap();
+    let saved: Vec<zphira_game::SavedRoom> =
+        serde_json::from_str(&std::fs::read_to_string(w.data().join("rooms.json")).unwrap())
+            .unwrap();
     assert_eq!(saved[0].pool_ids.as_deref(), Some(&[1, 2, 99, 3][..]));
 
     let mut a = w.login(1, "A").await;
@@ -207,7 +206,7 @@ async fn play_one_round(w: &World, a: &mut Client, b: &mut Client, room: &str) {
 }
 
 #[tokio::test(start_paused = true)]
-async fn rooms_that_cannot_be_restored_are_skipped_with_the_java_warnings() {
+async fn rooms_that_cannot_be_restored_are_skipped_with_a_warning() {
     let rooms = r#"[
       {"room_id":"gone","pool_ids":[77],"setting":{"max_player":10,"min_player":2}},
       {"room_id":"a","pool_ids":[1],"setting":{"max_player":10,"min_player":2}},

@@ -3,7 +3,6 @@ mod support;
 use std::time::Duration;
 
 use support::*;
-use zphira_common::gson;
 use zphira_game::{
     CreateRoomError, RemoveRoomError, RoomPools, RoomUpdate, SwitchPoolError, UpdateRoomError,
 };
@@ -24,7 +23,7 @@ async fn room_view_serializes_like_room_snapshot() {
     w.ctx
         .create_room("r1", RoomPools::Resolve(vec![1, 2]))
         .unwrap();
-    let json = gson::to_string_compact(&w.ctx.room("r1").unwrap()).unwrap();
+    let json = serde_json::to_string(&w.ctx.room("r1").unwrap()).unwrap();
     assert_eq!(
         json,
         concat!(
@@ -52,7 +51,7 @@ async fn room_view_serializes_like_room_snapshot() {
     let view = w.ctx.room("r1").unwrap();
     assert_eq!(view.state, "WaitForReady");
     assert_eq!(view.host, Some(200));
-    let json = gson::to_string_compact(&view).unwrap();
+    let json = serde_json::to_string(&view).unwrap();
     assert!(json.contains(r#""chart":{"id":1,"name":"Alpha","level":"IN 12","difficulty":0.0,"charter":null,"composer":null,"illustrator":null,"description":null,"ranked":false,"reviewed":false,"stable":false,"stableRequest":false,"illustration":null,"preview":null,"file":null,"uploader":0,"tags":[],"rating":0.0,"ratingCount":0,"created":null,"updated":null,"chartUpdated":null,"durationSeconds":null}"#), "{json}");
     assert!(json.ends_with(r#""players":[{"id":100,"name":"Alice"},{"id":200,"name":"Bob"}],"monitors":[{"id":50,"name":"Mon"}]}"#), "{json}");
     assert_eq!(view.online_players, 2);

@@ -26,20 +26,19 @@ sha2 = "0.11.1"
 base64 = "0.23.1"
 subtle = "2.6.1"
 tracing = "0.1.44"
-indexmap = "2.14.2"
-flate2 = "1.1.11"
 serde = { version = "1.0.229", features = ["derive"] }
 chrono = { version = "0.4.45", default-features = false, features = ["clock", "std"] }
 getrandom = "0.4"
 hyper = { version = "1", features = ["http1", "server"] }
 hyper-util = { version = "0.1.21", features = ["tokio", "server", "server-graceful", "http1", "service"] }
 zphira-game = { version = "1.0.0", path = "../game" }
+serde_json = { version = "1.0.154", features = ["preserve_order", "float_roundtrip"] }
 
 [dev-dependencies]
 axum = { version = "0.8", default-features = false, features = ["tokio", "http1"] }
 flate2 = "1.1.11"
 futures-util = { version = "0.3.34", features = ["sink"] }
-serde_json = { version = "1.0.154", features = ["preserve_order"] }
+serde_json = { version = "1.0.154", features = ["float_roundtrip", "preserve_order"] }
 tempfile = "3.27.0"
 tokio = { version = "1.54.1", features = ["rt", "rt-multi-thread", "macros", "net", "time", "sync", "io-util"] }
 tokio-util = { version = "0.7.20", features = ["codec"] }

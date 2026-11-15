@@ -9,7 +9,7 @@ pub struct PhiraError {
 pub(crate) enum Kind {
     Status { status: u16, body: String },
     Transport(String),
-    Decode(zphira_common::gson::GsonError),
+    Decode(serde_json::Error),
     EmptyBody,
     InvalidUrl(String),
     InvalidRequest(String),
@@ -100,8 +100,8 @@ impl std::error::Error for PhiraError {
     }
 }
 
-impl From<zphira_common::gson::GsonError> for PhiraError {
-    fn from(error: zphira_common::gson::GsonError) -> Self {
+impl From<serde_json::Error> for PhiraError {
+    fn from(error: serde_json::Error) -> Self {
         Self::new(Kind::Decode(error))
     }
 }

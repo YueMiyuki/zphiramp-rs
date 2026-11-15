@@ -21,7 +21,7 @@ pub fn parse(buf: &[u8]) -> Result<ProxyHeader, String> {
         return Ok(ProxyHeader::Incomplete);
     }
     // The 13th byte decides between the binary and the text header.
-    if buf[..12] == V2_PREFIX && buf[12] as i8 as i32 != 1 {
+    if buf[..12] == V2_PREFIX && buf[12] != 1 {
         parse_v2(buf)
     } else {
         parse_v1(buf)
@@ -55,19 +55,8 @@ fn parse_v1(buf: &[u8]) -> Result<ProxyHeader, String> {
     })
 }
 
-fn java_split_space(text: &str) -> Vec<&str> {
-    let mut parts: Vec<&str> = text.split(' ').collect();
-    while parts.len() > 1 && parts.last().is_some_and(|p| p.is_empty()) {
-        parts.pop();
-    }
-    if parts.len() == 1 && parts[0].is_empty() {
-        return parts;
-    }
-    parts
-}
-
 fn decode_v1(header: &str) -> Result<SocketAddr, String> {
-    let parts = java_split_space(header);
+    let parts: Vec<&str> = header.trim_end_matches(' ').split(' ').collect();
     if parts.len() < 2 {
         return Err(format!(
             "invalid header: {header} (expected: 'PROXY' and proxied protocol values)"
@@ -86,10 +75,7 @@ fn decode_v1(header: &str) -> Result<SocketAddr, String> {
         "UNIX_DGRAM",
     ];
     if !NAMES.contains(&parts[1]) {
-        return Err(format!(
-            "java.lang.IllegalArgumentException: No enum constant io.netty.handler.codec.haproxy.HAProxyProxiedProtocol.{}",
-            parts[1]
-        ));
+        return Err(format!("unknown proxied protocol: {}", parts[1]));
     }
     let v6 = match parts[1] {
         "TCP4" => false,
@@ -111,12 +97,7 @@ fn decode_v1(header: &str) -> Result<SocketAddr, String> {
 }
 
 fn v1_port(text: &str) -> Option<u16> {
-    let value = zphira_common::java_fmt::parse_int(text).ok()?;
-    if (1..=65535).contains(&value) {
-        u16::try_from(value).ok()
-    } else {
-        None
-    }
+    text.parse::<u16>().ok().filter(|&port| port != 0)
 }
 
 fn v1_address(text: &str, v6: bool) -> Option<IpAddr> {
@@ -148,31 +129,16 @@ fn parse_v2(buf: &[u8]) -> Result<ProxyHeader, String> {
 }
 
 fn decode_v2(header: &[u8]) -> Result<SocketAddr, String> {
-    let ver_cmd = header[12] as i8 as i32;
-    let version = ver_cmd & 0xF0;
-    match version {
-        0x20 => {}
-        0x10 => {
-            return Err(format!(
-                "version 1 unsupported: 0x{:x}",
-                ver_cmd as u32 & 0xFF
-            ));
-        }
-        _ => {
-            return Err(format!(
-                "java.lang.IllegalArgumentException: unknown version: {version}"
-            ));
-        }
+    let ver_cmd = header[12];
+    match ver_cmd >> 4 {
+        2 => {}
+        1 => return Err(format!("version 1 unsupported: 0x{ver_cmd:x}")),
+        version => return Err(format!("unknown version: {version}")),
     }
-    let command = ver_cmd & 0x0F;
-    match command {
+    match ver_cmd & 0x0F {
         0x01 => {}
         0x00 => return Err(MISSING_SOURCE.to_owned()),
-        _ => {
-            return Err(format!(
-                "java.lang.IllegalArgumentException: unknown command: {command}"
-            ));
-        }
+        command => return Err(format!("unknown command: {command}")),
     }
     let family_byte = header[13];
     let family = match family_byte {
@@ -180,11 +146,7 @@ fn decode_v2(header: &[u8]) -> Result<SocketAddr, String> {
         0x21 | 0x22 => Family::V6,
         0x31 | 0x32 => Family::Unix,
         0x00 => return Err(MISSING_SOURCE.to_owned()),
-        other => {
-            return Err(format!(
-                "java.lang.IllegalArgumentException: unknown transport protocol + address family: {other}"
-            ));
-        }
+        other => return Err(format!("unknown address family: 0x{other:02x}")),
     };
     let info_len = u16::from_be_bytes([header[14], header[15]]) as usize;
     let body = &header[16..];
@@ -290,7 +252,7 @@ mod tests {
     }
 
     #[test]
-    fn v1_errors_carry_netty_messages() {
+    fn v1_errors() {
         assert_eq!(source(b"PROXY").unwrap(), ProxyHeader::Incomplete);
         assert_eq!(source(b"PROXY UNKNOWN\r\n").unwrap_err(), MISSING_SOURCE);
         assert_eq!(
@@ -315,7 +277,7 @@ mod tests {
         );
         assert_eq!(
             source(b"PROXY XYZ 1.1.1.1 2.2.2.2 1 2\r\n").unwrap_err(),
-            "java.lang.IllegalArgumentException: No enum constant io.netty.handler.codec.haproxy.HAProxyProxiedProtocol.XYZ"
+            "unknown proxied protocol: XYZ"
         );
         let long = vec![b'A'; 109];
         assert_eq!(
@@ -354,12 +316,11 @@ mod tests {
         assert_eq!(source(&local).unwrap_err(), MISSING_SOURCE);
         let mut bad = encode_v2(src, dst);
         bad[12] = 0x31;
-        assert_eq!(
-            source(&bad).unwrap_err(),
-            "java.lang.IllegalArgumentException: unknown version: 48"
-        );
+        assert_eq!(source(&bad).unwrap_err(), "unknown version: 3");
         bad[12] = 0x11;
         assert_eq!(source(&bad).unwrap_err(), "version 1 unsupported: 0x11");
+        bad[12] = 0x2F;
+        assert_eq!(source(&bad).unwrap_err(), "unknown command: 15");
         let mut short = V2_PREFIX.to_vec();
         short.extend_from_slice(&[0x21, 0x11, 0x00, 0x04, 1, 2, 3, 4]);
         assert_eq!(
@@ -368,9 +329,6 @@ mod tests {
         );
         let mut family = encode_v2(src, dst);
         family[13] = 0x41;
-        assert_eq!(
-            source(&family).unwrap_err(),
-            "java.lang.IllegalArgumentException: unknown transport protocol + address family: 65"
-        );
+        assert_eq!(source(&family).unwrap_err(), "unknown address family: 0x41");
     }
 }

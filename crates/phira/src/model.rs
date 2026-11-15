@@ -1,24 +1,27 @@
-use std::fmt;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicI64, Ordering};
 
-use serde::de::{IgnoredAny, MapAccess, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use zphira_common::time::JavaOffsetDateTime;
+use zphira_common::time::Timestamp;
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct UserInfo {
     pub id: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub language: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bio: Option<String>,
     pub exp: i32,
     pub rks: f64,
-    pub joined: Option<JavaOffsetDateTime>,
-    #[serde(rename = "lastLogin")]
-    pub last_login: Option<JavaOffsetDateTime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub joined: Option<Timestamp>,
+    #[serde(rename = "lastLogin", skip_serializing_if = "Option::is_none")]
+    pub last_login: Option<Timestamp>,
     pub roles: i32,
     pub banned: bool,
     #[serde(rename = "loginBanned")]
@@ -27,6 +30,7 @@ pub struct UserInfo {
     pub follower_count: i32,
     #[serde(rename = "followingCount")]
     pub following_count: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,
 }
 
@@ -40,30 +44,43 @@ impl UserInfo {
 #[serde(default)]
 pub struct ChartInfo {
     pub id: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub level: Option<String>,
     pub difficulty: f32,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub charter: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub composer: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub illustrator: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     pub ranked: bool,
     pub reviewed: bool,
     pub stable: bool,
     #[serde(rename = "stableRequest")]
     pub stable_request: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub illustration: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub preview: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub file: Option<String>,
     pub uploader: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
     pub rating: f32,
     #[serde(rename = "ratingCount")]
     pub rating_count: i32,
-    pub created: Option<JavaOffsetDateTime>,
-    pub updated: Option<JavaOffsetDateTime>,
-    #[serde(rename = "chartUpdated")]
-    pub chart_updated: Option<JavaOffsetDateTime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created: Option<Timestamp>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated: Option<Timestamp>,
+    #[serde(rename = "chartUpdated", skip_serializing_if = "Option::is_none")]
+    pub chart_updated: Option<Timestamp>,
+    #[serde(skip_serializing_if = "DurationCell::is_unknown")]
     duration_seconds: DurationCell,
 }
 
@@ -98,6 +115,10 @@ pub(crate) struct DurationCell(AtomicI64);
 impl DurationCell {
     // i32 values are stored widened, so i64::MIN can never be a real duration.
     const NONE: i64 = i64::MIN;
+
+    fn is_unknown(&self) -> bool {
+        self.get().is_none()
+    }
 
     fn get(&self) -> Option<i32> {
         let raw = self.0.load(Ordering::Acquire);
@@ -146,7 +167,8 @@ impl<'de> Deserialize<'de> for DurationCell {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Default, Serialize)]
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+#[serde(default)]
 pub struct GameRecord {
     pub id: i32,
     pub player: i32,
@@ -160,94 +182,27 @@ pub struct GameRecord {
     pub speed: f32,
     pub max_combo: i32,
     pub best: bool,
-    #[serde(rename = "bestStd")]
+    #[serde(rename = "bestStd", alias = "best_std")]
     pub best_std: bool,
     pub mods: i32,
-    #[serde(rename = "fullCombo")]
+    #[serde(rename = "fullCombo", alias = "full_combo")]
     pub full_combo: bool,
-    pub time: Option<JavaOffsetDateTime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub time: Option<Timestamp>,
     pub std: f32,
-    #[serde(rename = "stdScore")]
+    #[serde(rename = "stdScore", alias = "std_score")]
     pub std_score: f32,
-}
-
-// The Gson reader identifies the struct by this slice's address: keep it a single static.
-const GAME_RECORD_KEYS: &[&str] = &[
-    "id",
-    "player",
-    "chart",
-    "score",
-    "accuracy",
-    "perfect",
-    "good",
-    "bad",
-    "miss",
-    "speed",
-    "max_combo",
-    "best",
-    "bestStd",
-    "best_std",
-    "mods",
-    "fullCombo",
-    "full_combo",
-    "time",
-    "std",
-    "stdScore",
-    "std_score",
-];
-
-impl<'de> Deserialize<'de> for GameRecord {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        struct RecordVisitor;
-
-        impl<'de> Visitor<'de> for RecordVisitor {
-            type Value = GameRecord;
-
-            fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                f.write_str("a GameRecord object")
-            }
-
-            fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> Result<GameRecord, A::Error> {
-                let mut r = GameRecord::default();
-                while let Some(key) = map.next_key::<String>()? {
-                    match key.as_str() {
-                        "id" => r.id = map.next_value()?,
-                        "player" => r.player = map.next_value()?,
-                        "chart" => r.chart = map.next_value()?,
-                        "score" => r.score = map.next_value()?,
-                        "accuracy" => r.accuracy = map.next_value()?,
-                        "perfect" => r.perfect = map.next_value()?,
-                        "good" => r.good = map.next_value()?,
-                        "bad" => r.bad = map.next_value()?,
-                        "miss" => r.miss = map.next_value()?,
-                        "speed" => r.speed = map.next_value()?,
-                        "max_combo" => r.max_combo = map.next_value()?,
-                        "best" => r.best = map.next_value()?,
-                        "bestStd" | "best_std" => r.best_std = map.next_value()?,
-                        "mods" => r.mods = map.next_value()?,
-                        "fullCombo" | "full_combo" => r.full_combo = map.next_value()?,
-                        "time" => r.time = map.next_value()?,
-                        "std" => r.std = map.next_value()?,
-                        "stdScore" | "std_score" => r.std_score = map.next_value()?,
-                        _ => {
-                            map.next_value::<IgnoredAny>()?;
-                        }
-                    }
-                }
-                Ok(r)
-            }
-        }
-
-        deserializer.deserialize_struct("GameRecord", GAME_RECORD_KEYS, RecordVisitor)
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct LoginResult {
     pub id: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub token: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub refresh_token: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub expire_at: Option<String>,
 }
 
@@ -255,5 +210,6 @@ pub struct LoginResult {
 #[serde(default)]
 pub struct ChartListPage {
     pub count: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub results: Option<Vec<Arc<ChartInfo>>>,
 }

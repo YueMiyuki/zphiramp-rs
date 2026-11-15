@@ -5,7 +5,6 @@ use std::collections::HashMap;
 use serde_json::{Value, json};
 use support::replay::{self, Exchange};
 use support::{Env, Reply, error_body};
-use zphira_common::time::JavaOffsetDateTime;
 
 type Patch = fn(&mut Value);
 type Check = fn(&Reply) -> Result<(), String>;
@@ -85,6 +84,41 @@ fn set_header(response: &mut Value, name: &str, value: &str) {
     let headers = response["headers"].as_array_mut().unwrap();
     headers.retain(|h| !h[0].as_str().unwrap().eq_ignore_ascii_case(name));
     headers.push(json!([name, value]));
+}
+
+fn plain_not_found(response: &mut Value) {
+    plain(response, 404, "Not Found");
+}
+
+fn plain_bad_request(response: &mut Value) {
+    plain(response, 400, "Bad Request");
+}
+
+fn bad_param(response: &mut Value) {
+    plain(response, 400, "");
+    set_header(response, "Content-Type", "application/json");
+    set_header(response, "Access-Control-Allow-Origin", "*");
+    set_header(
+        response,
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, OPTIONS",
+    );
+    set_header(
+        response,
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization",
+    );
+    response["body"] = json!(err("参数格式错误").to_string());
+}
+
+fn plain(response: &mut Value, status: u16, body: &str) {
+    response["status"] = json!(status);
+    response["headers"]
+        .as_array_mut()
+        .unwrap()
+        .retain(|h| !h[0].as_str().unwrap().eq_ignore_ascii_case("Cache-Control"));
+    set_header(response, "Content-Type", "text/plain");
+    response["body"] = json!(body);
 }
 
 fn head(response: &mut Value, status: u16, content_type: &str, length: usize) {
@@ -227,14 +261,14 @@ async fn framework() {
             ),
             (
                 "body: enum number",
-                Expect::Json(400, err("未知类别：5"), "A-26"),
+                Expect::Json(400, err(BAD_FORMAT), "S-02: a number where a name belongs is a format error"),
             ),
             (
                 "body: latin1 charset",
                 Expect::Json(
                     400,
-                    err("未知类别：MANÉ"),
-                    "A-26 (the body is decoded as ISO-8859-1, as in Java)",
+                    err("未知类别：MAN\u{fffd}"),
+                    "S-05: bodies are read as UTF-8 whatever the charset parameter says",
                 ),
             ),
             (
@@ -247,12 +281,41 @@ async fn framework() {
             ),
             (
                 "body: bogus charset",
-                Expect::Json(
-                    400,
-                    err(BAD_FORMAT),
-                    "A-26: an unsupported charset is a malformed request (Java: 500)",
-                ),
+                Expect::Json(400, err("该类别不支持规则生成"), "S-05: the charset parameter is ignored"),
             ),
+            ("body: lenient", Expect::Json(400, err(BAD_FORMAT), "S-02: strict JSON")),
+            ("body: duplicate key", Expect::Json(400, err(BAD_FORMAT), "S-02")),
+            ("body: bom", Expect::Json(400, err(BAD_FORMAT), "S-02")),
+            ("body: 1000001 bytes", Expect::LogOnly("S-05: the limit warning is the server's own (Java: Javalin's logger)")),
+            ("body: 1000001 bytes chunked", Expect::LogOnly("S-05")),
+            ("body: 1000001 bytes, favorite", Expect::LogOnly("S-05")),
+            ("body: 1000001 bytes accept json", Expect::Response(|r| {
+                set_header(r, "Content-Type", "text/plain");
+                r["body"] = json!("Content Too Large");
+            }, "S-05: framework answers are plain text, whatever the Accept header")),
+            ("unknown api POST", Expect::Response(plain_not_found, "S-05: unknown routes answer a plain 404 (Java: Javalin's text)")),
+            ("unknown api POST accept json", Expect::Response(plain_not_found, "S-05")),
+            ("unknown api POST accept html", Expect::Response(plain_not_found, "S-05")),
+            ("unknown api POST accept any", Expect::Response(plain_not_found, "S-05")),
+            ("wrong method PATCH pool/list", Expect::Response(plain_not_found, "S-05")),
+            ("wrong method DELETE login", Expect::Response(plain_not_found, "S-05")),
+            ("unknown method", Expect::Response(plain_not_found, "S-05")),
+            ("POST root", Expect::Response(plain_not_found, "S-05")),
+            ("DELETE static", Expect::Response(plain_not_found, "S-05")),
+            ("OPTIONS api root no slash", Expect::Response(plain_not_found, "S-05")),
+            ("OPTIONS root", Expect::Response(plain_not_found, "S-05")),
+            ("OPTIONS star", Expect::Response(plain_not_found, "S-05 (Java: Jetty's empty 404)")),
+            ("path: missing segment", Expect::Response(plain_not_found, "S-05")),
+            ("path int: unicode digits", Expect::Json(400, err("参数格式错误"), "S-05: numbers in paths are ASCII digits")),
+            ("path: bad escape", Expect::Response(bad_param,
+                "S-05: a bad escape in a path parameter is the route's own 400 (Java: Jetty's HTML page)")),
+            ("path: truncated escape", Expect::Response(bad_param, "S-05")),
+            ("query: limit hex float", Expect::Json(400, err("参数格式错误：limit"), "S-05: Rust number parsing")),
+            ("query: limit suffix", Expect::Json(400, err("参数格式错误：limit"), "S-05")),
+            ("static: traversal raw", Expect::Response(plain_bad_request,
+                "S-05: a path above the root is the static guard's plain 400 (Java: Jetty's HTML page)")),
+            ("static: traversal nested raw", Expect::Response(plain_bad_request, "S-05")),
+            ("static: traversal encoded dots", Expect::Response(plain_bad_request, "S-05")),
             (
                 "body: 1000001 bytes, import",
                 Expect::Check(
@@ -295,13 +358,9 @@ async fn framework() {
             ("static: nested", Expect::Response(short_cache, "O-08")),
             ("static: query string", Expect::Response(short_cache, "O-08")),
             ("static: dot segment inside", Expect::Response(short_cache, "O-08")),
-            ("method override", Expect::Response(|r| {
-                r["status"] = json!(404);
-                set_header(r, "Content-Type", "text/plain");
-                r["body"] = json!("Endpoint POST /api/v1/pool/list not found");
-            }, "O-05: X-HTTP-Method-Override is ignored (Java: honoured)")),
-            ("method override unknown", Expect::Response(|r| r["body"] = json!("Endpoint POST /api/v1/pool/list not found"),
-                "O-05")),
+            ("method override", Expect::Response(plain_not_found,
+                "O-05: X-HTTP-Method-Override is ignored (Java: honoured); S-05: plain 404")),
+            ("method override unknown", Expect::Response(plain_not_found, "O-05, S-05")),
             ("HEAD api auth", Expect::Response(|r| head(r, 200, "application/json", 481),
                 "O-05: HEAD answers what GET answers, without the body (Java: 200 text/plain without running anything)")),
             ("HEAD api player", Expect::Response(|r| head(r, 403, "application/json", 36), "O-05")),
@@ -325,7 +384,7 @@ async fn framework() {
 
 fn pools_after_edits() -> Value {
     json!({"ok":true,"pools":[
-        {"id":10,"favoriteId":9,"default":true,"chartIds":[1000,1002,1006],"category":"CONFIGURED","sizeLimit":null,"roundsPerStay":5,"order":0,"submissionOpen":true},
+        {"id":10,"favoriteId":null,"default":false,"chartIds":[1000,1002,1006],"category":"CONFIGURED","sizeLimit":null,"roundsPerStay":5,"order":0,"submissionOpen":true},
         {"id":0,"favoriteId":null,"default":true,"chartIds":[1000,1002],"category":"REGULAR","sizeLimit":15,"roundsPerStay":3,"order":10,"submissionOpen":false},
         {"id":2,"favoriteId":null,"default":false,"chartIds":[1003],"category":"MANUAL","sizeLimit":null,"roundsPerStay":null,"order":30,"submissionOpen":true},
         {"id":12,"favoriteId":null,"default":false,"chartIds":[],"category":"REGULAR","sizeLimit":null,"roundsPerStay":null,"order":50,"submissionOpen":false},
@@ -339,7 +398,7 @@ fn pools_after_edits() -> Value {
 async fn pools() {
     let mut list_final = pools_after_edits();
     let pools = list_final["pools"].as_array_mut().unwrap();
-    pools.retain(|p| p["id"] != json!(0) && p["id"] != json!(1));
+    pools.retain(|p| p["id"] != json!(1));
     run(
         "pools",
         vec![
@@ -359,7 +418,14 @@ async fn pools() {
             ("default: unknown pool", Expect::Json(400, err("Pool not found: 999"), "A-26 (Java: 500)")),
             ("list after edits", Expect::Json(200, pools_after_edits(), "A-25, A-26, N-15, see pools_after_edits")),
             ("remove: ok", Expect::LogOnly("one empty pool fewer to warn about (A-26)")),
-            ("remove: last default", Expect::LogOnly("one empty pool fewer to warn about (A-26)")),
+            ("remove: last default", Expect::Json(400, err("Cannot remove the last default pool"),
+                "pool 10 is no longer a default pool, see default: text (S-02)")),
+            ("favorite: numeric text", Expect::Json(400, err(BAD_FORMAT), "S-02: strict JSON, no coercion of \"12\" to 12")),
+            ("favorite: fraction", Expect::Json(400, err(BAD_FORMAT), "S-02")),
+            ("favorite: huge", Expect::Json(400, err(BAD_FORMAT), "S-02 (Java overflowed to 1410065408)")),
+            ("favorite: one-element array", Expect::Json(400, err(BAD_FORMAT), "S-02")),
+            ("favorite: lenient", Expect::Json(400, err(BAD_FORMAT), "S-02")),
+            ("default: text", Expect::Json(400, err(BAD_FORMAT), "S-02")),
             ("list final", Expect::Json(200, list_final, "A-25, A-26, N-15, see pools_after_edits")),
         ],
     )
@@ -523,6 +589,9 @@ async fn charts() {
         "charts",
         vec![
             ("search: tag duplicate", Expect::Json(400, err("参数格式错误：tag"), "A-26 (Java: 500)")),
+            ("search: limit NaN", Expect::Check(|r| {
+                if r.json()["result"]["charts"].as_array().map(Vec::len) == Some(1) { Ok(()) } else { Err(r.text()) }
+            }, "S-05: a limit of NaN is clamped to 1 (Java: 0)")),
             ("generate: probe 200", Expect::Json(200, json!({"ok":true,"poolIds":[3],"leftover":0}),
                 "A-12: the probe budget is capped at 500, not refused over 20")),
             ("generate: manual probe 200", Expect::Json(400, err("该类别不支持规则生成"),
@@ -557,19 +626,6 @@ async fn charts() {
     .await;
 }
 
-fn java_dates(v: &mut Value) {
-    match v {
-        Value::String(s) => {
-            if let Ok(t) = JavaOffsetDateTime::parse(s) {
-                *s = t.to_string();
-            }
-        }
-        Value::Array(items) => items.iter_mut().for_each(java_dates),
-        Value::Object(map) => map.values_mut().for_each(java_dates),
-        _ => {}
-    }
-}
-
 fn sort_records(records: &mut [Value], key: &str, newest_first: bool) {
     records.sort_by_key(|r| r[key].as_i64().unwrap());
     if newest_first {
@@ -582,8 +638,6 @@ async fn data() {
     run(
         "data",
         vec![
-            ("export: submissions", Expect::Patch(java_dates,
-                "A-03: the export is the store's memory, so dates are written as OffsetDateTime.toString(); Java copied the file, which the seed wrote by hand")),
             ("export after: records", Expect::Patch(|v| sort_records(v.as_array_mut().unwrap(), "finished_at", false),
                 "N-02 (ledger): merged rounds are ordered by finish time")),
             ("records after import", Expect::Patch(|v| {
@@ -601,6 +655,7 @@ async fn data() {
             ("import: pools empty", Expect::Json(400, err("pools 至少需要一个谱池"), "A-01 (Java: 500)")),
             ("import: admins wrong rows", Expect::Json(400, err("管理员名单第 1 项无效：必须是整数用户 ID"),
                 "A-01 (Java: 200 with an admins.json that no longer loads)")),
+            ("import: primitive", Expect::Json(400, err("不是有效的 JSON"), "S-02: the catalog's own refusal text")),
             ("restore: kind prefix bypass", Expect::Json(400, err("备份不存在"),
                 "O-09: the kind is checked on the file name that is opened (Java restored an admins backup as points)")),
         ],
@@ -612,14 +667,48 @@ async fn data() {
 async fn admin() {
     run(
         "admin",
-        vec![(
-            "remove not admin, one left",
-            Expect::Json(
-                200,
-                json!({"ok":true,"removed":false,"admins":[1]}),
-                "N-03: removing a non-admin is a no-op, whatever the size of the list",
+        vec![
+            (
+                "add text number",
+                Expect::Json(
+                    400,
+                    err(BAD_FORMAT),
+                    "S-02: strict JSON, no coercion of \"7\" to 7",
+                ),
             ),
-        )],
+            (
+                "remove not admin",
+                Expect::Json(
+                    200,
+                    json!({"ok":true,"removed":false,"admins":[1,5]}),
+                    "user 7 was not added (S-02)",
+                ),
+            ),
+            (
+                "remove 5",
+                Expect::Json(
+                    200,
+                    json!({"ok":true,"removed":true,"admins":[1]}),
+                    "user 7 was not added (S-02)",
+                ),
+            ),
+            (
+                "remove 7",
+                Expect::Json(
+                    200,
+                    json!({"ok":true,"removed":false,"admins":[1]}),
+                    "user 7 was not added (S-02)",
+                ),
+            ),
+            (
+                "remove not admin, one left",
+                Expect::Json(
+                    200,
+                    json!({"ok":true,"removed":false,"admins":[1]}),
+                    "N-03: removing a non-admin is a no-op, whatever the size of the list",
+                ),
+            ),
+        ],
     )
     .await;
 }

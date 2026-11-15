@@ -134,12 +134,24 @@ async fn wire_level_behaviour() {
     let (status, _, _) = raw(addr, &format!("GET /api/v1/pool/list HTTP/1.1\r\nHost: x\r\nAuthorization: Bearer {admin}   \r\nConnection: close\r\n\r\n")).await;
     assert_eq!(status, "HTTP/1.1 200 OK");
 
+    for target in ["/api/v1/record/%zz", "/api/v1/record/abc%2"] {
+        let (status, headers, body) = raw(
+            addr,
+            &format!("GET {target} HTTP/1.1\r\nHost: x\r\nAuthorization: Bearer {admin}\r\nConnection: close\r\n\r\n"),
+        )
+        .await;
+        assert_eq!(status, "HTTP/1.1 400 Bad Request", "{target}");
+        assert_eq!(get(&headers, "content-type"), Some("application/json"));
+        assert_eq!(
+            body,
+            "{\"ok\":false,\"reason\":\"参数格式错误\"}".as_bytes()
+        );
+    }
     for target in [
-        "/api/v1/record/%zz",
-        "/api/v1/record/abc%2",
         "/../secret.txt",
         "/room/../../secret.txt",
         "/%2e%2e/secret.txt",
+        "//etc/passwd",
     ] {
         let (status, headers, body) = raw(
             addr,
@@ -147,35 +159,16 @@ async fn wire_level_behaviour() {
         )
         .await;
         assert_eq!(status, "HTTP/1.1 400 Bad Request", "{target}");
-        assert_eq!(
-            get(&headers, "content-type"),
-            Some("text/html;charset=iso-8859-1"),
-            "{target}"
-        );
-        assert_eq!(
-            get(&headers, "cache-control"),
-            Some("must-revalidate,no-cache,no-store")
-        );
-        assert_eq!(body.len(), 337, "{target}");
+        assert_eq!(get(&headers, "content-type"), Some("text/plain"));
+        assert_eq!(body, b"Bad Request");
     }
     let (status, _, body) = raw(
-        addr,
-        "GET //etc/passwd HTTP/1.1\r\nHost: x\r\nConnection: close\r\n\r\n",
-    )
-    .await;
-    assert_eq!(status, "HTTP/1.1 400 Bad Request");
-    assert_eq!(body, b"Bad Request");
-    let (status, headers, body) = raw(
         addr,
         "OPTIONS * HTTP/1.1\r\nHost: x\r\nConnection: close\r\n\r\n",
     )
     .await;
     assert_eq!(status, "HTTP/1.1 404 Not Found");
-    assert_eq!(
-        get(&headers, "cache-control"),
-        Some("must-revalidate,no-cache,no-store")
-    );
-    assert!(body.is_empty());
+    assert_eq!(body, b"Not Found");
 
     let (status, headers, body) = raw(addr, "OPTIONS /api/v1/pool/1 HTTP/1.1\r\nHost: x\r\nOrigin: http://localhost:3000\r\nAccess-Control-Request-Method: DELETE\r\nConnection: close\r\n\r\n").await;
     assert_eq!(status, "HTTP/1.1 204 No Content");

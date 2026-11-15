@@ -177,7 +177,7 @@ pub(super) async fn pool_list(
     let pool_id = path_int(ctx, "id")?;
     let filter = match ctx.query_param("status") {
         None => None,
-        Some(raw) if crate::java::is_blank(raw) => None,
+        Some(raw) if raw.trim().is_empty() => None,
         Some(raw) => Some(
             SubmissionStatus::parse_ignore_case(raw)
                 .ok_or_else(|| Failure::bad_request(format!("未知状态：{raw}")))?,

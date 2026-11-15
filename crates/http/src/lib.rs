@@ -2,7 +2,6 @@
 
 mod auth;
 mod body;
-mod java;
 mod jwt;
 mod ratelimit;
 mod reply;

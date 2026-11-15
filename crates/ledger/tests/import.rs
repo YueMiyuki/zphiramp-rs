@@ -114,14 +114,14 @@ fn points_import_writes_the_file_in_the_java_layout_and_matches_memory() {
     let dir = tempfile::tempdir().unwrap();
     let p = points(dir.path());
     p.import(
-        r#"{"20":{"name":"<b>","points":2},"3.0":{"points":9},"-1":{"name":"n","points":0}}"#,
+        r#"{"20":{"name":"<b>","points":2},"3":{"points":9},"-1":{"name":"n","points":0}}"#,
         ImportMode::Replace,
     )
     .unwrap();
     let written = file(dir.path(), "player-points.json").unwrap();
     assert_eq!(
         written,
-        "{\n  \"-1\": {\n    \"name\": \"n\",\n    \"points\": 0\n  },\n  \"3\": {\n    \"points\": 9\n  },\n  \"20\": {\n    \"name\": \"\\u003cb\\u003e\",\n    \"points\": 2\n  }\n}"
+        "{\n  \"-1\": {\n    \"name\": \"n\",\n    \"points\": 0\n  },\n  \"3\": {\n    \"points\": 9\n  },\n  \"20\": {\n    \"name\": \"<b>\",\n    \"points\": 2\n  }\n}"
     );
     assert_eq!(p.export().unwrap(), written);
     std::fs::remove_file(dir.path().join("player-points.json")).unwrap();
@@ -140,10 +140,12 @@ fn points_document_level_checks_use_the_java_messages() {
         assert_eq!(invalid(p.import(" \n\t ", mode)), "内容为空");
         assert_eq!(invalid(p.import("{", mode)), "不是有效的 JSON");
         assert_eq!(invalid(p.import("null", mode)), "不是有效的 JSON");
+        assert_eq!(invalid(p.import("not-json", mode)), "不是有效的 JSON");
         assert_eq!(
-            invalid(p.import("not-json", mode)),
-            "JSON 顶层必须是对象或数组"
+            invalid(p.import("{'1':{'points':1}}", mode)),
+            "不是有效的 JSON"
         );
+        assert_eq!(invalid(p.import("/*c*/{}", mode)), "不是有效的 JSON");
         assert_eq!(invalid(p.import("5", mode)), "JSON 顶层必须是对象或数组");
         assert_eq!(
             invalid(p.import("[]", mode)),
@@ -165,7 +167,7 @@ fn points_bad_rows_are_refused_and_the_first_one_is_named() {
     let before_file = file(dir.path(), "player-points.json").unwrap();
     let before_memory = p.export().unwrap();
 
-    let cases: [(&str, &str); 13] = [
+    let cases: [(&str, &str); 16] = [
         (r#"{"1":{"points":1},"x":{"points":2},"3":5}"#, "第 2 项"),
         (r#"{"abc":{"points":2}}"#, "玩家 ID \"abc\""),
         (r#"{"2147483648":{"points":2}}"#, "必须是整数"),
@@ -175,10 +177,13 @@ fn points_bad_rows_are_refused_and_the_first_one_is_named() {
         (r#"{"1":{}}"#, "缺少 points"),
         (r#"{"1":{"points":null}}"#, "缺少 points"),
         (r#"{"1":{"points":-5}}"#, "points 不能为负数"),
-        (r#"{"1":{"points":"many"}}"#, "\"many\""),
+        (r#"{"1":{"points":"many"}}"#, "points 必须是整数"),
+        (r#"{"1":{"points":"7"}}"#, "points 必须是整数"),
+        (r#"{"1":{"points":7.0}}"#, "points 必须是整数"),
         (r#"{"1":{"points":1.5}}"#, "points"),
         (r#"{"1":{"points":1,"name":{}}}"#, "name"),
-        (r#"{"1":{"points":1},"1.0":{"points":2}}"#, "重复"),
+        (r#"{"1":{"points":1},"1.0":{"points":2}}"#, "第 2 项"),
+        (r#"{"07":{"points":1}}"#, "玩家 ID \"07\""),
     ];
     for (document, needle) in cases {
         for mode in [ImportMode::Replace, ImportMode::Merge] {
@@ -431,7 +436,31 @@ fn records_bad_rows_are_refused_and_the_first_one_is_named() {
         (
             r#"[{"id":"a","room_id":"r","results":[{"player_id":1,"accuracy":"fast"}]}]"#
                 .to_owned(),
-            "\"fast\"",
+            "accuracy 必须是数字",
+        ),
+        (
+            r#"[{"id":"a","room_id":"r","results":[{"player_id":"3"}]}]"#.to_owned(),
+            "player_id 必须是整数",
+        ),
+        (
+            r#"[{"id":"a","room_id":"r","chart_id":"12","results":[]}]"#.to_owned(),
+            "chart_id 必须是整数",
+        ),
+        (
+            r#"[{"id":"a","room_id":"r","started_at":5.0,"results":[]}]"#.to_owned(),
+            "started_at 必须是整数",
+        ),
+        (
+            r#"[{"id":"a","room_id":7,"results":[]}]"#.to_owned(),
+            "room_id 必须是文本",
+        ),
+        (
+            r#"[{"id":5,"room_id":"r","results":[]}]"#.to_owned(),
+            "id 必须是文本",
+        ),
+        (
+            r#"[{"id":"a","room_id":"r","chart_name":3,"results":[]}]"#.to_owned(),
+            "chart_name 必须是文本",
         ),
     ];
     for (document, needle) in &cases {
@@ -452,7 +481,7 @@ fn records_bad_rows_are_refused_and_the_first_one_is_named() {
 }
 
 #[test]
-fn records_with_the_same_id_twice_or_non_finite_numbers_are_refused() {
+fn records_with_the_same_id_twice_or_numbers_json_cannot_hold_are_refused() {
     let dir = tempfile::tempdir().unwrap();
     let records = RoundRecords::load(dir.path()).unwrap();
     let message = invalid(records.import(
@@ -467,34 +496,37 @@ fn records_with_the_same_id_twice_or_non_finite_numbers_are_refused() {
         r#"[{"id":"a","room_id":"r","results":[{"player_id":1,"accuracy":NaN}]}]"#,
         ImportMode::Replace,
     ));
-    assert!(message.contains("accuracy"), "{message}");
+    assert_eq!(message, "不是有效的 JSON");
     let message = invalid(records.import(
-        r#"[{"id":"a","room_id":"r","results":[{"player_id":1,"std":Infinity}]}]"#,
+        r#"[{"id":"a","room_id":"r","results":[{"player_id":1,"std":1e999}]}]"#,
         ImportMode::Replace,
     ));
-    assert!(message.contains("std"), "{message}");
+    assert_eq!(message, "不是有效的 JSON");
     assert!(records.is_empty());
 }
 
 #[test]
-fn records_import_accepts_a_full_java_export_and_lenient_numbers() {
+fn records_import_accepts_a_full_java_export() {
     let dir = tempfile::tempdir().unwrap();
     let records = RoundRecords::load(dir.path()).unwrap();
     let java = std::fs::read_to_string(support::fixture_path("records_java.json")).unwrap();
     let report = records.import(&java, ImportMode::Replace).unwrap();
     assert_eq!(report.total, 5);
-    assert_eq!(records.export().unwrap(), java, "export is the Java layout");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&records.export().unwrap()).unwrap(),
+        serde_json::from_str::<serde_json::Value>(&java).unwrap()
+    );
 
     records
         .import(
-            r#"[{"id":"a","room_id":7,"chart_id":"12","started_at":5.0,"results":[{"player_id":"3","accuracy":"0.5","std":1}]}]"#,
+            r#"[{"id":"a","room_id":"r","chart_id":12,"started_at":5,"results":[{"player_id":3,"accuracy":1,"std":0.5}]}]"#,
             ImportMode::Replace,
         )
         .unwrap();
     let a = records.find("a").unwrap();
-    assert_eq!((a.room_id.as_str(), a.chart_id, a.started_at), ("7", 12, 5));
+    assert_eq!((a.chart_id, a.started_at), (12, 5));
     assert_eq!(a.results[0].player_id, 3);
-    assert_eq!((a.results[0].accuracy, a.results[0].std), (0.5, 1.0));
+    assert_eq!((a.results[0].accuracy, a.results[0].std), (1.0, 0.5));
 }
 
 #[test]
@@ -550,9 +582,7 @@ fn admins_replace_and_merge_semantics() {
     assert_eq!((report.imported, report.total), (1, 1));
     assert_eq!(admins.list(), vec![7]);
     assert_eq!(file(dir.path(), "admins.json").unwrap(), "[\n  7\n]");
-    admins
-        .import(r#"["9", 8.0, 10]"#, ImportMode::Replace)
-        .unwrap();
+    admins.import("[9, 8, 10]", ImportMode::Replace).unwrap();
     assert_eq!(admins.list(), vec![8, 9, 10]);
     let report = admins.import("[]", ImportMode::Merge).unwrap();
     assert_eq!(report.total, 3);

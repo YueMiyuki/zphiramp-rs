@@ -1,9 +1,8 @@
-use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
-use zphira_common::gson::GsonError;
-use zphira_common::{fs, gson};
+use serde::Serialize;
+use zphira_common::{fs, json};
 
 use crate::error::LedgerError;
 use crate::import::ImportError;
@@ -16,7 +15,7 @@ pub(crate) trait Document: Send + 'static {
 
     fn install(&mut self, content: Self::Content);
 
-    fn serialize<W: Write>(content: &Self::Content, out: W) -> Result<(), GsonError>;
+    fn view(content: &Self::Content) -> impl Serialize + '_;
 
     fn rows(content: &Self::Content) -> usize;
 }
@@ -142,16 +141,12 @@ impl<D: Document> Persisted<D> {
     }
 }
 
-fn render<D: Document>(content: &D::Content) -> Result<String, GsonError> {
-    let mut buffer = Vec::new();
-    D::serialize(content, &mut buffer)?;
-    Ok(String::from_utf8(buffer).expect("the serializer writes UTF-8"))
+fn render<D: Document>(content: &D::Content) -> serde_json::Result<String> {
+    serde_json::to_string_pretty(&D::view(content))
 }
 
-fn write_file<D: Document>(path: &Path, content: &D::Content) -> Result<(), GsonError> {
-    fs::write_atomic_with(path, &fs::AtomicWriteOptions::new(), |w| {
-        D::serialize(content, w)
-    })
+fn write_file<D: Document>(path: &Path, content: &D::Content) -> std::io::Result<()> {
+    fs::write_json_pretty(path, &D::view(content))
 }
 
 pub(crate) enum Loaded<T> {
@@ -171,7 +166,7 @@ pub(crate) fn read_file<T: serde::de::DeserializeOwned>(
     let Some(text) = text else {
         return Ok(Loaded::Missing);
     };
-    match gson::from_str_opt::<T>(&text) {
+    match json::from_str_opt::<T>(&text) {
         Ok(Some(value)) => Ok(Loaded::Value(value)),
         Ok(None) => Ok(Loaded::Empty),
         Err(e) => Err(LedgerError::load(what, path, e)),

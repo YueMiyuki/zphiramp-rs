@@ -195,11 +195,6 @@ fn helpers() {
     assert_eq!(logging::logger_name("zphiramp"), "Server");
     assert_eq!(logging::logger_name("STDERR"), "STDERR");
     assert_eq!(logging::logger_name("hyper::proto"), "hyper::proto");
-    assert_eq!(
-        logging::strip_ansi("a\u{1b}[31;1mb\u{1b}[mc\u{1b}[x"),
-        "abc\u{1b}[x"
-    );
-    assert_eq!(logging::strip_ansi("plain"), "plain");
 }
 
 #[test]

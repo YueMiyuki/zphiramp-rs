@@ -1,14 +1,16 @@
 use std::sync::Arc;
 
 use zphira_catalog::{
-    ApproveOutcome, ChartIndex, ChartPool, PoolCategory, ScreeningRule, SubmissionView, Submissions,
+    ApproveOutcome, CatalogError, ChartIndex, ChartPool, PoolCategory, ScreeningRule,
+    SubmissionView, Submissions,
 };
-use zphira_common::java_fmt::{self, JavaFloat};
+use zphira_common::java_fmt::JavaFloat;
 use zphira_game::{
     CreateRoomError, EndRoundError, GameContext, RemoveRoomError, RoomPools, RoomUpdate, RoomView,
     SwitchPoolError,
 };
 use zphira_ledger::Admins;
+use zphira_phira::ChartInfo;
 
 pub trait Out: Send + Sync + 'static {
     fn info(&self, message: String);
@@ -67,96 +69,44 @@ const CONFIG_KEYS: [&str; 9] = [
     "allReadyDelay",
 ];
 
-const CATEGORY_CLASS: &str = "top.rymc.phira.main.game.room.chart.PoolCategory";
-
 type CmdResult = Result<bool, String>;
-
-pub fn java_trim(s: &str) -> &str {
-    s.trim_matches(|c: char| c <= ' ')
-}
 
 /// Trims the line; `None` when it is blank.
 pub fn normalize(input: &str) -> Option<&str> {
-    let command = java_trim(input);
+    let command = input.trim();
     (!command.is_empty()).then_some(command)
 }
 
 pub fn is_stop(command: &str) -> bool {
-    eq_ic(command, "stop")
+    command.eq_ignore_ascii_case("stop")
 }
 
-fn is_regex_space(c: char) -> bool {
-    matches!(c, ' ' | '\t' | '\n' | '\u{0B}' | '\u{0C}' | '\r')
-}
-
-pub fn java_split(s: &str, limit: usize) -> Vec<&str> {
+fn words(line: &str, max: usize) -> Vec<&str> {
     let mut parts = Vec::new();
-    let mut start = 0;
-    let mut chars = s.char_indices().peekable();
-    while let Some((i, c)) = chars.next() {
-        if !is_regex_space(c) {
-            continue;
-        }
-        let mut end = i + c.len_utf8();
-        while let Some(&(j, d)) = chars.peek() {
-            if !is_regex_space(d) {
-                break;
-            }
-            end = j + d.len_utf8();
-            chars.next();
-        }
-        if limit > 0 && parts.len() + 1 == limit {
+    let mut rest = line.trim();
+    while !rest.is_empty() {
+        if parts.len() + 1 == max {
+            parts.push(rest);
             break;
         }
-        parts.push(&s[start..i]);
-        start = end;
-    }
-    parts.push(&s[start..]);
-    if limit == 0 {
-        while parts.len() > 1 && parts.last().is_some_and(|p| p.is_empty()) {
-            parts.pop();
+        match rest.find(char::is_whitespace) {
+            Some(i) => {
+                parts.push(&rest[..i]);
+                rest = rest[i..].trim_start();
+            }
+            None => {
+                parts.push(rest);
+                break;
+            }
         }
     }
     parts
 }
 
-fn upper1(c: char) -> char {
-    let mut it = c.to_uppercase();
-    match (it.next(), it.next()) {
-        (Some(u), None) => u,
-        _ => c,
-    }
-}
-
-fn lower1(c: char) -> char {
-    let mut it = c.to_lowercase();
-    match (it.next(), it.next()) {
-        (Some(l), None) => l,
-        _ => c,
-    }
-}
-
-pub fn eq_ic(a: &str, b: &str) -> bool {
-    let mut x = a.chars();
-    let mut y = b.chars();
-    loop {
-        match (x.next(), y.next()) {
-            (None, None) => return true,
-            (Some(c), Some(d)) => {
-                if c != d {
-                    let (uc, ud) = (upper1(c), upper1(d));
-                    if uc != ud && lower1(uc) != lower1(ud) {
-                        return false;
-                    }
-                }
-            }
-            _ => return false,
-        }
-    }
-}
-
 fn parse_int(value: &str) -> Result<i32, String> {
-    java_fmt::parse_int(value).map_err(|e| e.message().to_owned())
+    value
+        .parse::<i32>()
+        .map_err(|_| format!("Invalid number: {value}"))
 }
 
 fn parse_chart_ids(args: &[&str]) -> Result<Vec<i32>, String> {
@@ -164,9 +114,15 @@ fn parse_chart_ids(args: &[&str]) -> Result<Vec<i32>, String> {
 }
 
 fn parse_switch(value: &str, name: &str) -> Result<bool, String> {
-    if eq_ic(value, "on") || eq_ic(value, "true") || value == "1" {
+    if ["on", "true", "1"]
+        .iter()
+        .any(|word| value.eq_ignore_ascii_case(word))
+    {
         Ok(true)
-    } else if eq_ic(value, "off") || eq_ic(value, "false") || value == "0" {
+    } else if ["off", "false", "0"]
+        .iter()
+        .any(|word| value.eq_ignore_ascii_case(word))
+    {
         Ok(false)
     } else {
         Err(format!("Unknown {name} value: {value}. Use on or off"))
@@ -174,16 +130,21 @@ fn parse_switch(value: &str, name: &str) -> Result<bool, String> {
 }
 
 fn parse_category(raw: &str) -> Result<PoolCategory, String> {
-    let upper = java_trim(raw).to_uppercase();
-    PoolCategory::from_name(&upper)
-        .ok_or_else(|| format!("No enum constant {CATEGORY_CLASS}.{upper}"))
+    PoolCategory::from_name(&raw.trim().to_uppercase()).ok_or_else(|| {
+        let valid: Vec<&str> = PoolCategory::ALL.iter().map(|c| c.name()).collect();
+        format!(
+            "Unknown category: {}. Categories: {}",
+            raw.trim(),
+            valid.join(", ")
+        )
+    })
 }
 
 fn or_null<T: std::fmt::Display>(value: Option<T>) -> String {
     value.map_or_else(|| "null".to_owned(), |v| v.to_string())
 }
 
-fn java_list(ids: &[i32]) -> String {
+fn list_text(ids: &[i32]) -> String {
     let parts: Vec<String> = ids.iter().map(i32::to_string).collect();
     format!("[{}]", parts.join(", "))
 }
@@ -215,30 +176,44 @@ impl Commands {
         if is_stop(command) {
             return Flow::Stop;
         }
-        let lower = command.to_lowercase();
-        if lower.starts_with("room ") {
-            let args = java_split(command, 0);
-            self.finish("Room", USAGE_ROOM, self.room(&args).await);
-        } else if lower.starts_with("pool ") {
-            let args = java_split(command, 0);
-            self.finish("Pool", USAGE_POOL, self.pool(&args).await);
-        } else if lower.starts_with("admin ") {
-            let args = java_split(command, 0);
-            self.finish("Admin", USAGE_ADMIN, self.admin(&args).await);
-        } else if lower.starts_with("chart ") {
-            let args = java_split(command, 0);
-            self.finish("Chart", USAGE_CHART, self.chart(&args).await);
-        } else if lower.starts_with("submission ") {
-            let args = java_split(command, 5);
-            self.finish("Submission", USAGE_SUBMISSION, self.submission(&args).await);
-        } else if lower.starts_with("say ") {
-            // The prefix matched in lower case, so its four characters are ASCII.
-            let message = java_trim(&command[4..]);
-            self.svc.game.say_to_all(message);
-        } else {
+        let Some((group, rest)) = command.split_once(' ') else {
             self.warn(format!("Unknown command: {command}"));
+            return Flow::Continue;
+        };
+        match group.to_ascii_lowercase().as_str() {
+            "room" => {
+                let args = words(command, usize::MAX);
+                self.finish("Room", USAGE_ROOM, self.room(&args).await);
+            }
+            "pool" => {
+                let args = words(command, usize::MAX);
+                self.finish("Pool", USAGE_POOL, self.pool(&args).await);
+            }
+            "admin" => {
+                let args = words(command, usize::MAX);
+                self.finish("Admin", USAGE_ADMIN, self.admin(&args).await);
+            }
+            "chart" => {
+                let args = words(command, usize::MAX);
+                self.finish("Chart", USAGE_CHART, self.chart(&args).await);
+            }
+            "submission" => {
+                let args = words(command, 5);
+                self.finish("Submission", USAGE_SUBMISSION, self.submission(&args).await);
+            }
+            "say" => {
+                self.svc.game.say_to_all(rest.trim());
+            }
+            _ => self.warn(format!("Unknown command: {command}")),
         }
         Flow::Continue
+    }
+
+    fn chart_info(&self, chart_id: i32) -> Result<Arc<ChartInfo>, String> {
+        self.svc
+            .pools
+            .chart_info(chart_id)
+            .ok_or_else(|| format!("Chart info is not loaded: {chart_id}"))
     }
 
     fn finish(&self, group: &str, usage: &str, result: CmdResult) {
@@ -251,16 +226,16 @@ impl Commands {
 
     async fn admin(&self, a: &[&str]) -> CmdResult {
         let admins = self.svc.admins.clone();
-        if a.len() == 2 && eq_ic(a[1], "list") {
+        if a.len() == 2 && a[1].eq_ignore_ascii_case("list") {
             let list = blocking(move || admins.list()).await?;
             if list.is_empty() {
                 self.info("No admins".to_owned());
             } else {
-                self.info(format!("Admins: {}", java_list(&list)));
+                self.info(format!("Admins: {}", list_text(&list)));
             }
             return Ok(true);
         }
-        if a.len() == 3 && eq_ic(a[1], "add") {
+        if a.len() == 3 && a[1].eq_ignore_ascii_case("add") {
             let user_id = parse_int(a[2])?;
             let added = blocking(move || admins.add(user_id))
                 .await?
@@ -272,7 +247,7 @@ impl Commands {
             }
             return Ok(true);
         }
-        if a.len() == 3 && eq_ic(a[1], "remove") {
+        if a.len() == 3 && a[1].eq_ignore_ascii_case("remove") {
             let user_id = parse_int(a[2])?;
             let removed = blocking(move || admins.remove(user_id))
                 .await?
@@ -289,40 +264,40 @@ impl Commands {
 
     async fn room(&self, a: &[&str]) -> CmdResult {
         let n = a.len();
-        if n == 2 && eq_ic(a[1], "list") {
+        if n == 2 && a[1].eq_ignore_ascii_case("list") {
             self.list_rooms();
             return Ok(true);
         }
-        if n >= 3 && eq_ic(a[1], "create") {
+        if n >= 3 && a[1].eq_ignore_ascii_case("create") {
             self.create_room(a)?;
             return Ok(true);
         }
-        if n == 3 && eq_ic(a[1], "remove") {
+        if n == 3 && a[1].eq_ignore_ascii_case("remove") {
             self.remove_room(a[2])?;
             return Ok(true);
         }
         if n >= 3 {
             let room_id = a[1];
-            if eq_ic(a[2], "end") {
+            if a[2].eq_ignore_ascii_case("end") {
                 self.force_end_room(room_id).await?;
                 return Ok(true);
             }
-            if eq_ic(a[2], "clear") && n == 3 {
+            if a[2].eq_ignore_ascii_case("clear") && n == 3 {
                 self.clear_room(room_id).await?;
                 return Ok(true);
             }
-            if eq_ic(a[2], "config") && n == 5 {
+            if a[2].eq_ignore_ascii_case("config") && n == 5 {
                 self.set_room_config(room_id, a[3], a[4])?;
                 return Ok(true);
             }
-            if eq_ic(a[2], "pool") {
-                if n == 5 && eq_ic(a[3], "switch") {
+            if a[2].eq_ignore_ascii_case("pool") {
+                if n == 5 && a[3].eq_ignore_ascii_case("switch") {
                     // The pool number is read before the room is looked up.
                     let pool_id = parse_int(a[4])?;
                     self.switch_room_pool(room_id, pool_id)?;
                     return Ok(true);
                 }
-                if n == 5 && eq_ic(a[3], "favorite") {
+                if n == 5 && a[3].eq_ignore_ascii_case("favorite") {
                     self.set_room_pool_favorite(room_id, a[4])?;
                     return Ok(true);
                 }
@@ -464,7 +439,7 @@ impl Commands {
 
     fn set_room_pool_favorite(&self, room_id: &str, value: &str) -> Result<(), String> {
         self.require_room(room_id)?;
-        let favorite = if eq_ic(value, "none") {
+        let favorite = if value.eq_ignore_ascii_case("none") {
             None
         } else {
             Some(parse_int(value)?)
@@ -486,11 +461,11 @@ impl Commands {
 
     async fn pool(&self, a: &[&str]) -> CmdResult {
         let n = a.len();
-        if n == 2 && eq_ic(a[1], "list") {
+        if n == 2 && a[1].eq_ignore_ascii_case("list") {
             self.list_pools()?;
             return Ok(true);
         }
-        if n >= 3 && eq_ic(a[1], "add") {
+        if n >= 3 && a[1].eq_ignore_ascii_case("add") {
             let pool_id = parse_int(a[2])?;
             let chart_ids = parse_chart_ids(&a[3..])?;
             self.svc
@@ -504,7 +479,7 @@ impl Commands {
             ));
             return Ok(true);
         }
-        if n == 3 && eq_ic(a[1], "remove") {
+        if n == 3 && a[1].eq_ignore_ascii_case("remove") {
             let pool_id = parse_int(a[2])?;
             self.svc
                 .pools
@@ -514,13 +489,13 @@ impl Commands {
             self.info(format!("Removed chart pool {}", a[2]));
             return Ok(true);
         }
-        if n == 5 && eq_ic(a[1], "chart") && eq_ic(a[2], "add") {
+        if n == 5 && a[1].eq_ignore_ascii_case("chart") && a[2].eq_ignore_ascii_case("add") {
             let pool_id = parse_int(a[3])?;
             let chart_id = parse_int(a[4])?;
             self.add_chart(pool_id, chart_id).await?;
             return Ok(true);
         }
-        if n == 5 && eq_ic(a[1], "chart") && eq_ic(a[2], "remove") {
+        if n == 5 && a[1].eq_ignore_ascii_case("chart") && a[2].eq_ignore_ascii_case("remove") {
             let pool_id = parse_int(a[3])?;
             let chart_id = parse_int(a[4])?;
             self.svc
@@ -531,23 +506,23 @@ impl Commands {
             self.info(format!("Removed chart {} from pool {}", a[4], a[3]));
             return Ok(true);
         }
-        if n == 4 && eq_ic(a[1], "favorite") {
+        if n == 4 && a[1].eq_ignore_ascii_case("favorite") {
             let pool_id = parse_int(a[2])?;
             self.set_pool_favorite(pool_id, a[3]).await?;
             return Ok(true);
         }
-        if n == 4 && eq_ic(a[1], "default") {
+        if n == 4 && a[1].eq_ignore_ascii_case("default") {
             let pool_id = parse_int(a[2])?;
             self.set_pool_default_flag(pool_id, a[3]).await?;
             return Ok(true);
         }
-        if n >= 4 && eq_ic(a[1], "meta") {
+        if n >= 4 && a[1].eq_ignore_ascii_case("meta") {
             let pool_id = parse_int(a[2])?;
             self.set_pool_metadata(pool_id, a[3], a.get(4), a.get(5), a.get(6))
                 .await?;
             return Ok(true);
         }
-        if n >= 3 && eq_ic(a[1], "generate") {
+        if n >= 3 && a[1].eq_ignore_ascii_case("generate") {
             self.generate_pools(a[2], a.get(3), a.get(4), a.get(5))
                 .await?;
             return Ok(true);
@@ -569,11 +544,7 @@ impl Commands {
                 pool.chart_ids.len()
             ));
             for &chart_id in &pool.chart_ids {
-                let chart = self
-                    .svc
-                    .pools
-                    .get_chart_info(chart_id)
-                    .map_err(|e| e.message())?;
+                let chart = self.chart_info(chart_id)?;
                 self.info(format!(
                     "  {} | Lv.{} | ID:{}",
                     chart.name_or_null(),
@@ -586,12 +557,12 @@ impl Commands {
     }
 
     async fn add_chart(&self, pool_id: i32, chart_id: i32) -> Result<(), String> {
-        let pools = &self.svc.pools;
-        pools
+        self.svc
+            .pools
             .add_chart(pool_id, chart_id)
             .await
             .map_err(|e| e.message())?;
-        let chart = pools.get_chart_info(chart_id).map_err(|e| e.message())?;
+        let chart = self.chart_info(chart_id)?;
         self.info(format!(
             "Added chart to pool {pool_id}: {} | Lv.{} | ID:{}",
             chart.name_or_null(),
@@ -602,7 +573,7 @@ impl Commands {
     }
 
     async fn set_pool_favorite(&self, pool_id: i32, value: &str) -> Result<(), String> {
-        let favorite = if eq_ic(value, "none") {
+        let favorite = if value.eq_ignore_ascii_case("none") {
             None
         } else {
             Some(parse_int(value)?)
@@ -669,17 +640,11 @@ impl Commands {
         if let Some(raw) = probe_duration {
             let budget = parse_int(raw)?;
             let relaxed = rule.without_duration();
-            // A negative limit is refused with the number as the message.
-            let limit = budget.wrapping_mul(4);
-            let Ok(limit) = usize::try_from(limit) else {
-                return Err(limit.to_string());
+            let Ok(budget) = usize::try_from(budget) else {
+                return Err(format!("Probe budget must not be negative: {budget}"));
             };
-            let candidates = self.svc.index.search(&relaxed, limit);
-            let probed = self
-                .svc
-                .index
-                .probe_durations(&candidates, usize::try_from(budget).unwrap_or(0))
-                .await;
+            let candidates = self.svc.index.search(&relaxed, budget.saturating_mul(4));
+            let probed = self.svc.index.probe_durations(&candidates, budget).await;
             self.info(format!("Probed {probed} durations for {parsed}"));
         }
         // These two are read after the probe, so a bad number is reported after it ran.
@@ -694,7 +659,7 @@ impl Commands {
             .generate_pools(&self.svc.index, &rule, size, rounds)
             .await
             .map_err(|e| {
-                if e.is_io_exception() {
+                if matches!(e, CatalogError::Upstream(_) | CatalogError::Storage { .. }) {
                     format!("Pool generation failed: {}", e.message())
                 } else {
                     e.message()
@@ -703,7 +668,7 @@ impl Commands {
         self.info(format!(
             "Generated {} {parsed} pools: {}",
             outcome.pool_ids.len(),
-            java_list(&outcome.pool_ids)
+            list_text(&outcome.pool_ids)
         ));
         Ok(())
     }
@@ -711,7 +676,7 @@ impl Commands {
     async fn chart(&self, a: &[&str]) -> CmdResult {
         let n = a.len();
         let index = &self.svc.index;
-        if n == 2 && eq_ic(a[1], "index") {
+        if n == 2 && a[1].eq_ignore_ascii_case("index") {
             self.info(format!(
                 "Chart index holds {} charts (remote total {}, refreshing {})",
                 index.indexed_count(),
@@ -720,8 +685,8 @@ impl Commands {
             ));
             return Ok(true);
         }
-        if (n == 2 || n == 3) && eq_ic(a[1], "refresh") {
-            let full = n == 3 && eq_ic(a[2], "full");
+        if (n == 2 || n == 3) && a[1].eq_ignore_ascii_case("refresh") {
+            let full = n == 3 && a[2].eq_ignore_ascii_case("full");
             let division = a.get(2).map(|d| (*d).to_owned());
             let started = if full {
                 self.info("Refreshing chart index in background (full sweep)".to_owned());
@@ -738,11 +703,11 @@ impl Commands {
             }
             return Ok(true);
         }
-        if n >= 3 && eq_ic(a[1], "search") {
+        if n >= 3 && a[1].eq_ignore_ascii_case("search") {
             self.search_charts(a[2], a.get(3).copied())?;
             return Ok(true);
         }
-        if n >= 3 && eq_ic(a[1], "duration") {
+        if n >= 3 && a[1].eq_ignore_ascii_case("duration") {
             let ids = parse_chart_ids(&a[2..])?;
             self.probe_durations(&ids).await?;
             return Ok(true);
@@ -758,9 +723,8 @@ impl Commands {
             Some(v) => parse_int(v)?,
             None => 20,
         };
-        // A negative limit is refused with the number as the message.
         let Ok(max) = usize::try_from(max) else {
-            return Err(max.to_string());
+            return Err(format!("Limit must not be negative: {max}"));
         };
         let matched = self.svc.index.search(&rule, max);
         self.info(format!(
@@ -809,11 +773,11 @@ impl Commands {
     async fn submission(&self, a: &[&str]) -> CmdResult {
         let n = a.len();
         let subs = &self.svc.submissions;
-        if n == 2 && eq_ic(a[1], "list") {
+        if n == 2 && a[1].eq_ignore_ascii_case("list") {
             self.print_submissions(&subs.list_pending(), "待审投稿");
             return Ok(true);
         }
-        if n == 3 && eq_ic(a[1], "list") {
+        if n == 3 && a[1].eq_ignore_ascii_case("list") {
             let pool_id = parse_int(a[2])?;
             self.print_submissions(
                 &subs.list_by_pool(pool_id, None),
@@ -821,7 +785,7 @@ impl Commands {
             );
             return Ok(true);
         }
-        if n >= 4 && eq_ic(a[1], "approve") {
+        if n >= 4 && a[1].eq_ignore_ascii_case("approve") {
             let pool_id = parse_int(a[2])?;
             let chart_id = parse_int(a[3])?;
             match subs
@@ -838,7 +802,7 @@ impl Commands {
             ));
             return Ok(true);
         }
-        if n >= 4 && eq_ic(a[1], "reject") {
+        if n >= 4 && a[1].eq_ignore_ascii_case("reject") {
             let pool_id = parse_int(a[2])?;
             let chart_id = parse_int(a[3])?;
             let reason = a.get(4).copied();

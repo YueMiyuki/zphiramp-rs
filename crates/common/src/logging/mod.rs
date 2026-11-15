@@ -51,7 +51,7 @@ pub fn logger_name(target: &str) -> &str {
     }
 }
 
-pub fn strip_ansi(s: &str) -> Cow<'_, str> {
+fn strip_ansi(s: &str) -> Cow<'_, str> {
     if !s.contains('\u{1b}') {
         return Cow::Borrowed(s);
     }
@@ -336,5 +336,16 @@ fn writer_loop(
     }
     if let Some(mut f) = file.take() {
         let _ = f.close();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::strip_ansi;
+
+    #[test]
+    fn strips_colour_codes_only() {
+        assert_eq!(strip_ansi("a\u{1b}[31;1mb\u{1b}[mc\u{1b}[x"), "abc\u{1b}[x");
+        assert_eq!(strip_ansi("plain"), "plain");
     }
 }

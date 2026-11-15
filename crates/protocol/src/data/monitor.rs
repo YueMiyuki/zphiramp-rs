@@ -1,6 +1,6 @@
 use bytes::{Buf, BufMut};
 
-use crate::error::ProtocolError;
+use crate::error::{IdKind, ProtocolError};
 use crate::wire::{
     Decode, Encode, decode_float16_le, decode_list, encode_float16_le, encode_list, get_f32_le,
     get_i8, get_i32_le,
@@ -49,7 +49,10 @@ impl Decode for Judgement {
             3 => Ok(Judgement::Miss),
             4 => Ok(Judgement::HoldPerfect),
             5 => Ok(Judgement::HoldGood),
-            id => Err(ProtocolError::UnknownJudgementId(id)),
+            id => Err(ProtocolError::UnknownId {
+                kind: IdKind::Judgement,
+                id: i32::from(id),
+            }),
         }
     }
 }

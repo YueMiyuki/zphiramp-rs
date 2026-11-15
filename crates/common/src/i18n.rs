@@ -1,9 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, Mutex};
 
-use crate::gson;
-
-pub const FALLBACK_LANGUAGE: &str = "zh-CN";
+const FALLBACK_LANGUAGE: &str = "zh-CN";
 
 const BUNDLED: [(&str, &str); 2] = [
     ("en-US", include_str!("../lang/en-US.json")),
@@ -27,7 +25,7 @@ impl I18n {
         let tables = BUNDLED
             .iter()
             .map(|(lang, json)| {
-                let table: HashMap<String, String> = gson::from_str(json)
+                let table: HashMap<String, String> = serde_json::from_str(json)
                     .unwrap_or_else(|e| panic!("bundled lang/{lang}.json: {e}"));
                 (*lang, table)
             })
@@ -41,19 +39,8 @@ impl I18n {
         }
     }
 
-    pub fn with_default_language(&self, default_language: &str) -> Self {
-        Self {
-            inner: Arc::clone(&self.inner),
-            default_language: Arc::from(default_language),
-        }
-    }
-
     pub fn default_language(&self) -> &str {
         &self.default_language
-    }
-
-    pub fn bundled_languages(&self) -> impl Iterator<Item = &str> {
-        BUNDLED.iter().map(|(lang, _)| *lang)
     }
 
     pub fn message(&self, language: &str, key: &str) -> String {
@@ -65,14 +52,6 @@ impl I18n {
             }
         };
         table.get(key).cloned().unwrap_or_else(|| key.to_owned())
-    }
-
-    pub fn message_default(&self, key: &str) -> String {
-        self.message(&self.default_language, key)
-    }
-
-    pub fn message_for(&self, player_language: Option<&str>, key: &str) -> String {
-        self.message(player_language.unwrap_or(&self.default_language), key)
     }
 
     fn warn_once(&self, language: &str) {
@@ -113,18 +92,14 @@ mod tests {
             "成绩提交失败，请稍后重试"
         );
         assert_eq!(
-            i18n.message_default("system.live_recorder_name"),
+            i18n.message("zh-CN", "system.live_recorder_name"),
             "录制状态设置器(请忽略该账号)"
         );
-        let en = i18n.with_default_language("en-US");
         assert_eq!(
-            en.message_for(None, "error.not_host"),
+            i18n.message("en-US", "error.not_host"),
             "You are not the host"
         );
-        assert_eq!(
-            en.message_for(Some("zh-CN"), "error.not_host"),
-            "你不是房主"
-        );
+        assert_eq!(i18n.default_language(), "zh-CN");
         assert_eq!(i18n.inner.warned.lock().unwrap().len(), 1);
     }
 
@@ -140,6 +115,6 @@ mod tests {
         for h in handles {
             assert_eq!(h.join().unwrap(), "你不是房主");
         }
-        assert_eq!(i18n.message_default("error.not_host"), "你不是房主");
+        assert_eq!(i18n.message("fr-FR", "error.not_host"), "你不是房主");
     }
 }

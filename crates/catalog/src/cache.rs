@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use arc_swap::ArcSwap;
-use zphira_common::{fs, gson};
+use zphira_common::{fs, json};
 use zphira_phira::ChartInfo;
 
 use crate::config::{CatalogConfig, FileSink};
@@ -31,11 +31,11 @@ impl ChartInfoCache {
         remove_stale(config, CACHE_FILE);
         let path = config.path(CACHE_FILE);
         let (map, unreadable) =
-            match fs::read_to_string_if_exists(&path).map_err(CatalogError::io)? {
+            match fs::read_to_string_if_exists(&path).map_err(CatalogError::storage)? {
                 None => (ChartMap::new(), None),
-                Some(text) => match gson::from_str_opt::<ChartMap>(&text) {
+                Some(text) => match json::from_str_opt::<ChartMap>(&text) {
                     Ok(map) => (map.unwrap_or_default(), None),
-                    Err(e) => (ChartMap::new(), Some(e.message().to_owned())),
+                    Err(e) => (ChartMap::new(), Some(e.to_string())),
                 },
             };
         let cache = Self {

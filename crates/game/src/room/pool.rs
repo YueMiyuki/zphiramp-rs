@@ -88,10 +88,7 @@ impl RoomChartPool {
     pub fn pools(&self) -> Vec<Arc<PoolSnapshot>> {
         self.entries
             .iter()
-            .filter_map(|e| {
-                self.resolve(e)
-                    .or_else(|| self.catalog.find_published_pool(e.id))
-            })
+            .filter_map(|e| self.resolve(e).or_else(|| self.catalog.find_pool(e.id)))
             .collect()
     }
 
@@ -250,7 +247,7 @@ impl RoomChartPool {
 }
 
 fn usable_live(catalog: &ChartPool, id: i32) -> Option<Arc<PoolSnapshot>> {
-    let live = catalog.find_published_pool(id)?;
+    let live = catalog.find_pool(id)?;
     if live.chart_ids.is_empty()
         || !live
             .chart_ids

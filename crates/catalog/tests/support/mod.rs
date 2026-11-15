@@ -15,7 +15,6 @@ use zphira_catalog::{
     AtomicFiles, BoxFuture, CatalogConfig, CatalogError, Clock, FileSink, Sleeper, Upstream,
     UpstreamError,
 };
-use zphira_common::gson;
 use zphira_phira::{ChartInfo, ChartListPage};
 
 pub fn fixture_path(rel: &str) -> PathBuf {
@@ -88,12 +87,59 @@ pub fn read(dir: &Path, name: &str) -> String {
     std::fs::read_to_string(dir.join(name)).unwrap()
 }
 
-pub fn java_error(e: &CatalogError) -> String {
-    let class = e.java_class().rsplit('.').next().unwrap();
-    format!("{class}: {}", e.message())
+pub fn error_text(e: &CatalogError) -> String {
+    let kind = match e {
+        CatalogError::Invalid(_) => "Invalid",
+        CatalogError::NotFound(_) => "NotFound",
+        CatalogError::Upstream(_) => "Upstream",
+        CatalogError::Storage { .. } => "Storage",
+        _ => "Other",
+    };
+    format!("{kind}: {}", e.message())
 }
 
-pub fn java_list<T: std::fmt::Display>(items: &[T]) -> String {
+/// A recorded outcome with its exception class replaced by the error kind used here.
+pub fn recorded(text: &str) -> String {
+    let Some((class, message)) = text.split_once(": ") else {
+        return text.to_owned();
+    };
+    let kind = match class {
+        "IllegalArgumentException" if message.starts_with("Pool not found") => "NotFound",
+        "IllegalArgumentException" => "Invalid",
+        "IllegalStateException" => "Storage",
+        "IOException" => "Upstream",
+        _ => return text.to_owned(),
+    };
+    format!("{kind}: {message}")
+}
+
+pub fn same_json(a: &str, b: &str) -> bool {
+    fn equal(a: &serde_json::Value, b: &serde_json::Value) -> bool {
+        use serde_json::Value;
+        match (a, b) {
+            (Value::String(x), Value::String(y)) => {
+                x == y
+                    || matches!(
+                        (zphira_common::time::Timestamp::parse(x), zphira_common::time::Timestamp::parse(y)),
+                        (Ok(p), Ok(q)) if p == q
+                    )
+            }
+            (Value::Number(x), Value::Number(y)) => x.as_f64() == y.as_f64(),
+            (Value::Array(x), Value::Array(y)) => {
+                x.len() == y.len() && x.iter().zip(y).all(|(p, q)| equal(p, q))
+            }
+            (Value::Object(x), Value::Object(y)) => {
+                x.keys().eq(y.keys()) && x.iter().zip(y).all(|((_, p), (_, q))| equal(p, q))
+            }
+            _ => a == b,
+        }
+    }
+    let a: serde_json::Value = serde_json::from_str(a).expect("first document");
+    let b: serde_json::Value = serde_json::from_str(b).expect("second document");
+    equal(&a, &b)
+}
+
+pub fn list_text<T: std::fmt::Display>(items: &[T]) -> String {
     let parts: Vec<String> = items.iter().map(ToString::to_string).collect();
     format!("[{}]", parts.join(", "))
 }
@@ -123,7 +169,7 @@ pub fn chart(
 
 pub fn chart_map_json(charts: &[ChartInfo]) -> String {
     let map: BTreeMap<i32, &ChartInfo> = charts.iter().map(|c| (c.id, c)).collect();
-    gson::to_string_pretty(&map).unwrap()
+    serde_json::to_string_pretty(&map).unwrap()
 }
 
 pub fn not_found() -> UpstreamError {
@@ -258,7 +304,7 @@ impl Upstream for FakeUpstream {
             self.pass_gate(&path).await;
             let body = self.pages.lock().unwrap().get(&path).cloned();
             match body {
-                Some(body) => Ok(gson::from_str(&body).expect("stub page")),
+                Some(body) => Ok(serde_json::from_str(&body).expect("stub page")),
                 None => Err(not_found()),
             }
         })

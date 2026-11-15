@@ -6,8 +6,8 @@ use arc_swap::ArcSwap;
 use serde::ser::SerializeStruct;
 use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
-use zphira_common::time::JavaOffsetDateTime;
-use zphira_common::{fs, gson};
+use zphira_common::time::Timestamp;
+use zphira_common::{fs, json};
 
 use crate::config::{CatalogConfig, FileSink};
 use crate::error::CatalogError;
@@ -48,10 +48,10 @@ impl SubmissionStatus {
     }
 
     pub fn parse_ignore_case(raw: &str) -> Option<Self> {
-        let upper = raw.trim_matches(|c: char| c <= ' ').to_uppercase();
+        let raw = raw.trim();
         [Self::Pending, Self::Approved, Self::Rejected]
             .into_iter()
-            .find(|s| s.name() == upper)
+            .find(|s| s.name().eq_ignore_ascii_case(raw))
     }
 }
 
@@ -59,8 +59,10 @@ impl SubmissionStatus {
 #[serde(default)]
 pub struct Submitter {
     pub user_id: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
-    pub at: Option<JavaOffsetDateTime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub at: Option<Timestamp>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -69,8 +71,8 @@ pub struct SubmissionView {
     pub chart_id: i32,
     pub status: SubmissionStatus,
     pub submitters: Vec<Submitter>,
-    pub created_at: Option<JavaOffsetDateTime>,
-    pub reviewed_at: Option<JavaOffsetDateTime>,
+    pub created_at: Option<Timestamp>,
+    pub reviewed_at: Option<Timestamp>,
     pub reviewer_id: Option<i32>,
     pub reason: Option<String>,
 }
@@ -112,12 +114,19 @@ pub enum ApproveOutcome {
 struct Submission {
     pool_id: i32,
     chart_id: i32,
-    #[serde(deserialize_with = "gson::enum_or_none")]
+    #[serde(
+        deserialize_with = "json::enum_or_none",
+        skip_serializing_if = "Option::is_none"
+    )]
     status: Option<SubmissionStatus>,
     submitters: Vec<Submitter>,
-    created_at: Option<JavaOffsetDateTime>,
-    reviewed_at: Option<JavaOffsetDateTime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    created_at: Option<Timestamp>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reviewed_at: Option<Timestamp>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     reviewer_id: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     reason: Option<String>,
 }
 
@@ -165,7 +174,7 @@ type Entries = BTreeMap<Key, Arc<Submission>>;
 #[derive(Deserialize)]
 #[serde(default)]
 struct StoreFile {
-    submissions: Option<Vec<Option<Submission>>>,
+    submissions: Option<Vec<Submission>>,
 }
 
 impl Default for StoreFile {
@@ -360,14 +369,14 @@ impl Submissions {
                 None => Submission {
                     pool_id,
                     chart_id,
-                    created_at: Some(JavaOffsetDateTime::now()),
+                    created_at: Some(Timestamp::now()),
                     ..Submission::default()
                 },
             };
             entry.submitters.push(Submitter {
                 user_id,
                 name: name.map(str::to_owned),
-                at: Some(JavaOffsetDateTime::now()),
+                at: Some(Timestamp::now()),
             });
             if entry.status != Some(SubmissionStatus::Pending) {
                 entry.reviewed_at = None;
@@ -383,7 +392,7 @@ impl Submissions {
         if changed {
             self.commit(entries)
                 .await
-                .map_err(|e| CatalogError::save_failed(SAVE_FAILED, e))?;
+                .map_err(|e| CatalogError::storage_with(SAVE_FAILED, e))?;
         }
         Ok(results)
     }
@@ -413,7 +422,7 @@ impl Submissions {
         }
         self.commit(entries)
             .await
-            .map_err(|e| CatalogError::save_failed(SAVE_FAILED, e))?;
+            .map_err(|e| CatalogError::storage_with(SAVE_FAILED, e))?;
         Ok(true)
     }
 
@@ -438,14 +447,14 @@ impl Submissions {
         } else {
             SubmissionStatus::Rejected
         });
-        entry.reviewed_at = Some(JavaOffsetDateTime::now());
+        entry.reviewed_at = Some(Timestamp::now());
         entry.reviewer_id = Some(reviewer_id);
         entry.reason = reason.map(str::to_owned);
         let mut entries = current.entries.clone();
         entries.insert(key, Arc::new(entry));
         self.commit(entries)
             .await
-            .map_err(|e| CatalogError::save_failed(SAVE_FAILED, e))?;
+            .map_err(|e| CatalogError::storage_with(SAVE_FAILED, e))?;
         Ok(true)
     }
 
@@ -478,7 +487,7 @@ impl Submissions {
         if !state.file_exists {
             return Ok(EMPTY_DOCUMENT.to_owned());
         }
-        gson::to_string_pretty(&StoreOut(&state.entries)).map_err(CatalogError::Json)
+        serde_json::to_string_pretty(&StoreOut(&state.entries)).map_err(CatalogError::json)
     }
 
     pub async fn import_json(
@@ -500,9 +509,9 @@ impl Submissions {
         let path = self.inner.path.clone();
         let backup_file = run_blocking(move || backup(&path))
             .await
-            .map_err(CatalogError::io)?;
+            .map_err(CatalogError::storage)?;
         let count = i32::try_from(entries.len()).unwrap_or(i32::MAX);
-        self.commit(entries).await.map_err(CatalogError::io)?;
+        self.commit(entries).await.map_err(CatalogError::storage)?;
         Ok(ImportResult {
             imported: count,
             total: count,
@@ -530,18 +539,14 @@ impl Submissions {
 }
 
 fn parse_store(text: &str) -> Result<(Entries, Vec<Key>), String> {
-    let store = gson::from_str_opt::<StoreFile>(text).map_err(|e| e.message().to_owned())?;
+    let store = json::from_str_opt::<StoreFile>(text).map_err(|e| e.to_string())?;
     let mut entries = Entries::new();
     let mut normalized = Vec::new();
     if let Some(StoreFile {
         submissions: Some(rows),
     }) = store
     {
-        for row in rows {
-            let Some(mut row) = row else {
-                // Fixed log text for a null row.
-                return Err("Cannot read field \"poolId\" because \"entry\" is null".to_owned());
-            };
+        for mut row in rows {
             if row.status.is_none() {
                 row.status = Some(SubmissionStatus::Pending);
                 normalized.push((row.pool_id, row.chart_id));
@@ -580,8 +585,7 @@ fn parse_import_rows(document: &str) -> Result<Vec<Submission>, CatalogError> {
                 }
             }
         }
-        let submission: Submission =
-            gson::from_element(row).map_err(|e| bad_row(FIELD, i, e.message()))?;
+        let submission = Submission::deserialize(row).map_err(|e| bad_row(FIELD, i, e))?;
         if !keys.insert((submission.pool_id, submission.chart_id)) {
             return Err(bad_row(
                 FIELD,
@@ -633,7 +637,7 @@ mod tests {
             "submissions[0] 无效：submitters[0] 缺少 user_id"
         );
         assert_eq!(
-            err(r#"{"submissions":[{"pool_id":1,"chart_id":2},{"pool_id":"1","chart_id":2}]}"#),
+            err(r#"{"submissions":[{"pool_id":1,"chart_id":2},{"pool_id":1,"chart_id":2}]}"#),
             "submissions[1] 无效：池 1 谱面 2 重复"
         );
         assert!(
@@ -641,7 +645,7 @@ mod tests {
                 .starts_with("submissions[0] 无效：")
         );
         let ok = parse_import_rows(
-            r#"{"submissions":[{"pool_id":1,"chart_id":2,"submitters":null},{"pool_id":1,"chart_id":3,"status":"APPROVED"}]}"#,
+            r#"{"submissions":[{"pool_id":1,"chart_id":2},{"pool_id":1,"chart_id":3,"status":"APPROVED"}]}"#,
         )
         .unwrap();
         assert_eq!(ok[0].status, Some(SubmissionStatus::Pending));

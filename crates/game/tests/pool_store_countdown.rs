@@ -5,7 +5,6 @@ use std::time::Duration;
 
 use support::*;
 use zphira_catalog::{CatalogConfig, ChartPool, PoolCategory, PoolSnapshot};
-use zphira_common::gson;
 use zphira_game::{RoomChartPool, RoomUpdate, Rotation, SavedRoom};
 use zphira_protocol::ServerBoundPacket as Sb;
 
@@ -287,7 +286,7 @@ const SETTING: &str = r#"{"auto_destroy": false, "host": false, "max_player": 10
 
 #[test]
 fn a_file_written_before_rotation_was_saved_still_loads() {
-    let rooms: Vec<SavedRoom> = gson::from_str(&format!(
+    let rooms: Vec<SavedRoom> = serde_json::from_str(&format!(
         r#"[{{"room_id": "a", "pool_ids": [1, 2], "setting": {SETTING}}}]"#
     ))
     .unwrap();
@@ -296,7 +295,7 @@ fn a_file_written_before_rotation_was_saved_still_loads() {
 
 #[test]
 fn rotation_progress_is_read_back() {
-    let rooms: Vec<SavedRoom> = gson::from_str(&format!(
+    let rooms: Vec<SavedRoom> = serde_json::from_str(&format!(
         r#"[{{"room_id": "a", "pool_ids": [1, 2], "setting": {SETTING}, "current_pool_id": 2, "pending_pool_id": 1, "finished_rounds": 2}}]"#
     ))
     .unwrap();
@@ -308,7 +307,7 @@ fn rotation_progress_is_read_back() {
             finished_rounds: 2
         }
     );
-    let written = gson::to_string_pretty(&rooms).unwrap();
+    let written = serde_json::to_string_pretty(&rooms).unwrap();
     for key in [
         "\"current_pool_id\": 2",
         "\"pending_pool_id\": 1",

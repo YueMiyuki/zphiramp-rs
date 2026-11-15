@@ -1,11 +1,11 @@
 mod common;
 
 use common::*;
-use zphira_protocol::float16::{float_to_half, half_to_float};
+use zphira_protocol::wire::{decode_float16_le, encode_float16_le};
 use zphira_protocol::wire::{
     decode_string, decode_varint, encode_string, encode_varint, varint_len,
 };
-use zphira_protocol::{ProtocolError, encode_frame};
+use zphira_protocol::{ProtocolError, ServerBoundPacket, encode_frame};
 
 #[test]
 fn varints() {
@@ -26,9 +26,7 @@ fn varints() {
                 let got = decode_varint(&mut buf);
                 let want = &row[2];
                 if want == "err" {
-                    let err = got.expect_err(&row[1]);
-                    assert_eq!(err.java_exception(), Some(row[3].as_str()), "{}", row[1]);
-                    assert_eq!(err.to_string(), row[4], "{}", row[1]);
+                    got.expect_err(&row[1]);
                 } else {
                     let (value, consumed) = want.split_once(':').unwrap();
                     assert_eq!(
@@ -82,9 +80,7 @@ fn strings() {
                 let got = decode_string(&mut buf, max);
                 let what = format!("max {max} input {}", row[2]);
                 if row[3] == "err" {
-                    let err = got.expect_err(&what);
-                    assert_eq!(err.java_exception(), Some(row[4].as_str()), "{what}");
-                    assert_eq!(err.to_string(), row[5], "{what}");
+                    got.expect_err(&what);
                 } else {
                     let (text_hex, consumed) = row[4].split_once(':').unwrap();
                     let text = got.unwrap_or_else(|e| panic!("{what}: {e}"));
@@ -115,7 +111,7 @@ fn strings() {
                 b.extend(std::iter::repeat_n(b'a', len as usize));
                 let got = match decode_string(&mut &b[..], max) {
                     Ok(s) => format!("ok:{}", s.len()),
-                    Err(e) => format!("err:{}", code(&e)),
+                    Err(_) => "err".to_owned(),
                 };
                 assert_eq!(got, row[2], "{}", row[1]);
             }
@@ -127,25 +123,36 @@ fn strings() {
 }
 
 #[test]
-fn utf8_replacement_matches_the_jdk() {
-    let rows = rows("utf8_lossy.tsv");
-    let mut differs_from_rust_lossy = 0;
-    for row in &rows {
-        let input = unhex(&row[0]);
+fn invalid_utf8_decodes_with_replacement_characters() {
+    let bodies: [&[u8]; 5] = [
+        &[0xc3, 0x28],
+        &[0xed, 0xa0, 0x80],
+        &[0xe2, 0x82],
+        &[0xff, 0xfe, 0x41],
+        &[0xc0, 0xaf],
+    ];
+    for body in bodies {
         let mut framed = Vec::new();
-        encode_varint(&mut framed, input.len() as i32);
-        framed.extend_from_slice(&input);
+        encode_varint(&mut framed, body.len() as i32);
+        framed.extend_from_slice(body);
         let got = decode_string(&mut &framed[..], 131_072).unwrap();
-        assert_eq!(hex(got.as_bytes()), row[1], "input {}", row[0]);
-        if got != String::from_utf8_lossy(&input) {
-            differs_from_rust_lossy += 1;
-        }
+        assert_eq!(got, String::from_utf8_lossy(body));
+        assert!(got.contains('\u{FFFD}'), "{body:02x?}");
     }
+}
 
-    assert!(differs_from_rust_lossy > 0);
-    eprintln!(
-        "{} inputs, {differs_from_rust_lossy} of them decode differently with from_utf8_lossy",
-        rows.len()
+#[test]
+fn invalid_utf8_in_a_packet_is_repaired_and_reencodes_as_valid_utf8() {
+    let packet = ServerBoundPacket::decode(&mut &[0x02, 0x02, 0xc3, 0x28][..]).unwrap();
+    assert_eq!(
+        packet,
+        ServerBoundPacket::Chat {
+            message: "\u{FFFD}(".into()
+        }
+    );
+    assert_eq!(
+        packet.to_bytes().as_ref(),
+        &[0x02, 0x04, 0xef, 0xbf, 0xbd, 0x28]
     );
 }
 
@@ -157,7 +164,13 @@ fn half_to_float_is_exhaustively_exact() {
         assert_eq!(line.len(), 256 * 8);
         for chunk in line.as_bytes().chunks(8) {
             let want = u32::from_str_radix(std::str::from_utf8(chunk).unwrap(), 16).unwrap();
-            assert_eq!(half_to_float(i as u16).to_bits(), want, "half {i:#06x}");
+            assert_eq!(
+                decode_float16_le(&mut &(i as u16).to_le_bytes()[..])
+                    .unwrap()
+                    .to_bits(),
+                want,
+                "half {i:#06x}"
+            );
             i += 1;
         }
     }
@@ -216,7 +229,9 @@ fn float_to_half_matches_java() {
     let want: String = lines("float16_encode.txt").concat();
     assert_eq!(want.len(), inputs.len() * 4);
     for (i, bits) in inputs.iter().enumerate() {
-        let got = float_to_half(f32::from_bits(*bits));
+        let mut b = Vec::new();
+        encode_float16_le(&mut b, f32::from_bits(*bits));
+        let got = u16::from_le_bytes([b[0], b[1]]);
         assert_eq!(
             format!("{got:04x}"),
             want[4 * i..4 * i + 4],
@@ -230,10 +245,14 @@ fn float_to_half_matches_java() {
 fn string_limit_check_order() {
     assert_eq!(
         decode_string(&mut &[0x05, b'a'][..], 3),
-        Err(ProtocolError::BadStringLength { length: 5, max: 3 })
+        Err(ProtocolError::StringTooLong { length: 5, max: 3 })
     );
     assert_eq!(
         decode_string(&mut &[0x03, b'a'][..], 3),
-        Err(ProtocolError::NeedMoreData)
+        Err(ProtocolError::Malformed("truncated"))
+    );
+    assert_eq!(
+        decode_string(&mut &[0xff, 0xff, 0xff, 0xff, 0x0f][..], 3),
+        Err(ProtocolError::Malformed("negative string length"))
     );
 }

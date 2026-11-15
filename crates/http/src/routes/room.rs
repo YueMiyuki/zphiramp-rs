@@ -9,9 +9,9 @@ use zphira_game::{
 };
 
 use super::pool::require_favorite_body;
+use super::{non_blank, or_null};
 use crate::auth::{is_admin, require_admin, require_user};
-use crate::body::{body_or_null, int_list, primitive};
-use crate::java;
+use crate::body::body_or_null;
 use crate::reply::{self, Failure};
 use crate::request::Ctx;
 use crate::state::AppState;
@@ -55,7 +55,7 @@ async fn require_in_room(
 #[serde(default)]
 struct CreateRoomBody {
     r#type: Option<String>,
-    pools: Option<Vec<Option<i32>>>,
+    pools: Option<Vec<i32>>,
 }
 
 pub(super) async fn create(
@@ -77,7 +77,7 @@ pub(super) async fn create(
     }
     let body: Option<CreateRoomBody> = body_or_null(ctx).await?;
     let (kind, pools) = match body {
-        Some(body) => (body.r#type, int_list(body.pools)?),
+        Some(body) => (body.r#type, body.pools),
         None => (None, None),
     };
     let kind = kind.unwrap_or_else(|| "local".to_owned());
@@ -91,11 +91,7 @@ pub(super) async fn create(
     let ids = game
         .create_room(&room_id, pools)
         .map_err(|e| Failure::bad_request(e.http_message()))?;
-    tracing::info!(
-        "HTTP create room: {} pools={}",
-        room_id,
-        java::list_to_string(Some(&ids))
-    );
+    tracing::info!("HTTP create room: {} pools={}", room_id, format!("{ids:?}"));
     reply::ok()
 }
 
@@ -118,7 +114,7 @@ struct UpdateRoomBody {
     force_finish: Option<i32>,
     interval: Option<i32>,
     #[serde(rename = "adminIds")]
-    admin_ids: Option<Vec<Option<i32>>>,
+    admin_ids: Option<Vec<i32>>,
     #[serde(rename = "cancelReadyInVote")]
     cancel_ready_in_vote: Option<bool>,
     #[serde(rename = "startWhenAllReady")]
@@ -138,7 +134,7 @@ pub(super) async fn update(
     let update = RoomUpdate {
         live: body.live,
         locked: body.lock,
-        admin_ids: int_list(body.admin_ids)?,
+        admin_ids: body.admin_ids,
         chat_enable: body.chat_enable,
         min_player: body.min_player,
         max_player: body.max_player,
@@ -229,35 +225,35 @@ struct SayBody {
 
 async fn require_say_message(ctx: &mut Ctx) -> Result<String, Failure> {
     let body: Option<SayBody> = body_or_null(ctx).await?;
-    let message = body
-        .and_then(|b| b.message)
-        .filter(|m| !java::is_blank(m))
-        .ok_or_else(|| Failure::bad_request("消息不能为空"))?;
-    Ok(say_text(&message))
+    let message = body.and_then(|b| b.message);
+    let message =
+        non_blank(message.as_deref()).ok_or_else(|| Failure::bad_request("消息不能为空"))?;
+    Ok(say_text(message))
 }
 
 pub(crate) fn say_text(message: &str) -> String {
-    let stripped = message.trim_matches(java::is_java_whitespace);
-    let mut folded = String::with_capacity(stripped.len());
+    let mut folded = String::with_capacity(message.len());
+    let mut units = 0;
     let mut in_break = false;
-    for c in stripped.chars() {
-        if c == '\r' || c == '\n' {
-            if !in_break {
-                folded.push(' ');
+    for c in message.trim().chars() {
+        let c = match c {
+            '\r' | '\n' if in_break => continue,
+            '\r' | '\n' => {
+                in_break = true;
+                ' '
             }
-            in_break = true;
-        } else {
-            folded.push(c);
-            in_break = false;
+            c => {
+                in_break = false;
+                c
+            }
+        };
+        units += c.len_utf16();
+        if units > MAX_CHAT_LENGTH {
+            break;
         }
+        folded.push(c);
     }
-    let units: Vec<u16> = folded.encode_utf16().collect();
-    if units.len() <= MAX_CHAT_LENGTH {
-        return folded;
-    }
-    char::decode_utf16(units[..MAX_CHAT_LENGTH].iter().copied())
-        .map(|r| r.unwrap_or('?'))
-        .collect()
+    folded
 }
 
 #[derive(Serialize)]
@@ -314,7 +310,7 @@ pub(super) async fn pool(state: &Arc<AppState>, ctx: &mut Ctx) -> Result<Respons
 #[derive(Deserialize, Default)]
 #[serde(default)]
 struct SwitchPoolBody {
-    #[serde(rename = "poolId", deserialize_with = "primitive")]
+    #[serde(rename = "poolId")]
     pool_id: i32,
 }
 
@@ -352,7 +348,7 @@ pub(super) async fn pool_favorite(
     tracing::info!(
         "HTTP room {} pool favorite set to {}",
         room_id,
-        java::opt_to_string(favorite_id)
+        or_null(favorite_id)
     );
     reply::ok()
 }
@@ -383,13 +379,12 @@ mod tests {
     use super::say_text;
 
     #[test]
-    fn say_text_like_java() {
+    fn say_text_folds_and_cuts() {
         assert_eq!(say_text("  hi\r\n\nthere  "), "hi there");
         assert_eq!(say_text("a\rb\nc"), "a b c");
-        assert_eq!(say_text("\u{3000}x\u{a0}"), "x\u{a0}");
         let long = "长".repeat(250);
         assert_eq!(say_text(&long).chars().count(), 200);
         let emoji = format!("{}{}", "a".repeat(199), "😀");
-        assert_eq!(say_text(&emoji), format!("{}?", "a".repeat(199)));
+        assert_eq!(say_text(&emoji), "a".repeat(199));
     }
 }

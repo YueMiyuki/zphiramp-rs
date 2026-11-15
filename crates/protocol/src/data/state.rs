@@ -1,6 +1,6 @@
 use bytes::{Buf, BufMut};
 
-use crate::error::ProtocolError;
+use crate::error::{IdKind, ProtocolError};
 use crate::wire::{Decode, Encode, get_bool, get_i8, get_i32_le};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -38,7 +38,10 @@ impl Decode for GameState {
             })),
             0x01 => Ok(GameState::WaitForReady),
             0x02 => Ok(GameState::Playing),
-            id => Err(ProtocolError::UnknownGameStateId(id)),
+            id => Err(ProtocolError::UnknownId {
+                kind: IdKind::GameState,
+                id: i32::from(id),
+            }),
         }
     }
 }

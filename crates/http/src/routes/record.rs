@@ -5,9 +5,8 @@ use http::Response;
 use serde::Serialize;
 use zphira_ledger::{PlayerRoundView, RankEntry, RecordView};
 
-use super::{path_int, query_double, query_int_or_null, query_limit};
+use super::{non_blank, path_int, query_double, query_number, query_page_size};
 use crate::auth::require_admin;
-use crate::java;
 use crate::reply::{self, Failure};
 use crate::request::Ctx;
 use crate::state::AppState;
@@ -26,11 +25,11 @@ struct ListJson<'a> {
 
 pub(super) async fn list(state: &Arc<AppState>, ctx: &mut Ctx) -> Result<Response<Body>, Failure> {
     require_admin(state, ctx).await?;
-    let limit = query_limit(ctx)?;
-    let offset = java::double_to_int(query_double(ctx, "offset", 0.0)?).max(0);
+    let limit = query_page_size(ctx)?;
+    let offset = (query_double(ctx, "offset", 0.0)? as i32).max(0);
     let total = state.records.len();
-    let room_id = java::blank_to_null(ctx.query_param("roomId")).map(str::to_owned);
-    let player_id = query_int_or_null(ctx, "playerId")?;
+    let room_id = non_blank(ctx.query_param("roomId")).map(str::to_owned);
+    let player_id = query_number(ctx, "playerId")?.map(|id| id as i32);
     let records = state.records.query(
         limit,
         usize::try_from(offset).unwrap_or(0),
@@ -84,7 +83,7 @@ pub(super) async fn player(
 ) -> Result<Response<Body>, Failure> {
     require_admin(state, ctx).await?;
     let player_id = path_int(ctx, "playerId")?;
-    let limit = query_limit(ctx)?;
+    let limit = query_page_size(ctx)?;
     let rounds = state.records.by_player(player_id, limit);
     reply::json(&PlayerJson {
         ok: true,
@@ -106,7 +105,7 @@ pub(super) async fn ranking(
     ctx: &mut Ctx,
 ) -> Result<Response<Body>, Failure> {
     require_admin(state, ctx).await?;
-    let limit = query_limit(ctx)?;
+    let limit = query_page_size(ctx)?;
     reply::json(&RankingJson {
         ok: true,
         ranking: state.points.ranking_snapshot(limit),

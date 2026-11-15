@@ -4,8 +4,6 @@ use std::sync::Mutex;
 
 use crate::util::lock;
 
-use super::addr::java_host_address;
-
 pub const MAX_PER_ADDRESS: usize = 64;
 
 #[derive(Debug)]
@@ -35,10 +33,7 @@ impl ConnectionLimiter {
         }
         let per = counts.per_address.get(&address).copied().unwrap_or(0);
         if per >= MAX_PER_ADDRESS {
-            return Err(format!(
-                "too many connections from {}",
-                java_host_address(address)
-            ));
+            return Err(format!("too many connections from {address}"));
         }
         counts.total += 1;
         *counts.per_address.entry(address).or_insert(0) += 1;

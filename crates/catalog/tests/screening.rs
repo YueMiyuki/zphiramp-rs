@@ -1,7 +1,6 @@
 use std::collections::BTreeSet;
 
 use zphira_catalog::{PoolCategory, ScreeningRule};
-use zphira_common::gson;
 use zphira_phira::ChartInfo;
 
 fn chart(
@@ -15,7 +14,7 @@ fn chart(
         "{{\"tags\":[{tags}],\"rating\":{rating},\"ratingCount\":{votes},\"difficulty\":{difficulty}{}}}",
         duration.map_or(String::new(), |d| format!(",\"duration_seconds\":{d}"))
     );
-    gson::from_str(&json).unwrap()
+    serde_json::from_str(&json).unwrap()
 }
 
 fn tags(rule: &ScreeningRule) -> Vec<&str> {
@@ -122,7 +121,7 @@ fn empty_tags_and_absent_bounds_are_not_checked() {
         !rule.matches(&chart("", "0.0", 0, "1.0", None)),
         "rating 0 is not above 0"
     );
-    let no_tags: ChartInfo = gson::from_str("{\"rating\":0.9}").unwrap();
+    let no_tags: ChartInfo = serde_json::from_str("{\"rating\":0.9}").unwrap();
     assert!(rule.matches(&no_tags));
     assert!(
         !ScreeningRule::regular().matches(&no_tags),
@@ -156,8 +155,5 @@ fn categories_parse_like_value_of() {
         PoolCategory::ALL.map(PoolCategory::name),
         ["REGULAR", "CONFIGURED", "TB", "MANUAL"]
     );
-    assert_eq!(
-        gson::to_string_compact(&PoolCategory::Tb).unwrap(),
-        "\"TB\""
-    );
+    assert_eq!(serde_json::to_string(&PoolCategory::Tb).unwrap(), "\"TB\"");
 }

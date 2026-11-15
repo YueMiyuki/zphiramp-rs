@@ -150,7 +150,7 @@ fn ordered(lines: &[String], expected: &[&str]) {
 }
 
 #[test]
-fn starts_in_java_order_takes_console_commands_and_stops_on_stop() {
+fn starts_in_order_takes_console_commands_and_stops_on_stop() {
     let phira = FakePhira::start();
     let mut server = start(&phira);
     server.wait_for("Server is running. Type 'stop' to stop.");
@@ -263,40 +263,54 @@ fn an_unterminated_last_line_runs_when_input_ends() {
     assert_eq!(server.wait_exit().code(), Some(0));
 }
 
+fn run_with_arguments(args: &[&str]) -> (std::process::Output, tempfile::TempDir) {
+    let dir = tempfile::tempdir().unwrap();
+    let output = Command::new(BIN)
+        .current_dir(dir.path())
+        .args(args)
+        .stdin(Stdio::null())
+        .output()
+        .unwrap();
+    (output, dir)
+}
+
 #[test]
-fn help_and_argument_errors_exit_with_javas_codes() {
-    for (args, code, first) in [
-        (vec!["--help"], 0, "[Server]: Phira Server Usage:"),
-        (
-            vec!["--bogus"],
-            1,
-            "ERROR] [Server]: Failed to parse arguments: bogus is not a recognized option",
-        ),
-        (
-            vec!["--port", "abc"],
-            1,
-            "ERROR] [Server]: Failed to parse arguments: Cannot parse argument 'abc' of option port",
-        ),
-    ] {
-        let dir = tempfile::tempdir().unwrap();
-        let output = Command::new(BIN)
-            .current_dir(dir.path())
-            .args(&args)
-            .stdin(Stdio::null())
-            .output()
-            .unwrap();
-        assert_eq!(output.status.code(), Some(code), "{args:?}");
+fn help_goes_to_stdout_and_exits_zero_without_starting_anything() {
+    for flag in ["--help", "-h"] {
+        let (output, dir) = run_with_arguments(&[flag]);
+        assert_eq!(output.status.code(), Some(0), "{flag}");
         let stdout = String::from_utf8_lossy(&output.stdout);
-        let lines: Vec<&str> = stdout.lines().collect();
-        assert!(
-            lines.iter().any(|l| l.contains(first)),
-            "{args:?}: {stdout}"
-        );
-        if code == 1 {
-            assert!(stdout.contains("[Server]: Phira Server Usage:"));
+        for expected in [
+            "--port",
+            "--http-port",
+            "--proxy-protocol",
+            "--login-rate-limit",
+        ] {
+            assert!(stdout.contains(expected), "{flag}: {stdout}");
         }
-        let file = std::fs::read_to_string(dir.path().join("logs").join("latest.log")).unwrap();
-        assert!(file.contains("Phira Server Usage:"), "{args:?}");
+        assert!(output.stderr.is_empty(), "{flag}");
+        assert!(!dir.path().join("data").exists());
+        assert!(!dir.path().join("logs").exists());
+    }
+}
+
+#[test]
+fn argument_errors_go_to_stderr_and_exit_one() {
+    for args in [
+        vec!["--bogus"],
+        vec!["--port"],
+        vec!["--port", "abc"],
+        vec!["--port", "1", "--port", "2"],
+        vec!["--po", "1"],
+        vec!["-port", "1"],
+    ] {
+        let (output, dir) = run_with_arguments(&args);
+        assert_eq!(output.status.code(), Some(1), "{args:?}");
+        assert!(output.stdout.is_empty(), "{args:?}");
+        assert!(
+            !String::from_utf8_lossy(&output.stderr).trim().is_empty(),
+            "{args:?}"
+        );
         assert!(!dir.path().join("data").exists());
     }
 }

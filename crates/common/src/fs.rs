@@ -15,13 +15,6 @@ pub fn read_to_string_if_exists(path: impl AsRef<Path>) -> io::Result<Option<Str
     }
 }
 
-/// Not crash safe; data files go through `write_atomic`.
-pub fn write_string(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> io::Result<()> {
-    let path = path.as_ref();
-    create_parent_dirs(path)?;
-    fs::write(path, contents)
-}
-
 #[derive(Debug, Clone)]
 pub struct AtomicWriteOptions {
     mode: Option<u32>,
@@ -56,6 +49,16 @@ impl AtomicWriteOptions {
 pub fn write_atomic(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> io::Result<()> {
     write_atomic_with(path.as_ref(), &AtomicWriteOptions::default(), |w| {
         w.write_all(contents.as_ref())
+    })
+}
+
+/// Pretty JSON with two-space indentation, the layout of the data files, written atomically.
+pub fn write_json_pretty<T: serde::Serialize + ?Sized>(
+    path: impl AsRef<Path>,
+    value: &T,
+) -> io::Result<()> {
+    write_atomic_with(path.as_ref(), &AtomicWriteOptions::default(), |w| {
+        Ok(serde_json::to_writer_pretty(w, value)?)
     })
 }
 

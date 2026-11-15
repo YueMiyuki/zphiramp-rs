@@ -8,7 +8,6 @@ use std::thread;
 use std::time::Duration;
 
 use support::ManualClock;
-use zphira_common::gson::JsonElement;
 use zphira_ledger::{
     Admins, ImportError, ImportMode, ImportResult, PointAward, Points, RoundRecord, RoundRecords,
 };
@@ -565,14 +564,8 @@ fn no_award_is_lost_between_the_backup_and_the_swap() {
     .unwrap();
     awarder.join().unwrap();
 
-    let state = JsonElement::parse(&backed_up.lock().unwrap()).unwrap();
-    let seen = state
-        .as_object()
-        .and_then(|o| o.get("1"))
-        .and_then(JsonElement::as_object)
-        .and_then(|o| o.get("points"))
-        .and_then(JsonElement::get_as_int)
-        .unwrap();
+    let state: serde_json::Value = serde_json::from_str(&backed_up.lock().unwrap()).unwrap();
+    let seen = i32::try_from(state["1"]["points"].as_i64().unwrap()).unwrap();
     let final_points = p.ranking_snapshot(1)[0].points;
     assert_eq!(
         final_points,

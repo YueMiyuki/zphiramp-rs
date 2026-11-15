@@ -2,15 +2,12 @@ use bytes::{Buf, BufMut, Bytes, BytesMut};
 use tokio_util::codec::{Decoder, Encoder};
 
 use crate::error::{CodecError, ProtocolError};
-use crate::wire::{decode_varint, encode_varint};
+use crate::wire::{encode_varint, try_decode_varint};
 
 pub const DEFAULT_MAX_FRAME_LENGTH: usize = 2 * 1024 * 1024;
 
 /// Cap before login: the largest legal frame (an Authenticate) is 38 bytes.
 pub const PRE_AUTH_MAX_FRAME_LENGTH: usize = 1024;
-
-/// No cap at all; only for replaying recorded Java traffic.
-pub const UNLIMITED_FRAME_LENGTH: usize = i32::MAX as usize;
 
 pub fn decode_frame(
     src: &mut BytesMut,
@@ -27,19 +24,17 @@ pub fn decode_frame(
 
     let mut peek: &[u8] = &src[..];
     let before = peek.len();
-    let length = match decode_varint(&mut peek) {
-        Ok(length) => length,
-        Err(ProtocolError::NeedMoreData) => return Ok(None),
-        Err(e) => return Err(e),
+    let Some(length) = try_decode_varint(&mut peek)? else {
+        return Ok(None);
     };
     if length < 0 {
-        return Err(ProtocolError::BadPacketLength);
+        return Err(ProtocolError::Malformed("negative frame length"));
     }
     let prefix_len = before - peek.len();
     let length = length as usize;
     // Checked before the body is buffered, so a peer cannot make us hold it.
     if length > max_frame_length {
-        return Err(ProtocolError::InboundFrameTooLarge {
+        return Err(ProtocolError::FrameTooLarge {
             length,
             max: max_frame_length,
         });
@@ -52,8 +47,10 @@ pub fn decode_frame(
 }
 
 pub fn encode_frame<B: BufMut>(payload: &[u8], dst: &mut B) -> Result<(), ProtocolError> {
-    let length =
-        i32::try_from(payload.len()).map_err(|_| ProtocolError::FrameTooLarge(payload.len()))?;
+    let length = i32::try_from(payload.len()).map_err(|_| ProtocolError::FrameTooLarge {
+        length: payload.len(),
+        max: i32::MAX as usize,
+    })?;
     encode_varint(dst, length);
     dst.put_slice(payload);
     Ok(())
@@ -71,10 +68,6 @@ impl FrameDecoder {
 
     pub fn with_max_frame_length(max_frame_length: usize) -> Self {
         Self { max_frame_length }
-    }
-
-    pub fn unlimited() -> Self {
-        Self::with_max_frame_length(UNLIMITED_FRAME_LENGTH)
     }
 
     pub fn max_frame_length(&self) -> usize {

@@ -4,12 +4,12 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
-use zphira_common::gson::{self, GsonError, JsonElement, JsonObject};
+use serde_json::Value;
 
 use crate::error::LedgerError;
 use crate::import::{
-    BackupFn, ImportError, ImportMode, ImportReport, ImportResult, Kind, gson_reason,
-    parse_document,
+    BackupFn, ImportError, ImportMode, ImportReport, ImportResult, Kind, check_text,
+    parse_document, present,
 };
 use crate::persist::{Document, Loaded, Persisted, read_file};
 use crate::util::{Clock, system_clock};
@@ -22,6 +22,7 @@ const TOP_LINES_CACHE_MILLIS: i64 = 60_000;
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 struct PointData {
+    #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     points: i32,
 }
@@ -52,38 +53,6 @@ struct Ranking {
     version: u64,
     order: Vec<i32>,
     position: HashMap<i32, usize>,
-}
-
-// Gson refuses two keys that read as the same integer; serde's map impls would overwrite one.
-struct Board(BTreeMap<i32, PointData>);
-
-impl<'de> Deserialize<'de> for Board {
-    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        struct Rows;
-
-        impl<'de> serde::de::Visitor<'de> for Rows {
-            type Value = Board;
-
-            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                f.write_str("a map of player ids to point rows")
-            }
-
-            fn visit_map<A: serde::de::MapAccess<'de>>(
-                self,
-                mut map: A,
-            ) -> Result<Board, A::Error> {
-                let mut board = BTreeMap::new();
-                while let Some((id, row)) = map.next_entry::<i32, PointData>()? {
-                    if board.insert(id, row).is_some() {
-                        return Err(serde::de::Error::custom(format!("duplicate key: {id}")));
-                    }
-                }
-                Ok(Board(board))
-            }
-        }
-
-        deserializer.deserialize_map(Rows)
-    }
 }
 
 struct PointsData {
@@ -172,8 +141,8 @@ impl Document for PointsData {
         self.version += 1;
     }
 
-    fn serialize<W: std::io::Write>(content: &Self::Content, out: W) -> Result<(), GsonError> {
-        gson::to_writer_pretty(out, content)
+    fn view(content: &Self::Content) -> impl Serialize + '_ {
+        content
     }
 
     fn rows(content: &Self::Content) -> usize {
@@ -204,8 +173,8 @@ impl Points {
 
     pub fn load_with_clock(data_dir: impl AsRef<Path>, clock: Clock) -> Result<Self, LedgerError> {
         let path = data_dir.as_ref().join(FILE_NAME);
-        let points = match read_file::<Board>(WHAT, &path)? {
-            Loaded::Value(Board(points)) => points,
+        let points = match read_file::<BTreeMap<i32, PointData>>(WHAT, &path)? {
+            Loaded::Value(points) => points,
             Loaded::Missing => BTreeMap::new(),
             Loaded::Empty => {
                 tracing::warn!("{} is empty, starting with no points", path.display());
@@ -242,7 +211,7 @@ impl Points {
         self.0.store.mutate(|data| {
             data.touch(player_id, name);
             let row = data.points.entry(player_id).or_default();
-            row.points = row.points.wrapping_add(points).max(0);
+            row.points = row.points.saturating_add(points).max(0);
             let total = row.points;
             data.bump();
             total
@@ -258,7 +227,7 @@ impl Points {
                     if let Some(name) = &award.name {
                         row.name = Some(name.clone());
                     }
-                    row.points = row.points.wrapping_add(award.gained).max(0);
+                    row.points = row.points.saturating_add(award.gained).max(0);
                     (award.player_id, row.points)
                 })
                 .collect();
@@ -385,47 +354,48 @@ fn assemble(
     board
 }
 
-fn parse_rows(root: &JsonElement) -> Result<BTreeMap<i32, PointData>, ImportError> {
-    let object: &JsonObject = root
+fn parse_rows(root: &Value) -> Result<BTreeMap<i32, PointData>, ImportError> {
+    let object = root
         .as_object()
         .expect("parse_document checked the container");
     let mut board = BTreeMap::new();
     for (index, (key, value)) in object.iter().enumerate() {
-        let bad = |reason: String| {
+        let bad = |reason: &str| {
             ImportError::invalid(format!(
                 "积分数据第 {} 项（玩家 ID \"{key}\"）无效：{reason}",
                 index + 1
             ))
         };
-        let player_id = parse_key(key).map_err(bad)?;
-        let row = parse_row(value).map_err(bad)?;
-        if board.insert(player_id, row).is_some() {
-            return Err(bad(format!("玩家 ID {player_id} 重复")));
-        }
+        let player_id = key
+            .parse::<i32>()
+            .ok()
+            .filter(|id| id.to_string() == *key)
+            .ok_or_else(|| bad("玩家 ID 必须是整数"))?;
+        board.insert(player_id, parse_row(value).map_err(|e| bad(&e))?);
     }
     Ok(board)
 }
 
-fn parse_key(key: &str) -> Result<i32, String> {
-    let mut one = JsonObject::new();
-    one.insert(key, JsonElement::Bool(true));
-    gson::from_element::<BTreeMap<i32, serde::de::IgnoredAny>>(&JsonElement::Object(one))
-        .ok()
-        .and_then(|map| map.into_keys().next())
-        .ok_or_else(|| "玩家 ID 必须是整数".to_owned())
-}
-
-fn parse_row(value: &JsonElement) -> Result<PointData, String> {
+fn parse_row(value: &Value) -> Result<PointData, String> {
     let Some(object) = value.as_object() else {
         return Err("积分数据必须是对象".to_owned());
     };
-    match object.get("points") {
-        None | Some(JsonElement::Null) => return Err("缺少 points".to_owned()),
-        Some(_) => {}
-    }
-    let row: PointData = gson::from_element(value).map_err(|e| gson_reason(&e))?;
-    if row.points < 0 {
+    let Some(points) = present(object, "points") else {
+        return Err("缺少 points".to_owned());
+    };
+    let points = points
+        .as_i64()
+        .and_then(|n| i32::try_from(n).ok())
+        .ok_or("points 必须是整数")?;
+    if points < 0 {
         return Err("points 不能为负数".to_owned());
     }
-    Ok(row)
+    check_text(object, "name", true)?;
+    Ok(PointData {
+        name: object
+            .get("name")
+            .and_then(Value::as_str)
+            .map(str::to_owned),
+        points,
+    })
 }

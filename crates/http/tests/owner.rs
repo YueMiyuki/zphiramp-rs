@@ -248,7 +248,7 @@ async fn method_override_header_is_ignored() {
         .send(with_override("POST", "/api/v1/pool/list", "GET"))
         .await;
     assert_eq!(r.status, 404);
-    assert_eq!(r.text(), "Endpoint POST /api/v1/pool/list not found");
+    assert_eq!(r.text(), "Not Found");
     let r = env
         .send(with_override("GET", "/api/v1/pool/list", "DELETE"))
         .await;
@@ -257,7 +257,7 @@ async fn method_override_header_is_ignored() {
     let r = env
         .send(with_override("DELETE", "/api/v1/chart/search", "GET"))
         .await;
-    assert_eq!(r.text(), "Endpoint DELETE /api/v1/chart/search not found");
+    assert_eq!(r.text(), "Not Found");
 }
 
 async fn search(env: &Env, query: &str) -> Value {

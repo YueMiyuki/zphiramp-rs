@@ -24,17 +24,7 @@ use crate::router::dispatch;
 use crate::state::AppState;
 
 pub fn router(state: Arc<AppState>) -> Router {
-    let predicate = SizeAbove::new(1500)
-        .and(NotForContentType::IMAGES)
-        .and(NotForContentType::const_new("audio/"))
-        .and(NotForContentType::const_new("video/"))
-        .and(NotForContentType::const_new("application/compress"))
-        .and(NotForContentType::const_new("application/zip"))
-        .and(NotForContentType::const_new("application/gzip"))
-        .and(NotForContentType::const_new("application/bzip2"))
-        .and(NotForContentType::const_new("application/brotli"))
-        .and(NotForContentType::const_new("application/x-xz"))
-        .and(NotForContentType::const_new("application/x-rar-compressed"));
+    let predicate = SizeAbove::new(1500).and(NotForContentType::IMAGES);
     Router::new()
         .fallback(move |request: Request<Body>| {
             let state = state.clone();

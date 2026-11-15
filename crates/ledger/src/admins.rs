@@ -4,8 +4,8 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
 
-use zphira_common::fs::{self, AtomicWriteOptions};
-use zphira_common::gson;
+use serde_json::Value;
+use zphira_common::fs;
 
 use crate::error::LedgerError;
 use crate::import::{
@@ -168,7 +168,7 @@ impl Admins {
         let mut state = lock(&self.0.state);
         self.refresh(&mut state, false);
         let ids: Vec<i32> = state.ids.iter().copied().collect();
-        gson::to_string_pretty(&ids).map_err(|e| LedgerError::export(WHAT, &self.0.path, e))
+        serde_json::to_string_pretty(&ids).map_err(|e| LedgerError::export(WHAT, &self.0.path, e))
     }
 
     pub fn import(&self, document: &str, mode: ImportMode) -> Result<ImportReport, ImportError> {
@@ -196,8 +196,8 @@ impl Admins {
             return Err(ImportError::invalid("至少保留一名管理员"));
         }
         let current: Vec<i32> = state.ids.iter().copied().collect();
-        let current =
-            gson::to_string_pretty(&current).map_err(|e| ImportError::Write(e.to_string()))?;
+        let current = serde_json::to_string_pretty(&current)
+            .map_err(|e| ImportError::Write(e.to_string()))?;
         let backup_file = backup(&current).map_err(|e| ImportError::Write(e.to_string()))?;
         write_ids(&self.0.path, &ids).map_err(|e| ImportError::Write(e.to_string()))?;
         self.install(&mut state, ids);
@@ -279,17 +279,15 @@ impl Admins {
     }
 }
 
-fn save(path: &Path, state: &mut State) -> Result<(), gson::GsonError> {
+fn save(path: &Path, state: &mut State) -> io::Result<()> {
     write_ids(path, &state.ids)?;
     state.signature = Signature::of(path).ok().flatten();
     Ok(())
 }
 
-fn write_ids(path: &Path, ids: &BTreeSet<i32>) -> Result<(), gson::GsonError> {
+fn write_ids(path: &Path, ids: &BTreeSet<i32>) -> io::Result<()> {
     let sorted: Vec<i32> = ids.iter().copied().collect();
-    fs::write_atomic_with(path, &AtomicWriteOptions::new(), |w| {
-        gson::to_writer_pretty(w, &sorted)
-    })
+    fs::write_json_pretty(path, &sorted)
 }
 
 enum ReadError {
@@ -307,11 +305,12 @@ fn read_ids(path: &Path) -> Result<BTreeSet<i32>, ReadError> {
     };
     // An empty or `null` document is an error: an editor that truncates before writing must not
     // empty the list.
-    let ids: Vec<i32> = gson::from_str(&text).map_err(|e| ReadError::Unreadable(Box::new(e)))?;
+    let ids: Vec<i32> =
+        serde_json::from_str(&text).map_err(|e| ReadError::Unreadable(Box::new(e)))?;
     Ok(ids.into_iter().collect())
 }
 
-fn parse_ids(root: &gson::JsonElement) -> Result<Vec<i32>, ImportError> {
+fn parse_ids(root: &Value) -> Result<Vec<i32>, ImportError> {
     let rows = root
         .as_array()
         .expect("parse_document checked the container");
@@ -321,7 +320,10 @@ fn parse_ids(root: &gson::JsonElement) -> Result<Vec<i32>, ImportError> {
         let bad = |reason: String| {
             ImportError::invalid(format!("管理员名单第 {} 项无效：{reason}", index + 1))
         };
-        let id: i32 = gson::from_element(row).map_err(|_| bad("必须是整数用户 ID".to_owned()))?;
+        let id = row
+            .as_i64()
+            .and_then(|n| i32::try_from(n).ok())
+            .ok_or_else(|| bad("必须是整数用户 ID".to_owned()))?;
         if !seen.insert(id) {
             return Err(bad(format!("用户 ID {id} 重复")));
         }

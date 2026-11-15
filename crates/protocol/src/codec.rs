@@ -2,7 +2,7 @@ use bytes::{Bytes, BytesMut};
 use tokio_util::codec::{Decoder, Encoder};
 
 use crate::error::{CodecError, ProtocolError};
-use crate::frame::{DEFAULT_MAX_FRAME_LENGTH, UNLIMITED_FRAME_LENGTH, decode_frame, encode_frame};
+use crate::frame::{DEFAULT_MAX_FRAME_LENGTH, decode_frame, encode_frame};
 use crate::packet::{ClientBoundPacket, ServerBoundPacket};
 
 fn next_frame(src: &mut BytesMut, max_frame_length: usize) -> Result<Option<Bytes>, ProtocolError> {
@@ -31,10 +31,6 @@ impl ServerCodec {
             scratch: BytesMut::new(),
             max_frame_length,
         }
-    }
-
-    pub fn unlimited() -> Self {
-        Self::with_max_frame_length(UNLIMITED_FRAME_LENGTH)
     }
 
     pub fn max_frame_length(&self) -> usize {
@@ -106,10 +102,6 @@ impl ClientCodec {
             scratch: BytesMut::new(),
             max_frame_length,
         }
-    }
-
-    pub fn unlimited() -> Self {
-        Self::with_max_frame_length(UNLIMITED_FRAME_LENGTH)
     }
 
     pub fn max_frame_length(&self) -> usize {

@@ -484,8 +484,8 @@ async fn probes_run_concurrently() {
 }
 
 #[tokio::test]
-async fn probe_follows_at_most_four_redirects() {
-    for (hops, ok) in [(1usize, true), (4, true), (5, false), (6, false)] {
+async fn probe_follows_redirect_chains_and_gives_up_on_a_loop() {
+    for (hops, ok) in [(1usize, true), (5, true), (10, true), (1000, false)] {
         let own = Arc::new(OnceLock::<String>::new());
         let base = own.clone();
         let server = Server::start(move |request, _| {
@@ -519,7 +519,7 @@ async fn probe_follows_at_most_four_redirects() {
                 "HTTP 302 for chart archive",
                 "{hops} redirects"
             );
-            assert_eq!(server.request_count(), 1 + 5, "{hops} redirects");
+            assert_eq!(server.request_count(), 1 + 11, "{hops} redirects");
         }
     }
 }

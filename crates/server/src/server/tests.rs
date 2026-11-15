@@ -102,15 +102,11 @@ fn the_upstream_url_comes_from_the_environment_d5() {
 }
 
 #[tokio::test]
-async fn bind_addresses_resolve_like_inet_address_get_by_name() {
+async fn bind_addresses_resolve_names_and_literals_preferring_ipv4() {
     let any = resolve_bind_address("0.0.0.0", 12346).await.unwrap();
     assert_eq!(any, "0.0.0.0:12346".parse().unwrap());
-    let v6 = resolve_bind_address("[::1]", 80).await.unwrap();
-    assert_eq!(v6, "[::1]:80".parse().unwrap());
     let v6 = resolve_bind_address("::1", 80).await.unwrap();
     assert_eq!(v6, "[::1]:80".parse().unwrap());
-    let empty = resolve_bind_address("", 7).await.unwrap();
-    assert_eq!(empty, "127.0.0.1:7".parse().unwrap());
     let local = resolve_bind_address("localhost", 7).await.unwrap();
     assert!(local.is_ipv4(), "{local}");
 }

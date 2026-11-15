@@ -5,19 +5,17 @@ use axum::body::Body;
 use http::Response;
 use serde::{Deserialize, Serialize};
 use zphira_catalog::{CatalogError, MAX_PROBE_BUDGET, PoolCategory, ScreeningRule};
-use zphira_common::gson::JsonElement;
 
 use super::pool::ChartIdsBody;
-use super::{query_double, query_number};
+use super::{non_blank, query_double, query_limit, query_number};
 use crate::auth::require_admin;
 use crate::body::{body_or_null, category};
-use crate::java;
 use crate::reply::{self, Failure};
 use crate::request::Ctx;
 use crate::state::AppState;
 use crate::views::ChartJson;
 
-const MAX_SEARCH_LIMIT: f64 = 500.0;
+const MAX_SEARCH_LIMIT: i32 = 500;
 const MAX_PROBE_BATCH: usize = 20;
 const DEFAULT_POOL_SIZE: i32 = 15;
 
@@ -45,10 +43,7 @@ pub(super) async fn search(
 ) -> Result<Response<Body>, Failure> {
     require_admin(state, ctx).await?;
     let rule = rule_from_query(ctx)?;
-    let limit = java::double_to_int(java::min_f64(
-        java::max_f64(1.0, query_double(ctx, "limit", 50.0)?),
-        MAX_SEARCH_LIMIT,
-    ));
+    let limit = query_limit(ctx, MAX_SEARCH_LIMIT)?;
     let probe_budget = query_number(ctx, "probeDuration")?;
     // A refresh starts only once the whole query above is valid.
     match ctx.query_param("refresh") {
@@ -56,7 +51,7 @@ pub(super) async fn search(
             state.index.refresh_full_async();
         }
         Some(_) => {
-            let division = java::blank_to_null(ctx.query_param("division")).map(str::to_owned);
+            let division = non_blank(ctx.query_param("division")).map(str::to_owned);
             state.index.refresh_async(division);
         }
         None => {}
@@ -64,12 +59,10 @@ pub(super) async fn search(
     if let Some(budget) = probe_budget
         && budget > 0.0
     {
-        probe_durations_for(state, &rule, java::double_to_int(budget)).await;
+        probe_durations_for(state, &rule, budget as i32).await;
     }
 
-    let charts = state
-        .index
-        .search(&rule, usize::try_from(limit).unwrap_or(0));
+    let charts = state.index.search(&rule, limit);
     let pending_duration = rule.min_duration_seconds.is_some()
         && state.index.count_matches(&rule.without_duration()) > 0;
     reply::json(&SearchJson {
@@ -86,7 +79,7 @@ pub(super) async fn search(
 }
 
 fn query_category(ctx: &mut Ctx) -> Result<Option<PoolCategory>, Failure> {
-    let Some(raw) = java::blank_to_null(ctx.query_param("category")) else {
+    let Some(raw) = non_blank(ctx.query_param("category")) else {
         return Ok(None);
     };
     PoolCategory::parse_ignore_case(raw)
@@ -103,12 +96,12 @@ fn rule_from_query(ctx: &mut Ctx) -> Result<ScreeningRule, Failure> {
 
     let difficulty_bound = min_difficulty.or(preset.as_ref().and_then(|p| p.min_difficulty));
     let duration_bound = match min_duration {
-        Some(d) => Some(java::double_to_int(d)),
+        Some(d) => Some(d as i32),
         None => preset.as_ref().and_then(|p| p.min_duration_seconds),
     };
     let tags: Vec<String> = match tag.as_deref() {
-        Some(tag) if !java::is_blank(tag) => {
-            let parts = java::split_comma(tag);
+        Some(tag) if !tag.trim().is_empty() => {
+            let parts: Vec<&str> = tag.split(',').filter(|p| !p.is_empty()).collect();
             let mut seen = HashSet::new();
             if !parts.iter().all(|p| seen.insert(*p)) {
                 return Err(Failure::bad_request("参数格式错误：tag"));
@@ -125,13 +118,13 @@ fn rule_from_query(ctx: &mut Ctx) -> Result<ScreeningRule, Failure> {
         "minRating",
         preset.as_ref().map_or(0.0, |p| f64::from(p.min_rating)),
     )? as f32;
-    let min_rating_count = java::double_to_int(query_double(
+    let min_rating_count = query_double(
         ctx,
         "minRatingCount",
         preset
             .as_ref()
             .map_or(0.0, |p| f64::from(p.min_rating_count)),
-    )?);
+    )? as i32;
     Ok(ScreeningRule::new(
         category.unwrap_or(PoolCategory::Manual),
         tags,
@@ -163,7 +156,7 @@ async fn probe_durations_for(state: &Arc<AppState>, rule: &ScreeningRule, budget
 #[derive(Deserialize, Default)]
 #[serde(default)]
 struct PoolGenerateBody {
-    category: Option<JsonElement>,
+    category: Option<String>,
     #[serde(rename = "sizeLimit")]
     size_limit: Option<i32>,
     #[serde(rename = "roundsPerStay")]
@@ -186,7 +179,7 @@ pub(super) async fn generate(
 ) -> Result<Response<Body>, Failure> {
     require_admin(state, ctx).await?;
     let body: PoolGenerateBody = body_or_null(ctx).await?.ok_or_else(Failure::bad_format)?;
-    let category = category(body.category.as_ref())?.ok_or_else(Failure::bad_format)?;
+    let category = category(body.category.as_deref())?.ok_or_else(Failure::bad_format)?;
     let rule =
         ScreeningRule::of(category).ok_or_else(|| Failure::bad_request("该类别不支持规则生成"))?;
     if let Some(budget) = body.probe_duration
@@ -204,10 +197,8 @@ pub(super) async fn generate(
         )
         .await
         .map_err(|e| match e {
-            CatalogError::IllegalArgument(_) | CatalogError::Io(_) | CatalogError::Upstream(_) => {
-                Failure::bad_request(e.message())
-            }
-            other => Failure::internal(other),
+            CatalogError::Storage { .. } => Failure::internal(e),
+            other => Failure::bad_request(other.message()),
         })?;
     reply::json(&GenerateJson {
         ok: true,

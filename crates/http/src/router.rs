@@ -10,7 +10,7 @@ use http::header::{
 use http::{Request, Response, StatusCode};
 
 use crate::auth;
-use crate::reply::{self, Failure, JavalinError};
+use crate::reply::{self, Failure};
 use crate::request::Ctx;
 use crate::routes::{self, Route};
 use crate::state::AppState;
@@ -29,10 +29,7 @@ pub(crate) async fn dispatch(state: Arc<AppState>, request: Request<Body>) -> Re
     let mut ctx = Ctx::new(request, client);
 
     if !ctx.path.starts_with('/') {
-        return reply::jetty_not_found();
-    }
-    if !jetty_accepts(&ctx.path) {
-        return reply::jetty_bad_request();
+        return reply::not_found();
     }
 
     let api = is_api_path(&ctx.path);
@@ -87,7 +84,7 @@ async fn run_endpoint(state: &Arc<AppState>, ctx: &mut Ctx) -> Response<Body> {
     };
     match find_endpoint(route_method, &ctx.path) {
         Some((endpoint, params)) => {
-            ctx.raw_params = params;
+            ctx.params = params;
             ctx.body_idle_timeout = state.config.idle_timeout;
             if endpoint.route == Route::DataImport {
                 ctx.max_body = state.config.max_import_size;
@@ -99,7 +96,7 @@ async fn run_endpoint(state: &Arc<AppState>, ctx: &mut Ctx) -> Response<Body> {
                 Err(failure) => render_failure(ctx, failure),
             }
         }
-        None => JavalinError::endpoint_not_found(route_method, &ctx.path).render(&ctx.headers),
+        None => reply::not_found(),
     }
 }
 
@@ -114,11 +111,11 @@ fn render_failure(ctx: &Ctx, failure: Failure) -> Response<Body> {
             );
             reply::api_error(StatusCode::INTERNAL_SERVER_ERROR, reply::INTERNAL_ERROR)
         }
-        Failure::Javalin(error) => error.render(&ctx.headers),
+        Failure::Plain(status, text) => reply::plain(status, text),
         Failure::Aborted(reason) => {
             tracing::debug!("HTTP request on {} aborted: {}", ctx.path, reason);
-            let mut response = reply::empty(StatusCode::INTERNAL_SERVER_ERROR);
-            response.headers_mut().remove(http::header::CONTENT_TYPE);
+            let mut response = Response::new(Body::empty());
+            *response.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
             response
         }
     }
@@ -134,7 +131,10 @@ fn find_endpoint(
         .find_map(|e| match_pattern(e.pattern, path).map(|params| (e, params)))
 }
 
-pub(crate) fn match_pattern(pattern: &str, path: &str) -> Option<Vec<(&'static str, String)>> {
+pub(crate) fn match_pattern(
+    pattern: &'static str,
+    path: &str,
+) -> Option<Vec<(&'static str, String)>> {
     if pattern == "/" {
         return (path == "/").then(Vec::new);
     }
@@ -155,7 +155,7 @@ pub(crate) fn match_pattern(pattern: &str, path: &str) -> Option<Vec<(&'static s
             if actual.is_empty() {
                 return None;
             }
-            params.push((static_name(name), actual.to_owned()));
+            params.push((name, actual.to_owned()));
         } else if expected != actual {
             return None;
         }
@@ -164,53 +164,6 @@ pub(crate) fn match_pattern(pattern: &str, path: &str) -> Option<Vec<(&'static s
         return None;
     }
     Some(params)
-}
-
-fn static_name(name: &str) -> &'static str {
-    match name {
-        "id" => "id",
-        "chartId" => "chartId",
-        "poolId" => "poolId",
-        "kind" => "kind",
-        "userId" => "userId",
-        "playerId" => "playerId",
-        _ => "param",
-    }
-}
-
-fn jetty_accepts(path: &str) -> bool {
-    let bytes = path.as_bytes();
-    let mut i = 0;
-    while i < bytes.len() {
-        if bytes[i] == b'%' {
-            let valid = bytes.get(i + 1).is_some_and(u8::is_ascii_hexdigit)
-                && bytes.get(i + 2).is_some_and(u8::is_ascii_hexdigit);
-            if !valid {
-                return false;
-            }
-            i += 3;
-        } else {
-            i += 1;
-        }
-    }
-    let mut depth: i64 = 0;
-    let segments: Vec<&str> = path.split('/').skip(1).collect();
-    let last = segments.len().saturating_sub(1);
-    for (index, segment) in segments.iter().enumerate() {
-        let decoded = segment.to_ascii_lowercase().replace("%2e", ".");
-        match decoded.as_str() {
-            "." => {}
-            ".." => {
-                depth -= 1;
-                if depth < 0 {
-                    return false;
-                }
-            }
-            "" if index == last => {}
-            _ => depth += 1,
-        }
-    }
-    true
 }
 
 #[cfg(test)]
@@ -250,20 +203,5 @@ mod tests {
         );
         assert_eq!(match_pattern("/", "//"), None);
         assert_eq!(match_pattern("/*", "/anything/at/all"), Some(vec![]));
-    }
-
-    #[test]
-    fn jetty_rules() {
-        assert!(jetty_accepts("/docs/../style.css"));
-        assert!(jetty_accepts("/api/v1/record/player/../list"));
-        assert!(!jetty_accepts("/../secret.txt"));
-        assert!(!jetty_accepts("/room/../../secret.txt"));
-        assert!(!jetty_accepts("/%2e%2e/secret.txt"));
-        assert!(jetty_accepts("/..%2fsecret.txt"));
-        assert!(!jetty_accepts("/api/v1/record/%zz"));
-        assert!(!jetty_accepts("/api/v1/record/abc%2"));
-        assert!(jetty_accepts("/api/v1/record/a%2Fb"));
-        assert!(jetty_accepts("/"));
-        assert!(jetty_accepts("//etc/passwd"));
     }
 }

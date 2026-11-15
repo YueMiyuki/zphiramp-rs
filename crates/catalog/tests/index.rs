@@ -61,28 +61,28 @@ fn path(s: &Setup, name: &str) -> String {
 }
 
 #[tokio::test]
-async fn saved_index_matches_java_byte_for_byte() {
+async fn saved_index_matches_java() {
     let s = setup(Some("index_save/input/chart-index.json"), true).await;
     let java = java_results("index_save");
     assert_eq!(s.index.indexed_count().to_string(), java["indexed"]);
     assert_eq!(
-        java_list(&ids(&s.index.search(&ScreeningRule::regular(), 10))),
+        list_text(&ids(&s.index.search(&ScreeningRule::regular(), 10))),
         java["search"]
     );
     s.upstream
         .page("chart?page=1&division=plain", r#"{"count":0,"results":[]}"#);
     let outcome = s.index.refresh(Some("plain")).await.unwrap();
     assert_eq!(outcome, RefreshOutcome::Refreshed { indexed: 5 });
-    assert_eq!(
-        path(&s, INDEX_FILE),
-        read_fixture("index_save/output/chart-index.json")
-    );
+    assert!(same_json(
+        &path(&s, INDEX_FILE),
+        &read_fixture("index_save/output/chart-index.json")
+    ));
     assert_eq!(s.index.remote_count(), 0);
     assert!(s.sleeper.sleeps.lock().unwrap().is_empty());
 }
 
 #[tokio::test]
-async fn an_unreadable_index_starts_empty_with_the_java_warning() {
+async fn an_unreadable_index_starts_empty_with_a_warning() {
     let (_guard, logs) = capture_logs();
     let dir = data_dir(
         &[(CACHE_FILE, "pool_defaults/input/chart-info-cache.json")],
@@ -98,12 +98,16 @@ async fn an_unreadable_index_starts_empty_with_the_java_warning() {
         s.index.indexed_count().to_string(),
         java_results("index_unreadable")["indexed"]
     );
-    // zphira-common names the map key in the error path; the recorded line does not.
-    let expected: Vec<String> = java_log("index_unreadable")
-        .into_iter()
-        .map(|l| l.replace("path $.)", "path $.2)"))
-        .collect();
-    assert_eq!(logs.lines(), expected);
+    let input = read_fixture("index_unreadable/input/chart-index.json");
+    let reason = serde_json::from_str::<std::collections::BTreeMap<i32, ChartInfo>>(&input)
+        .unwrap_err()
+        .to_string();
+    assert_eq!(
+        logs.lines(),
+        [format!(
+            "WARN Chart index cache is unreadable ({reason}), starting empty; run a refresh to rebuild it"
+        )]
+    );
     assert_eq!(
         path(&s, INDEX_FILE),
         read_fixture("index_unreadable/input/chart-index.json")
@@ -153,9 +157,11 @@ async fn sweeps_match_java() {
             java["refreshing"],
             "{scenario}"
         );
-        assert_eq!(
-            path(&s, INDEX_FILE),
-            read_fixture(&format!("{scenario}/output/chart-index.json")),
+        assert!(
+            same_json(
+                &path(&s, INDEX_FILE),
+                &read_fixture(&format!("{scenario}/output/chart-index.json"))
+            ),
             "{scenario}"
         );
         assert_eq!(logs.lines(), java_log(scenario), "{scenario}");
@@ -207,10 +213,9 @@ async fn a_fresh_index_is_swept_in_full() {
     pauses.extend(std::iter::repeat_n(60, 49));
     assert_eq!(ms, pauses);
     let java_file: std::collections::BTreeMap<i32, ChartInfo> =
-        zphira_common::gson::from_str(&read_fixture("sweep_fresh/output/chart-index.json"))
-            .unwrap();
+        serde_json::from_str(&read_fixture("sweep_fresh/output/chart-index.json")).unwrap();
     let rust_file: std::collections::BTreeMap<i32, ChartInfo> =
-        zphira_common::gson::from_str(&path(&s, INDEX_FILE)).unwrap();
+        serde_json::from_str(&path(&s, INDEX_FILE)).unwrap();
     assert_eq!(rust_file.len(), 155);
     for (id, chart) in &java_file {
         assert_eq!(rust_file.get(id), Some(chart), "chart {id}");
@@ -256,21 +261,19 @@ async fn a_failed_sweep_keeps_what_it_merged() {
         "chart?page=1&division=plain",
         &format!(
             "{{\"count\":9,\"results\":[{},{}]}}",
-            zphira_common::gson::to_string_compact(&chart(1, &["plain"], 0.9, 10, 3.0, None))
-                .unwrap(),
-            zphira_common::gson::to_string_compact(&chart(2, &["plain"], 0.9, 10, 3.0, None))
-                .unwrap()
+            serde_json::to_string(&chart(1, &["plain"], 0.9, 10, 3.0, None)).unwrap(),
+            serde_json::to_string(&chart(2, &["plain"], 0.9, 10, 3.0, None)).unwrap()
         ),
     );
     let err = s.index.refresh(None).await.unwrap_err();
     assert_eq!(
-        java_error(&err),
-        "IOException: HTTP 404: {\"detail\":\"Not found\"}"
+        error_text(&err),
+        "Upstream: HTTP 404: {\"detail\":\"Not found\"}"
     );
     assert!(!s.index.is_refreshing());
     assert_eq!(s.index.indexed_count(), 2);
     let saved: std::collections::BTreeMap<i32, ChartInfo> =
-        zphira_common::gson::from_str(&path(&s, INDEX_FILE)).unwrap();
+        serde_json::from_str(&path(&s, INDEX_FILE)).unwrap();
     assert_eq!(saved.keys().copied().collect::<Vec<_>>(), [1, 2]);
     assert!(logs.lines().is_empty());
 }
@@ -359,8 +362,8 @@ async fn a_failed_refresh_is_reported_and_clears_the_flag() {
     let s = setup(None, true).await;
     let err = s.index.refresh(None).await.unwrap_err();
     assert_eq!(
-        java_error(&err),
-        "IOException: HTTP 404: {\"detail\":\"Not found\"}"
+        error_text(&err),
+        "Upstream: HTTP 404: {\"detail\":\"Not found\"}"
     );
     assert!(!s.index.is_refreshing());
     assert!(!s.dir.path().join(INDEX_FILE).exists(), "nothing saved");
@@ -581,7 +584,7 @@ async fn probe_duration_async_runs_once_in_the_background() {
     let s = setup_in(dir).await;
     s.upstream.duration(42058, Ok(222));
     let gate = s.upstream.gate("probe/42058");
-    let in_room = s.pool.get_chart_info(42058).unwrap();
+    let in_room = s.pool.chart_info(42058).unwrap();
     let arrived = gate.arrived.notified();
     s.index.probe_duration_async(&in_room);
     s.index.probe_duration_async(&in_room);
@@ -611,7 +614,7 @@ async fn probe_duration_async_runs_once_in_the_background() {
     tokio::task::yield_now().await;
     assert_eq!(s.upstream.probe_calls.lock().unwrap().len(), 1);
 
-    let other = s.pool.get_chart_info(52087).unwrap();
+    let other = s.pool.chart_info(52087).unwrap();
     logs.clear();
     s.index.probe_duration_async(&other);
     while logs.lines().is_empty() {
@@ -642,7 +645,7 @@ async fn durations_from_the_java_server_are_cleared_once() {
     assert!(marker.exists());
     assert!(
         s.pool
-            .get_chart_info(30474)
+            .chart_info(30474)
             .unwrap()
             .duration_seconds()
             .is_none()
@@ -749,7 +752,7 @@ async fn ensure_indexed_answers_per_chart() {
 fn page_json(count: i32, charts: &[ChartInfo]) -> String {
     let rows: Vec<String> = charts
         .iter()
-        .map(|c| zphira_common::gson::to_string_compact(c).unwrap())
+        .map(|c| serde_json::to_string(c).unwrap())
         .collect();
     format!("{{\"count\":{count},\"results\":[{}]}}", rows.join(","))
 }
@@ -832,7 +835,7 @@ async fn a_forced_full_sweep_reaches_what_an_incremental_one_misses() {
     assert_eq!(s.index.get(1).unwrap().duration_seconds(), Some(200));
     assert_eq!(s.index.get(10).unwrap().duration_seconds(), Some(333));
     let saved: std::collections::BTreeMap<i32, ChartInfo> =
-        zphira_common::gson::from_str(&path(&s, INDEX_FILE)).unwrap();
+        serde_json::from_str(&path(&s, INDEX_FILE)).unwrap();
     assert_eq!(saved.len(), 9);
     assert_eq!(saved[&10].duration_seconds(), Some(333));
 }
@@ -872,12 +875,12 @@ async fn a_forced_full_sweep_runs_alone_and_saves_on_failure() {
     gate.open();
     let err = running.await.unwrap().unwrap_err();
     assert_eq!(
-        java_error(&err),
-        "IOException: HTTP 404: {\"detail\":\"Not found\"}"
+        error_text(&err),
+        "Upstream: HTTP 404: {\"detail\":\"Not found\"}"
     );
     assert!(!s.index.is_refreshing());
     let saved: std::collections::BTreeMap<i32, ChartInfo> =
-        zphira_common::gson::from_str(&path(&s, INDEX_FILE)).unwrap();
+        serde_json::from_str(&path(&s, INDEX_FILE)).unwrap();
     assert_eq!(saved.keys().copied().collect::<Vec<_>>(), [1, 2]);
 
     logs.clear();

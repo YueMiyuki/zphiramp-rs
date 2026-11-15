@@ -28,16 +28,6 @@ impl Rng {
     }
 }
 
-pub(crate) fn java_double_compare(a: f64, b: f64) -> std::cmp::Ordering {
-    use std::cmp::Ordering;
-    match (a.is_nan(), b.is_nan()) {
-        (true, true) => Ordering::Equal,
-        (true, false) => Ordering::Greater,
-        (false, true) => Ordering::Less,
-        (false, false) => a.total_cmp(&b),
-    }
-}
-
 pub fn mask_token(token: &str) -> String {
     let chars: Vec<char> = token.chars().collect();
     if chars.len() <= 5 {
@@ -58,14 +48,5 @@ mod tests {
         assert_eq!(mask_token("abcde"), "***");
         assert_eq!(mask_token(""), "***");
         assert_eq!(mask_token("abcdef"), "ab***def");
-    }
-
-    #[test]
-    fn double_compare_matches_java() {
-        use std::cmp::Ordering::*;
-        assert_eq!(java_double_compare(-0.0, 0.0), Less);
-        assert_eq!(java_double_compare(f64::NAN, f64::INFINITY), Greater);
-        assert_eq!(java_double_compare(f64::NAN, -f64::NAN), Equal);
-        assert_eq!(java_double_compare(1.0, 2.0), Less);
     }
 }

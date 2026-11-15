@@ -10,6 +10,7 @@ mod signals;
 #[cfg(test)]
 mod testutil;
 
+use std::io::Write;
 use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::process::ExitCode;
 use std::time::{Duration, Instant};
@@ -24,6 +25,23 @@ const RUNTIME_EXIT_GRACE: Duration = Duration::from_secs(2);
 fn main() -> ExitCode {
     let boot = Instant::now();
 
+    let argv: Vec<String> = std::env::args_os()
+        .skip(1)
+        .map(|a| a.to_string_lossy().into_owned())
+        .collect();
+    let (parsed, warnings) = match args::parse(&argv) {
+        args::Next::Run { args, warnings } => (args, warnings),
+        args::Next::Exit {
+            code,
+            stdout,
+            stderr,
+        } => {
+            let _ = std::io::stdout().write_all(stdout.as_bytes());
+            let _ = std::io::stderr().write_all(stderr.as_bytes());
+            return ExitCode::from(code);
+        }
+    };
+
     let log = match logging::init(LogConfig::default()) {
         Ok(log) => log,
         Err(e) => {
@@ -37,21 +55,9 @@ fn main() -> ExitCode {
     if let Some(terminal) = &terminal {
         log.set_console_sink(terminal.clone());
     }
-
-    let argv: Vec<String> = std::env::args_os()
-        .skip(1)
-        .map(|a| a.to_string_lossy().into_owned())
-        .collect();
-    let parsed = match args::handle(&argv) {
-        args::Handled::Run(parsed) => parsed,
-        args::Handled::Exit(code) => {
-            log.shutdown();
-            if let Some(terminal) = &terminal {
-                terminal.close();
-            }
-            return ExitCode::from(code);
-        }
-    };
+    for warning in &warnings {
+        tracing::warn!("{}", warning);
+    }
 
     let code = match tokio::runtime::Builder::new_multi_thread()
         .enable_all()

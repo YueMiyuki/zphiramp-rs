@@ -230,8 +230,7 @@ fn a_reader_never_sees_a_torn_points_file() {
             let mut reads = 0;
             while !stop.load(std::sync::atomic::Ordering::Relaxed) {
                 let text = std::fs::read_to_string(&path).unwrap();
-                let parsed: Result<zphira_common::gson::JsonElement, _> =
-                    zphira_common::gson::JsonElement::parse(&text);
+                let parsed: Result<serde_json::Value, _> = serde_json::from_str(&text);
                 assert!(parsed.is_ok(), "torn file: {} bytes", text.len());
                 reads += 1;
             }

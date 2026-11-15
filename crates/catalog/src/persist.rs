@@ -6,7 +6,6 @@ use std::sync::{Arc, Mutex, PoisonError};
 
 use serde::Serialize;
 use serde::ser::SerializeMap;
-use zphira_common::gson;
 use zphira_phira::ChartInfo;
 
 use crate::config::{CatalogConfig, FileSink};
@@ -37,7 +36,7 @@ pub(crate) fn write_json_blocking<T: Serialize + ?Sized>(
     value: &T,
 ) -> io::Result<()> {
     files.write_atomic(path, &mut |w| {
-        gson::to_writer_pretty(w, value).map_err(io::Error::other)
+        serde_json::to_writer_pretty(w, value).map_err(io::Error::from)
     })
 }
 
@@ -104,7 +103,7 @@ pub(crate) fn remove_stale(config: &CatalogConfig, name: &str) {
     }
 }
 
-pub(crate) fn java_list(ids: &[i32]) -> String {
+pub(crate) fn id_list(ids: &[i32]) -> String {
     let parts: Vec<String> = ids.iter().map(i32::to_string).collect();
     format!("[{}]", parts.join(", "))
 }

@@ -5,7 +5,7 @@ use crate::data::{
     FullUserProfile, GameState, JudgeEvent, Message, PacketResult, RoomInfo, TouchFrame,
     UserProfile,
 };
-use crate::error::{Direction, ProtocolError};
+use crate::error::{IdKind, ProtocolError};
 use crate::wire::{Decode, Encode, decode_list, encode_list, get_bool, get_i32_le, get_u8};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -251,9 +251,9 @@ impl ClientBoundPacket {
             id::PLAYED => Self::Played(PacketResult::decode(buf)?),
             id::ABORT => Self::Abort(PacketResult::decode(buf)?),
             other => {
-                return Err(ProtocolError::UnknownPacketId {
-                    direction: Direction::ClientBound,
-                    id: other,
+                return Err(ProtocolError::UnknownId {
+                    kind: IdKind::ClientBoundPacket,
+                    id: i32::from(other),
                 });
             }
         })

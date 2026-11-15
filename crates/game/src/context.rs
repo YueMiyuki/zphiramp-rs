@@ -11,7 +11,7 @@ use tokio::sync::Notify;
 use tokio::task::JoinHandle;
 use tokio_util::sync::CancellationToken;
 use zphira_catalog::{ChartIndex, ChartPool};
-use zphira_common::args::ServerArgs;
+use zphira_common::cli::ServerArgs;
 use zphira_common::i18n::I18n;
 use zphira_ledger::{Points, RoundRecords};
 
@@ -173,7 +173,7 @@ impl Listener {
                         tokio::spawn(async move { ctx.serve_connection(stream, peer).await });
                     }
                     Err(e) => {
-                        tracing::warn!(error = %e, "Failed to create a new channel from an accepted socket.");
+                        tracing::warn!(error = %e, "Failed to accept a connection");
                         tokio::time::sleep(Duration::from_millis(100)).await;
                     }
                 }

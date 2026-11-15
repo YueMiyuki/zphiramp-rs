@@ -1,8 +1,7 @@
 use bytes::{Buf, BufMut};
 
 use crate::error::ProtocolError;
-use crate::float16;
-use crate::java_utf8;
+use half::f16;
 
 pub const MAXIMUM_VARINT_SIZE: usize = 5;
 
@@ -29,9 +28,8 @@ impl Decode for () {
 
 #[inline]
 fn need<B: Buf>(buf: &B, needed: usize) -> Result<(), ProtocolError> {
-    let remaining = buf.remaining();
-    if remaining < needed {
-        Err(ProtocolError::IndexOutOfBounds { needed, remaining })
+    if buf.remaining() < needed {
+        Err(ProtocolError::Malformed("truncated"))
     } else {
         Ok(())
     }
@@ -62,29 +60,33 @@ pub fn get_f32_le<B: Buf>(buf: &mut B) -> Result<f32, ProtocolError> {
     Ok(f32::from_bits(buf.get_u32_le()))
 }
 
-pub fn decode_varint<B: Buf>(buf: &mut B) -> Result<i32, ProtocolError> {
+pub(crate) fn try_decode_varint<B: Buf>(buf: &mut B) -> Result<Option<i32>, ProtocolError> {
     if !buf.has_remaining() {
-        return Err(ProtocolError::NeedMoreData);
+        return Ok(None);
     }
     let b = buf.get_u8();
     if b & 0x80 == 0 {
-        return Ok(i32::from(b));
+        return Ok(Some(i32::from(b)));
     }
     let mut value = u32::from(b & 0x7f);
     let mut shift = 7;
     for _ in 1..MAXIMUM_VARINT_SIZE {
         if !buf.has_remaining() {
-            return Err(ProtocolError::NeedMoreData);
+            return Ok(None);
         }
         let b = buf.get_u8();
         // Wire compatibility: surplus high bits of the fifth byte fall off, non-canonical forms pass.
         value |= u32::from(b & 0x7f) << shift;
         if b & 0x80 == 0 {
-            return Ok(value as i32);
+            return Ok(Some(value as i32));
         }
         shift += 7;
     }
-    Err(ProtocolError::BadVarInt)
+    Err(ProtocolError::Malformed("bad varint"))
+}
+
+pub fn decode_varint<B: Buf>(buf: &mut B) -> Result<i32, ProtocolError> {
+    try_decode_varint(buf)?.ok_or(ProtocolError::Malformed("truncated"))
 }
 
 pub fn encode_varint<B: BufMut>(buf: &mut B, value: i32) {
@@ -108,18 +110,21 @@ pub fn varint_len(value: i32) -> usize {
 
 pub fn decode_string<B: Buf>(buf: &mut B, max_length: i32) -> Result<String, ProtocolError> {
     let length = decode_varint(buf)?;
-    if length < 0 || length > max_length {
-        return Err(ProtocolError::BadStringLength {
+    if length < 0 {
+        return Err(ProtocolError::Malformed("negative string length"));
+    }
+    if length > max_length {
+        return Err(ProtocolError::StringTooLong {
             length,
             max: max_length,
         });
     }
     let length = length as usize;
     if buf.remaining() < length {
-        return Err(ProtocolError::NeedMoreData);
+        return Err(ProtocolError::Malformed("truncated"));
     }
     let bytes = buf.copy_to_bytes(length);
-    Ok(java_utf8::decode(&bytes))
+    Ok(String::from_utf8_lossy(&bytes).into_owned())
 }
 
 pub fn decode_string_default<B: Buf>(buf: &mut B) -> Result<String, ProtocolError> {
@@ -133,11 +138,17 @@ pub fn encode_string<B: BufMut>(buf: &mut B, s: &str) {
 
 pub fn decode_float16_le<B: Buf>(buf: &mut B) -> Result<f32, ProtocolError> {
     need(buf, 2)?;
-    Ok(float16::half_to_float(buf.get_u16_le()))
+    Ok(f16::from_bits(buf.get_u16_le()).to_f32())
 }
 
 pub fn encode_float16_le<B: BufMut>(buf: &mut B, value: f32) {
-    buf.put_u16_le(float16::float_to_half(value));
+    // Every NaN goes out as the same quiet NaN (sign kept), whatever its payload.
+    let bits = if value.is_nan() {
+        0x7e00 | ((value.to_bits() >> 16) & 0x8000) as u16
+    } else {
+        f16::from_f32(value).to_bits()
+    };
+    buf.put_u16_le(bits);
 }
 
 pub const MAX_INITIAL_CAPACITY: usize = 1024;
@@ -156,7 +167,7 @@ pub fn decode_list<B: Buf, T>(
 ) -> Result<Vec<T>, ProtocolError> {
     let count = decode_varint(buf)?;
     if count < 0 {
-        return Err(ProtocolError::IllegalCapacity(count));
+        return Err(ProtocolError::Malformed("negative list count"));
     }
     let mut list = Vec::with_capacity(initial_capacity(
         count as usize,
@@ -233,9 +244,9 @@ mod tests {
         let mut reserved = 0;
         let r = decode_list(&mut &data[..], 5, |_| -> Result<u8, _> {
             reserved += 1;
-            Err(ProtocolError::NeedMoreData)
+            Err(ProtocolError::Malformed("truncated"))
         });
-        assert_eq!(r, Err(ProtocolError::NeedMoreData));
+        assert_eq!(r, Err(ProtocolError::Malformed("truncated")));
         assert_eq!(reserved, 1, "stops at the first element");
     }
 
@@ -243,15 +254,15 @@ mod tests {
     fn varint_errors() {
         assert_eq!(
             decode_varint(&mut &[][..]),
-            Err(ProtocolError::NeedMoreData)
+            Err(ProtocolError::Malformed("truncated"))
         );
         assert_eq!(
             decode_varint(&mut &[0x80][..]),
-            Err(ProtocolError::NeedMoreData)
+            Err(ProtocolError::Malformed("truncated"))
         );
         assert_eq!(
             decode_varint(&mut &[0xff; 5][..]),
-            Err(ProtocolError::BadVarInt)
+            Err(ProtocolError::Malformed("bad varint"))
         );
 
         assert_eq!(

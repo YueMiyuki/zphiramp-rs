@@ -1,8 +1,8 @@
 use std::fmt;
 
-use zphira_common::gson::JsonElement;
+use serde_json::Value;
 
-pub const MAX_IMPORT_CHARS: usize = 64 * 1024 * 1024;
+pub const MAX_IMPORT_BYTES: usize = 64 * 1024 * 1024;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImportMode {
@@ -68,14 +68,6 @@ impl fmt::Display for ImportError {
 
 impl std::error::Error for ImportError {}
 
-pub(crate) fn gson_reason(error: &zphira_common::gson::GsonError) -> String {
-    use zphira_common::gson::GsonErrorKind;
-    match error.kind() {
-        GsonErrorKind::NumberFormat => format!("数值格式错误：{}", error.message()),
-        _ => error.message().to_owned(),
-    }
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Kind {
     Admins,
@@ -93,14 +85,15 @@ impl Kind {
     }
 }
 
-pub(crate) fn parse_document(kind: Kind, document: &str) -> Result<JsonElement, ImportError> {
+pub(crate) fn parse_document(kind: Kind, document: &str) -> Result<Value, ImportError> {
     if document.trim().is_empty() {
         return Err(ImportError::invalid("内容为空"));
     }
-    if document.encode_utf16().count() > MAX_IMPORT_CHARS {
+    if document.len() > MAX_IMPORT_BYTES {
         return Err(ImportError::invalid("内容过大"));
     }
-    let root = JsonElement::parse(document).map_err(|_| ImportError::invalid("不是有效的 JSON"))?;
+    let root: Value =
+        serde_json::from_str(document).map_err(|_| ImportError::invalid("不是有效的 JSON"))?;
     if root.is_null() {
         return Err(ImportError::invalid("不是有效的 JSON"));
     }
@@ -120,4 +113,50 @@ pub(crate) fn parse_document(kind: Kind, document: &str) -> Result<JsonElement, 
         }
     }
     Ok(root)
+}
+
+pub(crate) fn present<'a>(
+    object: &'a serde_json::Map<String, Value>,
+    key: &str,
+) -> Option<&'a Value> {
+    object.get(key).filter(|value| !value.is_null())
+}
+
+pub(crate) fn check_integer(
+    object: &serde_json::Map<String, Value>,
+    key: &str,
+    wide: bool,
+) -> Result<(), String> {
+    match object.get(key) {
+        None => Ok(()),
+        Some(Value::Null) => Err(format!("{key} 不能为 null")),
+        Some(value) => match value.as_i64() {
+            Some(n) if wide || i32::try_from(n).is_ok() => Ok(()),
+            _ => Err(format!("{key} 必须是整数")),
+        },
+    }
+}
+
+pub(crate) fn check_number(
+    object: &serde_json::Map<String, Value>,
+    key: &str,
+) -> Result<(), String> {
+    match object.get(key) {
+        None => Ok(()),
+        Some(Value::Null) => Err(format!("{key} 不能为 null")),
+        Some(Value::Number(_)) => Ok(()),
+        Some(_) => Err(format!("{key} 必须是数字")),
+    }
+}
+
+pub(crate) fn check_text(
+    object: &serde_json::Map<String, Value>,
+    key: &str,
+    nullable: bool,
+) -> Result<(), String> {
+    match object.get(key) {
+        None | Some(Value::String(_)) => Ok(()),
+        Some(Value::Null) if nullable => Ok(()),
+        Some(_) => Err(format!("{key} 必须是文本")),
+    }
 }

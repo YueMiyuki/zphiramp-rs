@@ -8,39 +8,34 @@ fn lines(items: &[&str]) -> Vec<String> {
 }
 
 #[test]
-fn java_trim_removes_everything_up_to_space() {
-    assert_eq!(java_trim("\u{1}\t room list \r\n\u{0}"), "room list");
+fn normalize_trims_and_skips_blank_lines() {
+    assert_eq!(normalize(" \t room list \r\n"), Some("room list"));
     assert_eq!(normalize("   "), None);
     assert_eq!(normalize(""), None);
     assert_eq!(normalize(" stop "), Some("stop"));
 }
 
 #[test]
-fn split_like_java() {
+fn words_split_on_whitespace_runs_and_keep_the_rest_of_a_limited_split() {
     assert_eq!(
-        java_split("room  create\tr1   1", 0),
+        words("room  create\tr1   1", usize::MAX),
         ["room", "create", "r1", "1"]
     );
     assert_eq!(
-        java_split("submission reject 3 1001 not good  enough", 5),
+        words("submission reject 3 1001 not good  enough", 5),
         ["submission", "reject", "3", "1001", "not good  enough"]
     );
-    assert_eq!(java_split("submission list", 5), ["submission", "list"]);
-    assert_eq!(java_split("a b c d e", 5), ["a", "b", "c", "d", "e"]);
-    assert_eq!(java_split("a b c d", 5), ["a", "b", "c", "d"]);
-    assert_eq!(java_split("say\u{a0}x y", 0), ["say\u{a0}x", "y"]);
+    assert_eq!(words("submission list", 5), ["submission", "list"]);
+    assert_eq!(words("a b c d e", 5), ["a", "b", "c", "d", "e"]);
+    assert_eq!(words("a b c d", 5), ["a", "b", "c", "d"]);
 }
 
 #[test]
-fn equals_ignore_case_like_java() {
-    assert!(eq_ic("STOP", "stop"));
-    assert!(eq_ic("List", "list"));
-    assert!(!eq_ic("lists", "list"));
-    assert!(!eq_ic("lis", "list"));
-    assert!(eq_ic("adm\u{131}n", "admin"));
-    assert!(eq_ic("\u{17f}top", "stop"));
+fn stop_is_matched_in_any_case_and_only_as_a_whole_word() {
+    assert!(is_stop("STOP"));
     assert!(is_stop("Stop"));
     assert!(!is_stop("Stop-not"));
+    assert!(!is_stop("stops"));
 }
 
 #[tokio::test]
@@ -109,7 +104,7 @@ async fn admin_commands() {
     );
     assert_eq!(
         f.run("admin add abc").await,
-        lines(&["WARN Admin command failed: For input string: \"abc\""])
+        lines(&["WARN Admin command failed: Invalid number: abc"])
     );
     assert_eq!(
         f.run("admin foo").await,
@@ -162,7 +157,7 @@ async fn room_list_create_remove() {
     );
     assert_eq!(
         f.run("room create c5 x").await,
-        lines(&["WARN Room command failed: For input string: \"x\""])
+        lines(&["WARN Room command failed: Invalid number: x"])
     );
     assert_eq!(
         f.run("room create bad! x").await,
@@ -264,11 +259,11 @@ async fn room_config() {
     );
     assert_eq!(
         f.run("room c1 config bogus x").await,
-        lines(&["WARN Room command failed: For input string: \"x\""])
+        lines(&["WARN Room command failed: Invalid number: x"])
     );
     assert_eq!(
         f.run("room c1 config interval x").await,
-        lines(&["WARN Room command failed: For input string: \"x\""])
+        lines(&["WARN Room command failed: Invalid number: x"])
     );
     assert_eq!(
         f.run("room c1 config selectcountdown 10").await,
@@ -363,7 +358,7 @@ async fn room_config_ready_settings_refuse_bad_values() {
     );
     assert_eq!(
         f.run("room c1 config allreadydelay on").await,
-        lines(&["WARN Room command failed: For input string: \"on\""])
+        lines(&["WARN Room command failed: Invalid number: on"])
     );
     assert_eq!(
         f.run("room nope config cancelready x").await,
@@ -392,7 +387,7 @@ async fn room_pool_switch_and_favorite() {
     );
     assert_eq!(
         f.run("room nope pool switch x").await,
-        lines(&["WARN Room command failed: For input string: \"x\""])
+        lines(&["WARN Room command failed: Invalid number: x"])
     );
     assert_eq!(
         f.run("room nope pool switch 1").await,
@@ -408,7 +403,7 @@ async fn room_pool_switch_and_favorite() {
     );
     assert_eq!(
         f.run("room c1 pool favorite x").await,
-        lines(&["WARN Room command failed: For input string: \"x\""])
+        lines(&["WARN Room command failed: Invalid number: x"])
     );
     assert_eq!(
         f.run("room nope pool favorite x").await,
@@ -512,11 +507,11 @@ async fn pool_add_remove() {
     );
     assert_eq!(
         f.run("pool add 22 x").await,
-        lines(&["WARN Pool command failed: For input string: \"x\""])
+        lines(&["WARN Pool command failed: Invalid number: x"])
     );
     assert_eq!(
         f.run("pool add x 1001").await,
-        lines(&["WARN Pool command failed: For input string: \"x\""])
+        lines(&["WARN Pool command failed: Invalid number: x"])
     );
     assert_eq!(
         f.run("pool add 23 4242").await,
@@ -584,7 +579,7 @@ async fn pool_favorite() {
     );
     assert_eq!(
         f.run("pool favorite 2 x").await,
-        lines(&["WARN Pool command failed: For input string: \"x\""])
+        lines(&["WARN Pool command failed: Invalid number: x"])
     );
 }
 
@@ -633,7 +628,7 @@ async fn pool_default_flag_takes_only_known_words_a31() {
     );
     assert_eq!(
         f.run("pool default x enable").await,
-        lines(&["WARN Pool command failed: For input string: \"x\""])
+        lines(&["WARN Pool command failed: Invalid number: x"])
     );
 }
 
@@ -664,7 +659,7 @@ async fn pool_meta() {
     assert_eq!(
         f.run("pool meta 3 bogus").await,
         lines(&[
-            "WARN Pool command failed: No enum constant top.rymc.phira.main.game.room.chart.PoolCategory.BOGUS"
+            "WARN Pool command failed: Unknown category: bogus. Categories: REGULAR, CONFIGURED, TB, MANUAL"
         ])
     );
     assert_eq!(
@@ -673,7 +668,7 @@ async fn pool_meta() {
     );
     assert_eq!(
         f.run("pool meta 3 tb x").await,
-        lines(&["WARN Pool command failed: For input string: \"x\""])
+        lines(&["WARN Pool command failed: Invalid number: x"])
     );
     assert_eq!(f.run("pool meta 3").await, lines(&[USAGE_POOL_TEXT]));
 }
@@ -694,7 +689,7 @@ async fn pool_generate() {
     assert_eq!(
         f.run("pool generate bogus").await,
         lines(&[
-            "WARN Pool command failed: No enum constant top.rymc.phira.main.game.room.chart.PoolCategory.BOGUS"
+            "WARN Pool command failed: Unknown category: bogus. Categories: REGULAR, CONFIGURED, TB, MANUAL"
         ])
     );
     assert_eq!(
@@ -703,7 +698,7 @@ async fn pool_generate() {
     );
     assert_eq!(
         f.run("pool generate REGULAR x").await,
-        lines(&["WARN Pool command failed: For input string: \"x\""])
+        lines(&["WARN Pool command failed: Invalid number: x"])
     );
     assert_eq!(f.run("pool generate").await, lines(&[USAGE_POOL_TEXT]));
 }
@@ -716,10 +711,10 @@ async fn pool_generate_probes_first_and_parses_after() {
     assert_eq!(out.len(), 2, "{out:?}");
     assert!(out[0].starts_with("INFO Probed "), "{out:?}");
     assert!(out[0].ends_with(" durations for TB"), "{out:?}");
-    assert_eq!(out[1], "WARN Pool command failed: For input string: \"x\"");
+    assert_eq!(out[1], "WARN Pool command failed: Invalid number: x");
     assert_eq!(
         f.run("pool generate TB 5 1 -2").await,
-        lines(&["WARN Pool command failed: -8"])
+        lines(&["WARN Pool command failed: Probe budget must not be negative: -2"])
     );
 }
 
@@ -833,16 +828,16 @@ async fn chart_search() {
     assert_eq!(
         f.run("chart search bogus").await,
         lines(&[
-            "WARN Chart command failed: No enum constant top.rymc.phira.main.game.room.chart.PoolCategory.BOGUS"
+            "WARN Chart command failed: Unknown category: bogus. Categories: REGULAR, CONFIGURED, TB, MANUAL"
         ])
     );
     assert_eq!(
         f.run("chart search REGULAR -1").await,
-        lines(&["WARN Chart command failed: -1"])
+        lines(&["WARN Chart command failed: Limit must not be negative: -1"])
     );
     assert_eq!(
         f.run("chart search REGULAR x").await,
-        lines(&["WARN Chart command failed: For input string: \"x\""])
+        lines(&["WARN Chart command failed: Invalid number: x"])
     );
     let out = f.run("chart search regular").await;
     assert_eq!(
@@ -871,11 +866,11 @@ async fn chart_duration() {
     );
     assert_eq!(
         f.run("chart duration x").await,
-        lines(&["WARN Chart command failed: For input string: \"x\""])
+        lines(&["WARN Chart command failed: Invalid number: x"])
     );
     assert_eq!(
         f.run("chart duration 424242 x").await,
-        lines(&["WARN Chart command failed: For input string: \"x\""])
+        lines(&["WARN Chart command failed: Invalid number: x"])
     );
     assert_eq!(f.run("chart bogus").await, lines(&[USAGE_CHART_TEXT]));
 }
@@ -941,7 +936,7 @@ async fn submission_commands() {
     );
     assert_eq!(
         f.run("submission list x").await,
-        lines(&["WARN Submission command failed: For input string: \"x\""])
+        lines(&["WARN Submission command failed: Invalid number: x"])
     );
     let usage = lines(&[
         "WARN Usage: submission list | submission list <poolId> | submission approve <poolId> <chartId> | submission reject <poolId> <chartId> [reason]",

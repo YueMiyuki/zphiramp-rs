@@ -7,7 +7,7 @@ use serde::ser::SerializeStruct;
 use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
 use zphira_common::fs;
-use zphira_common::gson;
+use zphira_common::json;
 use zphira_phira::ChartInfo;
 
 use crate::cache::ChartInfoCache;
@@ -16,7 +16,7 @@ use crate::config::{CatalogConfig, FileSink};
 use crate::error::CatalogError;
 use crate::index::ChartIndex;
 use crate::persist::{
-    POOL_FILE, distinct, duration_reset_pending, java_list, remove_stale, run_blocking,
+    POOL_FILE, distinct, duration_reset_pending, id_list, remove_stale, run_blocking,
     write_json_blocking,
 };
 use crate::screening::ScreeningRule;
@@ -125,7 +125,7 @@ impl ChartPool {
             Ok((cache, file, duration_reset_pending(&config)))
         })
         .await
-        .map_err(CatalogError::io)?;
+        .map_err(CatalogError::storage)?;
         let (cache, unreadable) = cache?;
         if let Some(reason) = unreadable {
             tracing::warn!(
@@ -137,10 +137,10 @@ impl ChartPool {
             cache.clear_durations();
         }
 
-        let file = file.map_err(CatalogError::io)?;
+        let file = file.map_err(CatalogError::storage)?;
         let pools = match file {
             Some(text) => {
-                match gson::from_str_opt::<PoolConfigFile>(&text).map_err(CatalogError::Json)? {
+                match json::from_str_opt::<PoolConfigFile>(&text).map_err(CatalogError::json)? {
                     Some(PoolConfigFile { pools: Some(rows) }) => normalize(rows),
                     _ => default_pools(),
                 }
@@ -174,9 +174,11 @@ impl ChartPool {
             .cache
             .commit(fetched)
             .await
-            .map_err(CatalogError::io)?;
+            .map_err(CatalogError::storage)?;
         let pools: Vec<Arc<PoolSnapshot>> = pools.into_iter().map(Arc::new).collect();
-        pool.write_pools(&pools).await.map_err(CatalogError::io)?;
+        pool.write_pools(&pools)
+            .await
+            .map_err(CatalogError::storage)?;
         pool.inner.published.store(Arc::new(Published::new(pools)));
         Ok(pool)
     }
@@ -202,11 +204,6 @@ impl ChartPool {
 
     pub fn find_pool(&self, pool_id: i32) -> Option<Arc<PoolSnapshot>> {
         self.inner.published.load().by_id.get(&pool_id).cloned()
-    }
-
-    /// The same as `find_pool`: memory and the published state are one value.
-    pub fn find_published_pool(&self, pool_id: i32) -> Option<Arc<PoolSnapshot>> {
-        self.find_pool(pool_id)
     }
 
     pub fn resolve_pools(&self, pool_ids: &[i32]) -> Vec<Arc<PoolSnapshot>> {
@@ -245,12 +242,6 @@ impl ChartPool {
             .filter(|p| p.submission_open)
             .cloned()
             .collect()
-    }
-
-    pub fn get_chart_info(&self, chart_id: i32) -> Result<Arc<ChartInfo>, CatalogError> {
-        self.chart_info(chart_id).ok_or_else(|| {
-            CatalogError::illegal_state(format!("Chart info is not loaded: {chart_id}"))
-        })
     }
 
     pub fn chart_info(&self, chart_id: i32) -> Option<Arc<ChartInfo>> {
@@ -302,8 +293,8 @@ impl ChartPool {
             .cache
             .commit(fetched)
             .await
-            .map_err(CatalogError::io)?;
-        self.publish(pools).await.map_err(CatalogError::io)
+            .map_err(CatalogError::storage)?;
+        self.publish(pools).await.map_err(CatalogError::storage)
     }
 
     pub async fn remove_pool(&self, pool_id: i32) -> Result<(), CatalogError> {
@@ -313,15 +304,11 @@ impl ChartPool {
             .position(pool_id)
             .ok_or_else(|| pool_not_found(pool_id))?;
         if current.pools.len() == 1 {
-            return Err(CatalogError::illegal_argument(
-                "Cannot remove the last pool",
-            ));
+            return Err(CatalogError::invalid("Cannot remove the last pool"));
         }
         let default_count = current.pools.iter().filter(|p| p.default_flag).count();
         if current.pools[index].default_flag && default_count == 1 {
-            return Err(CatalogError::illegal_argument(
-                "Cannot remove the last default pool",
-            ));
+            return Err(CatalogError::invalid("Cannot remove the last default pool"));
         }
         let mut pools = current.pools.clone();
         pools.remove(index);
@@ -339,7 +326,7 @@ impl ChartPool {
         }
         let chart_ids = distinct(chart_ids);
         if chart_ids.len() > MAX_BATCH_CHARTS {
-            return Err(CatalogError::illegal_argument(format!(
+            return Err(CatalogError::invalid(format!(
                 "Too many charts in one batch: {} (max {MAX_BATCH_CHARTS})",
                 chart_ids.len()
             )));
@@ -368,8 +355,8 @@ impl ChartPool {
                 .cache
                 .commit(fetched)
                 .await
-                .map_err(CatalogError::io)?;
-            self.publish(pools).await.map_err(CatalogError::io)?;
+                .map_err(CatalogError::storage)?;
+            self.publish(pools).await.map_err(CatalogError::storage)?;
         }
         Ok(added)
     }
@@ -453,9 +440,7 @@ impl ChartPool {
         rounds_per_stay: Option<i32>,
     ) -> Result<GenerateOutcome, CatalogError> {
         if size_limit < 1 {
-            return Err(CatalogError::illegal_argument(
-                "Pool size limit must be positive",
-            ));
+            return Err(CatalogError::invalid("Pool size limit must be positive"));
         }
         let matched = index.search(rule, usize::MAX);
         if matched.is_empty() {
@@ -515,8 +500,8 @@ impl ChartPool {
             .cache
             .commit(fetched)
             .await
-            .map_err(CatalogError::io)?;
-        self.publish(pools).await.map_err(CatalogError::io)?;
+            .map_err(CatalogError::storage)?;
+        self.publish(pools).await.map_err(CatalogError::storage)?;
         tracing::info!(
             "Generated {} {} pools from {} charts (sizeLimit={})",
             created.len(),
@@ -538,7 +523,7 @@ impl ChartPool {
         rounds_per_stay: Option<i32>,
     ) -> Result<Vec<i32>, CatalogError> {
         if !(1..=MAX_BATCH_POOLS).contains(&count) {
-            return Err(CatalogError::illegal_argument(format!(
+            return Err(CatalogError::invalid(format!(
                 "Pool count must be between 1 and {MAX_BATCH_POOLS}"
             )));
         }
@@ -564,14 +549,14 @@ impl ChartPool {
             "Created {} empty {} pools: {}",
             created.len(),
             category.map_or("null", PoolCategory::name),
-            java_list(&created)
+            id_list(&created)
         );
         Ok(created)
     }
 
     pub fn export_json(&self) -> Result<String, CatalogError> {
         let published = self.inner.published.load_full();
-        gson::to_string_pretty(&PoolFileOut(&published.pools)).map_err(CatalogError::Json)
+        serde_json::to_string_pretty(&PoolFileOut(&published.pools)).map_err(CatalogError::json)
     }
 
     pub async fn import_json(
@@ -582,7 +567,7 @@ impl ChartPool {
     ) -> Result<ImportResult, CatalogError> {
         let incoming = parse_import_rows(document)?;
         if mode == ImportMode::Replace && incoming.is_empty() {
-            return Err(CatalogError::illegal_argument("pools 至少需要一个谱池"));
+            return Err(CatalogError::invalid("pools 至少需要一个谱池"));
         }
 
         let mut fetched: Vec<(i32, Arc<ChartInfo>)> = Vec::new();
@@ -620,20 +605,20 @@ impl ChartPool {
             );
         }
         if pools.is_empty() {
-            return Err(CatalogError::illegal_argument("pools 至少需要一个谱池"));
+            return Err(CatalogError::invalid("pools 至少需要一个谱池"));
         }
         let path = self.inner.path.clone();
         let backup_file = run_blocking(move || backup(&path))
             .await
-            .map_err(CatalogError::io)?;
+            .map_err(CatalogError::storage)?;
         warn_empty_pools(&pools);
         self.inner
             .cache
             .commit(fetched)
             .await
-            .map_err(CatalogError::io)?;
+            .map_err(CatalogError::storage)?;
         let count = i32::try_from(pools.len()).unwrap_or(i32::MAX);
-        self.publish(pools).await.map_err(CatalogError::io)?;
+        self.publish(pools).await.map_err(CatalogError::storage)?;
         Ok(ImportResult {
             imported: count,
             total: count,
@@ -698,15 +683,15 @@ impl ChartPool {
 }
 
 fn pool_not_found(pool_id: i32) -> CatalogError {
-    CatalogError::illegal_argument(format!("Pool not found: {pool_id}"))
+    CatalogError::not_found(format!("Pool not found: {pool_id}"))
 }
 
 fn pool_exists(pool_id: i32) -> CatalogError {
-    CatalogError::illegal_argument(format!("Pool already exists: {pool_id}"))
+    CatalogError::invalid(format!("Pool already exists: {pool_id}"))
 }
 
 fn save_pools_failed(e: std::io::Error) -> CatalogError {
-    CatalogError::save_failed(SAVE_POOLS_FAILED, e)
+    CatalogError::storage_with(SAVE_POOLS_FAILED, e)
 }
 
 fn reset_if_negative(value: i32) -> Option<i32> {
@@ -741,7 +726,7 @@ fn warn_empty_pools(pools: &[Arc<PoolSnapshot>]) {
 
 fn validate(pools: &[PoolSnapshot]) -> Result<(), CatalogError> {
     if pools.is_empty() {
-        return Err(CatalogError::illegal_state("No chart pools configured"));
+        return Err(CatalogError::bad_data("No chart pools configured"));
     }
     for pool in pools {
         if pool.chart_ids.is_empty() {
@@ -788,7 +773,7 @@ struct PoolDefinitionFile {
     favorite_id: Option<i32>,
     default_flag: bool,
     chart_ids: Option<Vec<i32>>,
-    #[serde(deserialize_with = "gson::enum_or_none")]
+    #[serde(deserialize_with = "json::enum_or_none")]
     category: Option<PoolCategory>,
     size_limit: Option<i32>,
     rounds_per_stay: Option<i32>,
@@ -826,11 +811,14 @@ impl Serialize for PoolFileOut<'_> {
 #[derive(Serialize)]
 struct PoolRow<'a> {
     id: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
     favorite_id: Option<i32>,
     default_flag: bool,
     chart_ids: &'a [i32],
     category: PoolCategory,
+    #[serde(skip_serializing_if = "Option::is_none")]
     size_limit: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     rounds_per_stay: Option<i32>,
     order: i32,
     submission_open: bool,
@@ -866,8 +854,7 @@ fn parse_import_rows(document: &str) -> Result<Vec<PoolSnapshot>, CatalogError> 
             format!("未知类别 {raw}")
         })
         .map_err(|reason| bad_row("pools", i, reason))?;
-        let parsed: PoolDefinitionFile =
-            gson::from_element(row).map_err(|e| bad_row("pools", i, e.message()))?;
+        let parsed = PoolDefinitionFile::deserialize(row).map_err(|e| bad_row("pools", i, e))?;
         if !ids.insert(parsed.id) {
             return Err(bad_row("pools", i, format!("谱池 id {} 重复", parsed.id)));
         }
@@ -901,7 +888,7 @@ mod tests {
             "pools[0] 无效：未知类别 true"
         );
         assert_eq!(
-            err(r#"{"pools":[{"id":1},{"id":"1"}]}"#),
+            err(r#"{"pools":[{"id":1},{"id":1}]}"#),
             "pools[1] 无效：谱池 id 1 重复"
         );
         assert!(err(r#"{"pools":[{"id":1,"chart_ids":["x"]}]}"#).starts_with("pools[0] 无效："));
@@ -915,7 +902,7 @@ mod tests {
     }
 
     #[test]
-    fn next_order_saturates_and_next_id_wraps_like_java() {
+    fn next_order_saturates_and_next_id_wraps() {
         let pool = |id, order| {
             let mut p = PoolSnapshot::new(id, false, vec![]);
             p.order = order;

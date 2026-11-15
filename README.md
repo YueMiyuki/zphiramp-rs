@@ -45,7 +45,12 @@ Run it from the directory that holds the state, as with the Java jar:
 | `--max-pending-submissions <n>` | `50` | New. Pending chart submissions per account; `-1` for no limit (`0` or below `-1` keeps the default, with a warning). |
 | `--login-rate-limit <n>` | `30` | New. HTTP login attempts per minute per client address; `-1` for no limit (likewise). |
 | `--plugins` | `plugins` | Accepted and ignored, as in Java. |
-| `--help` | | Print the usage and exit. |
+| `--help`, `-h` | | Print the usage to standard output and exit with code 0. |
+
+Write each flag in full as `--flag value` or `--flag=value`. Unlike Java, abbreviations (`--po`)
+and single-dash long flags are not accepted, a repeated flag is an error, and so is any word that
+is not a flag. An argument error is printed to standard error and exits with code 1; neither
+`--help` nor an error creates `logs/` or `data/`.
 
 The environment variable `ZPHIRA_PHIRA_HOST` overrides the Phira API address (default
 `https://phira.5wyxi.com/`), for testing against a mock.
@@ -66,6 +71,10 @@ The environment variable `ZPHIRA_PHIRA_HOST` overrides the Phira API address (de
   - Files under `data/` are written to a temporary file and renamed, so a crash never leaves a
     half-written file. Imports are validated before anything is written, and only the newest 20
     backups per data kind are kept in `data/backups`.
+  - Data files must be strict JSON: a hand edit with comments, single quotes, a number written
+    as a string or a repeated key cannot be read (Java tolerated them). Timestamps are written with
+    seconds; the Java form without seconds is still read.
+  - Command lines must spell flags out in full (see above).
 - **Going back** works: the Java server reads the files `zphiramp` writes. Unlock locked rooms
   first (the Java server cannot unlock them), and delete `data/.duration-probe-v2` before returning to
   `zphiramp` if the Java server probed durations in between.

@@ -1,6 +1,6 @@
 use serde::Serialize;
 use zphira_catalog::{ChartIndex, PoolSnapshot, SubmissionView};
-use zphira_common::time::JavaOffsetDateTime;
+use zphira_common::time::Timestamp;
 use zphira_phira::ChartInfo;
 
 #[derive(Serialize)]
@@ -60,10 +60,10 @@ pub(crate) struct ChartJson<'a> {
     rating: f32,
     #[serde(rename = "ratingCount")]
     rating_count: i32,
-    created: Option<&'a JavaOffsetDateTime>,
-    updated: Option<&'a JavaOffsetDateTime>,
+    created: Option<&'a Timestamp>,
+    updated: Option<&'a Timestamp>,
     #[serde(rename = "chartUpdated")]
-    chart_updated: Option<&'a JavaOffsetDateTime>,
+    chart_updated: Option<&'a Timestamp>,
     #[serde(rename = "durationSeconds")]
     duration_seconds: Option<i32>,
 }

@@ -3,9 +3,8 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, HeaderValue};
-use reqwest::redirect::Policy;
 use serde::Serialize;
-use zphira_common::gson;
+use zphira_common::json;
 
 use crate::PhiraError;
 use crate::cache::TtlCache;
@@ -17,7 +16,7 @@ use crate::model::{ChartInfo, ChartListPage, GameRecord, LoginResult, UserInfo};
 pub const DEFAULT_BASE_URL: &str = "https://phira.5wyxi.com/";
 
 const USER_AGENT: &str = "JPhira/1";
-const MAX_REDIRECTS: usize = 4;
+pub(crate) const MAX_REDIRECTS: usize = 10;
 const MAX_BODY: usize = 32 * 1024 * 1024;
 
 #[derive(Debug, Clone)]
@@ -82,7 +81,7 @@ impl PhiraClient {
         let http = reqwest::Client::builder()
             .user_agent(USER_AGENT)
             .connect_timeout(options.connect_timeout)
-            .redirect(redirect_policy())
+            .redirect(reqwest::redirect::Policy::limited(MAX_REDIRECTS))
             // Environment proxy variables are deliberately ignored.
             .no_proxy()
             .build()
@@ -161,7 +160,7 @@ impl PhiraClient {
         }
         let path = format!("record?player={player}&order=-time&pageNum=10");
         let body = self.execute(self.get(&path)?).await?;
-        let records: Option<Vec<GameRecord>> = gson::from_str_opt(&body)?;
+        let records: Option<Vec<GameRecord>> = json::from_str_opt(&body)?;
         let records = Arc::new(records.unwrap_or_default());
         self.inner
             .recent_record_cache
@@ -175,7 +174,7 @@ impl PhiraClient {
             email: &'a str,
             password: &'a str,
         }
-        let body = gson::to_string_pretty(&Body { email, password })?;
+        let body = serde_json::to_string_pretty(&Body { email, password })?;
         let request = self
             .request(reqwest::Method::POST, "login")?
             .header(CONTENT_TYPE, "application/json")
@@ -243,7 +242,7 @@ impl PhiraClient {
         request: reqwest::RequestBuilder,
     ) -> Result<T, PhiraError> {
         let body = self.execute(request).await?;
-        gson::from_str_opt(&body)?.ok_or_else(|| PhiraError::new(Kind::EmptyBody))
+        json::from_str_opt(&body)?.ok_or_else(|| PhiraError::new(Kind::EmptyBody))
     }
 
     async fn execute(&self, request: reqwest::RequestBuilder) -> Result<String, PhiraError> {
@@ -297,21 +296,6 @@ impl PhiraClient {
 
 fn backoff(failed_attempt: u32, unit: Duration) -> Duration {
     unit.saturating_mul(failed_attempt)
-}
-
-fn redirect_policy() -> Policy {
-    Policy::custom(|attempt| {
-        let downgrade = attempt
-            .previous()
-            .last()
-            .is_some_and(|from| from.scheme() == "https" && attempt.url().scheme() == "http");
-        // `previous()` includes the original request, so this follows MAX_REDIRECTS redirects.
-        if attempt.previous().len() > MAX_REDIRECTS || downgrade {
-            attempt.stop()
-        } else {
-            attempt.follow()
-        }
-    })
 }
 
 #[cfg(test)]

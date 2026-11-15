@@ -1,16 +1,16 @@
 use std::collections::{HashSet, VecDeque};
 use std::path::Path;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicI32, Ordering};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
-use zphira_common::gson::{self, GsonError, JsonElement};
+use serde_json::Value;
 
 use crate::error::LedgerError;
 use crate::import::{
-    BackupFn, ImportError, ImportMode, ImportReport, ImportResult, Kind, gson_reason,
-    parse_document,
+    BackupFn, ImportError, ImportMode, ImportReport, ImportResult, Kind, check_integer,
+    check_number, check_text, parse_document, present,
 };
 use crate::persist::{Document, Loaded, Persisted, read_file};
 use crate::writer::{self, SAVE_INTERVAL, WriterHandle};
@@ -26,6 +26,7 @@ pub struct RoundRecord {
     pub id: String,
     pub room_id: String,
     pub chart_id: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub chart_name: Option<String>,
     pub started_at: i64,
     pub finished_at: i64,
@@ -120,7 +121,8 @@ impl RoundRecord {
         }
     }
 
-    // Gson cannot write NaN or infinity, which would fail every later write of the history.
+    // JSON has no NaN or infinity: they would be written as `null` and the file could not be
+    // read back.
     fn make_finite(&mut self) -> bool {
         let mut changed = false;
         for result in &mut self.results {
@@ -163,9 +165,8 @@ impl Document for RecordsData {
         self.records = content.into_iter().rev().collect();
     }
 
-    fn serialize<W: std::io::Write>(content: &Self::Content, out: W) -> Result<(), GsonError> {
-        let rows: Vec<&RoundRecord> = content.iter().map(|r| &**r).collect();
-        gson::to_writer_pretty(out, &rows)
+    fn view(content: &Self::Content) -> impl Serialize + '_ {
+        content.iter().map(|r| &**r).collect::<Vec<&RoundRecord>>()
     }
 
     fn rows(content: &Self::Content) -> usize {
@@ -175,7 +176,7 @@ impl Document for RecordsData {
 
 struct Inner {
     store: Persisted<RecordsData>,
-    sequence: AtomicI32,
+    sequence: AtomicU64,
 }
 
 #[derive(Clone)]
@@ -211,14 +212,6 @@ impl RoundRecords {
             );
             rows.drain(..rows.len() - MAX_RECORDS);
         }
-        for row in &mut rows {
-            if row.make_finite() {
-                tracing::warn!(
-                    "Round record {} held a non-finite accuracy or deviation, stored as 0",
-                    row.id
-                );
-            }
-        }
         let records = rows.into_iter().rev().map(Arc::new).collect();
         Ok(Self(Arc::new(Inner {
             store: Persisted::new(
@@ -227,7 +220,7 @@ impl RoundRecords {
                 "Failed to save round records",
                 RecordsData { records },
             ),
-            sequence: AtomicI32::new(0),
+            sequence: AtomicU64::new(0),
         })))
     }
 
@@ -236,11 +229,7 @@ impl RoundRecords {
     }
 
     pub fn next_id(&self, room_id: &str, finished_at: i64) -> String {
-        let n = self
-            .0
-            .sequence
-            .fetch_add(1, Ordering::Relaxed)
-            .wrapping_add(1);
+        let n = self.0.sequence.fetch_add(1, Ordering::Relaxed) + 1;
         format!("{room_id}-{finished_at}-{n}")
     }
 
@@ -258,7 +247,6 @@ impl RoundRecords {
         });
     }
 
-    /// A `limit` of 0 still returns one row.
     pub fn query(
         &self,
         limit: usize,
@@ -268,6 +256,9 @@ impl RoundRecords {
     ) -> Vec<Arc<RoundRecord>> {
         let mut matched = Vec::new();
         for record in self.snapshot() {
+            if matched.len() >= limit {
+                break;
+            }
             if room_id.is_some_and(|room| room != record.room_id) {
                 continue;
             }
@@ -279,9 +270,6 @@ impl RoundRecords {
                 continue;
             }
             matched.push(record);
-            if matched.len() >= limit {
-                break;
-            }
         }
         matched
     }
@@ -295,6 +283,9 @@ impl RoundRecords {
     pub fn by_player(&self, player_id: i32, limit: usize) -> Vec<PlayerRound> {
         let mut rounds = Vec::new();
         for record in self.snapshot() {
+            if rounds.len() >= limit {
+                break;
+            }
             if let Some(result) = record.results.iter().find(|r| r.player_id == player_id) {
                 rounds.push(PlayerRound {
                     record_id: record.id.clone(),
@@ -304,9 +295,6 @@ impl RoundRecords {
                     finished_at: record.finished_at,
                     result: result.clone(),
                 });
-            }
-            if rounds.len() >= limit {
-                break;
             }
         }
         rounds
@@ -396,48 +384,30 @@ fn assemble(
     history
 }
 
-fn parse_rows(root: &JsonElement) -> Result<Vec<Arc<RoundRecord>>, ImportError> {
+fn parse_rows(root: &Value) -> Result<Vec<Arc<RoundRecord>>, ImportError> {
     let rows = root
         .as_array()
         .expect("parse_document checked the container");
     let mut seen = HashSet::new();
     let mut history = Vec::with_capacity(rows.len());
     for (index, row) in rows.iter().enumerate() {
-        let bad = |reason: String| {
-            let id = row
-                .as_object()
-                .and_then(|o| o.get("id"))
-                .and_then(JsonElement::get_as_string);
-            let which = match id {
+        let bad = |reason: &str| {
+            let which = match row.get("id").and_then(Value::as_str) {
                 Some(id) => format!("比赛记录第 {} 项（id \"{id}\"）", index + 1),
                 None => format!("比赛记录第 {} 项", index + 1),
             };
             ImportError::invalid(format!("{which}无效：{reason}"))
         };
-        let record = parse_record(row).map_err(bad)?;
+        let record = parse_record(row).map_err(|e| bad(&e))?;
         if !seen.insert(record.id.clone()) {
-            return Err(bad("id 重复".to_owned()));
+            return Err(bad("id 重复"));
         }
         history.push(Arc::new(record));
     }
     Ok(history)
 }
 
-const RECORD_NUMBERS: [&str; 3] = ["chart_id", "started_at", "finished_at"];
-const RESULT_NUMBERS: [&str; 6] = [
-    "rank",
-    "score",
-    "accuracy",
-    "std",
-    "gained_points",
-    "total_points",
-];
-
-fn present<'a>(object: &'a gson::JsonObject, key: &str) -> Option<&'a JsonElement> {
-    object.get(key).filter(|value| !value.is_null())
-}
-
-fn parse_record(row: &JsonElement) -> Result<RoundRecord, String> {
+fn parse_record(row: &Value) -> Result<RoundRecord, String> {
     let Some(object) = row.as_object() else {
         return Err("必须是对象".to_owned());
     };
@@ -445,12 +415,12 @@ fn parse_record(row: &JsonElement) -> Result<RoundRecord, String> {
         if present(object, key).is_none() {
             return Err(format!("缺少 {key}"));
         }
+        check_text(object, key, false)?;
     }
-    for key in RECORD_NUMBERS {
-        if object.get(key).is_some_and(JsonElement::is_null) {
-            return Err(format!("{key} 不能为 null"));
-        }
-    }
+    check_text(object, "chart_name", true)?;
+    check_integer(object, "chart_id", false)?;
+    check_integer(object, "started_at", true)?;
+    check_integer(object, "finished_at", true)?;
     let Some(results) = present(object, "results") else {
         return Err("缺少 results".to_owned());
     };
@@ -460,32 +430,27 @@ fn parse_record(row: &JsonElement) -> Result<RoundRecord, String> {
     for (index, result) in results.iter().enumerate() {
         check_result(result).map_err(|reason| format!("成绩第 {} 项无效：{reason}", index + 1))?;
     }
-
-    let record: RoundRecord = gson::from_element(row).map_err(|e| gson_reason(&e))?;
+    let record: RoundRecord = serde_json::from_value(row.clone()).map_err(|e| e.to_string())?;
     if record.id.is_empty() {
         return Err("id 不能为空".to_owned());
-    }
-    for (index, result) in record.results.iter().enumerate() {
-        for (key, value) in [("accuracy", result.accuracy), ("std", result.std)] {
-            if !value.is_finite() {
-                return Err(format!("成绩第 {} 项无效：{key} 必须是有限数", index + 1));
-            }
-        }
     }
     Ok(record)
 }
 
-fn check_result(result: &JsonElement) -> Result<(), String> {
+fn check_result(result: &Value) -> Result<(), String> {
     let Some(object) = result.as_object() else {
         return Err("必须是对象".to_owned());
     };
     if present(object, "player_id").is_none() {
         return Err("缺少 player_id".to_owned());
     }
-    for key in RESULT_NUMBERS {
-        if object.get(key).is_some_and(JsonElement::is_null) {
-            return Err(format!("{key} 不能为 null"));
-        }
+    check_integer(object, "player_id", false)?;
+    check_text(object, "player_name", false)?;
+    for key in ["rank", "score", "gained_points", "total_points"] {
+        check_integer(object, key, false)?;
+    }
+    for key in ["accuracy", "std"] {
+        check_number(object, key)?;
     }
     Ok(())
 }

@@ -17,6 +17,10 @@ pub fn fixture_path(name: &str) -> PathBuf {
         .join(name)
 }
 
+pub fn json(text: &str) -> serde_json::Value {
+    serde_json::from_str(text).unwrap_or_else(|e| panic!("not JSON ({e}): {text}"))
+}
+
 pub fn read_fixture(name: &str) -> String {
     std::fs::read_to_string(fixture_path(name))
         .unwrap_or_else(|e| panic!("reading fixture {name}: {e}"))

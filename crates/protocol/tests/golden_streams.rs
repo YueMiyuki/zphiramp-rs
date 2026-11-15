@@ -12,8 +12,6 @@ struct Outcome {
     events: Vec<String>,
     closed: bool,
     packets: Vec<Vec<u8>>,
-    first_error: Option<&'static str>,
-
     eof_events: usize,
 }
 
@@ -29,10 +27,9 @@ impl Outcome {
     fn summary(&self) -> String {
         let all: Vec<u8> = self.packets.concat();
         format!(
-            "{}.{}.{}.{}.{}",
+            "{}.{}.{}.{}",
             self.packets.len(),
             if self.closed { "C" } else { "O" },
-            self.first_error.unwrap_or("-"),
             crc32(&all),
             self.eof_events
         )
@@ -61,12 +58,14 @@ fn run(side: Side, handshake: bool, chunks: &[Vec<u8>]) -> Outcome {
         events: vec![],
         closed: false,
         packets: vec![],
-        first_error: None,
         eof_events: 0,
     };
 
     // Recorded Java vectors include 2 GB length prefixes that must only wait: replay uncapped.
-    let (mut server, mut client) = (ServerCodec::unlimited(), ClientCodec::unlimited());
+    let (mut server, mut client) = (
+        ServerCodec::with_max_frame_length(NO_CAP),
+        ClientCodec::with_max_frame_length(NO_CAP),
+    );
     let mut buf = BytesMut::new();
     let mut awaiting_version = handshake;
     for chunk in chunks {
@@ -82,7 +81,7 @@ fn run(side: Side, handshake: bool, chunks: &[Vec<u8>]) -> Outcome {
                     awaiting_version = false;
                 }
                 Err(e) => {
-                    out.events.push(format!("H:{}: {e}", e.java_exception()));
+                    out.events.push(format!("H:{e}"));
                     out.closed = true;
                     continue;
                 }
@@ -95,14 +94,8 @@ fn run(side: Side, handshake: bool, chunks: &[Vec<u8>]) -> Outcome {
                     out.packets.push(bytes);
                 }
                 Ok(None) => break,
-                Err(CodecError::Protocol(e)) => {
+                Err(CodecError::Protocol(_)) => {
                     out.closed = true;
-                    if e.pipeline_action() == PipelineAction::ExceptionCaught {
-                        let class = e.java_exception().unwrap();
-                        out.events
-                            .push(format!("E:{}", class.rsplit('.').next().unwrap()));
-                        out.first_error = Some(code(&e));
-                    }
                     break;
                 }
                 Err(other) => panic!("unexpected {other}"),
@@ -112,8 +105,7 @@ fn run(side: Side, handshake: bool, chunks: &[Vec<u8>]) -> Outcome {
     if !out.closed {
         if awaiting_version {
             let e = HandshakeError::ConnectionClosed;
-            out.events
-                .push(format!("EOF:H:{}: {e}", e.java_exception()));
+            out.events.push(format!("EOF:H:{e}"));
             out.eof_events += 1;
         } else {
             loop {
@@ -173,16 +165,8 @@ fn crafted_streams() {
             Side::Client
         };
         let got = match mode.as_str() {
-            "timeout" => format!(
-                "H:{}: {};CLOSED",
-                HandshakeError::Timeout.java_exception(),
-                HandshakeError::Timeout
-            ),
-            "eof" => format!(
-                "H:{}: {};CLOSED",
-                HandshakeError::ConnectionClosed.java_exception(),
-                HandshakeError::ConnectionClosed
-            ),
+            "timeout" => format!("H:{};CLOSED", HandshakeError::Timeout),
+            "eof" => format!("H:{};CLOSED", HandshakeError::ConnectionClosed),
             mode => {
                 let chunks: Vec<Vec<u8>> = if row[3].is_empty() {
                     vec![]
@@ -230,13 +214,7 @@ fn stream_fuzz(name: &str, seed: u64, framed_prefix: &str, side: fn() -> Side) {
             pos += n;
         }
         let got = run(side(), false, &chunks);
-        let mut got_summary = got.summary();
-        // Java ran out of memory on a huge declared count (heap dependent); only the error kind differs.
-        if want.split('.').nth(2) == Some("M") {
-            let mut parts: Vec<&str> = got_summary.split('.').collect();
-            parts[2] = "M";
-            got_summary = parts.join(".");
-        }
+        let got_summary = got.summary();
         assert_eq!(
             &got_summary,
             want,
@@ -316,13 +294,13 @@ async fn bad_frame_yields_earlier_packets_then_the_error_then_ends() {
         Err(CodecError::Protocol(e)) => {
             assert_eq!(
                 e,
-                ProtocolError::UnknownPacketId {
-                    direction: Direction::ServerBound,
+                ProtocolError::UnknownId {
+                    kind: IdKind::ServerBoundPacket,
                     id: 0x20
                 }
             );
-            assert_eq!(e.pipeline_action(), PipelineAction::CloseSilently);
-            assert_eq!(e.to_string(), "Unknown ServerBound packet id: 32");
+            assert_eq!(e.pipeline_action(), PipelineAction::Close);
+            assert_eq!(e.to_string(), "unknown serverbound packet id 32");
         }
         other => panic!("{other:?}"),
     }
@@ -355,34 +333,25 @@ fn frame_functions_on_plain_buffers() {
     assert_eq!(&buf[..5], &[3, b'a', b'b', b'c', 0]);
 
     assert_eq!(
-        decode_frame(&mut buf, UNLIMITED_FRAME_LENGTH).unwrap(),
+        decode_frame(&mut buf, NO_CAP).unwrap(),
         Some(Bytes::from_static(b"abc"))
     );
-    assert_eq!(
-        decode_frame(&mut buf, UNLIMITED_FRAME_LENGTH)
-            .unwrap()
-            .unwrap()
-            .len(),
-        200
-    );
+    assert_eq!(decode_frame(&mut buf, NO_CAP).unwrap().unwrap().len(), 200);
     assert!(buf.is_empty());
 
     let mut buf = BytesMut::from(&[0u8, 0, 4, 1][..]);
-    assert_eq!(
-        decode_frame(&mut buf, UNLIMITED_FRAME_LENGTH).unwrap(),
-        None
-    );
+    assert_eq!(decode_frame(&mut buf, NO_CAP).unwrap(), None);
     assert_eq!(&buf[..], &[4, 1]);
 
     let mut buf = BytesMut::from(&[0xff, 0xff, 0xff, 0xff, 0xff][..]);
     assert_eq!(
-        decode_frame(&mut buf, UNLIMITED_FRAME_LENGTH),
-        Err(ProtocolError::BadVarInt)
+        decode_frame(&mut buf, NO_CAP),
+        Err(ProtocolError::Malformed("bad varint"))
     );
     let mut buf = BytesMut::from(&[0xff, 0xff, 0xff, 0xff, 0x0f][..]);
     assert_eq!(
-        decode_frame(&mut buf, UNLIMITED_FRAME_LENGTH),
-        Err(ProtocolError::BadPacketLength)
+        decode_frame(&mut buf, NO_CAP),
+        Err(ProtocolError::Malformed("negative frame length"))
     );
 }
 

@@ -58,7 +58,7 @@ fn pools_line(pool: &ChartPool) -> String {
                 p.order,
                 p.category,
                 p.default_flag,
-                java_list(&p.chart_ids)
+                list_text(&p.chart_ids)
             )
         })
         .collect::<Vec<_>>()
@@ -159,10 +159,7 @@ async fn pools_import_fetches_unknown_charts_before_the_lock() {
     assert_eq!(*upstream.chart_calls.lock().unwrap(), [9001]);
     assert!(pool.is_chart_info_loaded(9001));
     assert!(read(dir.path(), CACHE_FILE).contains("\"9001\": {"));
-    assert_eq!(
-        pool.find_published_pool(5).unwrap().chart_ids,
-        [9001, 30474]
-    );
+    assert_eq!(pool.find_pool(5).unwrap().chart_ids, [9001, 30474]);
 }
 
 #[tokio::test]
@@ -223,8 +220,8 @@ async fn bad_pool_documents_change_nothing() {
             .await
             .unwrap_err();
         assert_eq!(
-            java_error(&err),
-            format!("IllegalArgumentException: {message}"),
+            error_text(&err),
+            format!("Invalid: {message}"),
             "{document}"
         );
         assert_eq!(read(dir.path(), POOL_FILE), file);
@@ -359,8 +356,8 @@ async fn bad_submission_documents_change_nothing() {
         for mode in [ImportMode::Replace, ImportMode::Merge] {
             let err = s.import_json(document, mode, no_backup).await.unwrap_err();
             assert_eq!(
-                java_error(&err),
-                format!("IllegalArgumentException: {message}"),
+                error_text(&err),
+                format!("Invalid: {message}"),
                 "{document}"
             );
             assert_eq!(read(dir.path(), SUBMISSIONS_FILE), file);
@@ -402,7 +399,7 @@ async fn a_failed_import_write_changes_nothing() {
         )
         .await
         .unwrap_err();
-    assert_eq!(java_error(&err), "IOException: injected write failure");
+    assert_eq!(error_text(&err), "Storage: injected write failure");
     assert_eq!(
         (read(dir.path(), POOL_FILE), pool.list_pools()),
         pools_before
@@ -413,7 +410,7 @@ async fn a_failed_import_write_changes_nothing() {
         })
         .await
         .unwrap_err();
-    assert!(err.is_io_exception());
+    assert!(matches!(err, zphira_catalog::CatalogError::Storage { .. }));
     assert_eq!(
         (
             read(dir.path(), SUBMISSIONS_FILE),
@@ -431,7 +428,7 @@ async fn a_failed_import_write_changes_nothing() {
         )
         .await
         .unwrap_err();
-    assert_eq!(java_error(&err), "IOException: disk full");
+    assert_eq!(error_text(&err), "Storage: disk full");
     assert_eq!(
         (read(dir.path(), POOL_FILE), pool.list_pools()),
         pools_before

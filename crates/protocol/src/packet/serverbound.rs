@@ -3,7 +3,7 @@ use bytes::{Buf, BufMut, Bytes, BytesMut};
 use super::clientbound::ClientBoundPacket;
 use super::serverbound_id as id;
 use crate::data::{JudgeEvent, MAX_ROOM_ID_LENGTH, TouchFrame};
-use crate::error::{Direction, ProtocolError};
+use crate::error::{IdKind, ProtocolError};
 use crate::wire::{
     Decode, decode_list, decode_string, encode_list, encode_string, get_bool, get_i32_le, get_u8,
 };
@@ -168,9 +168,9 @@ impl ServerBoundPacket {
             },
             id::ABORT => Self::Abort,
             other => {
-                return Err(ProtocolError::UnknownPacketId {
-                    direction: Direction::ServerBound,
-                    id: other,
+                return Err(ProtocolError::UnknownId {
+                    kind: IdKind::ServerBoundPacket,
+                    id: i32::from(other),
                 });
             }
         })

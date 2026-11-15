@@ -1,34 +1,19 @@
-use std::io::{Error as IoError, Read};
+use std::io::Error as IoError;
 use std::path::{Path, PathBuf};
 
 use base64::Engine;
-use base64::engine::general_purpose::{GeneralPurpose, GeneralPurposeConfig};
-use base64::engine::{DecodePaddingMode, general_purpose};
+use base64::engine::DecodePaddingMode;
+use base64::engine::general_purpose::{
+    self, GeneralPurpose, GeneralPurposeConfig, URL_SAFE_NO_PAD,
+};
 use hmac::{KeyInit, Mac};
+use serde_json::{Map, Value};
+use subtle::ConstantTimeEq;
 use zphira_common::fs::{self, AtomicWriteOptions};
-use zphira_common::gson::{JsonElement, JsonObject};
-use zphira_common::java_fmt;
-use zphira_common::time::JavaOffsetDateTime;
 
 pub const EXPIRATION_MILLIS: i64 = 24 * 60 * 60 * 1000;
 pub const SECRET_FILE: &str = "jwt-secret";
 const NEW_SECRET_BYTES: usize = 32;
-const MAX_INFLATED: u64 = 1024 * 1024;
-
-const B64URL_STRICT: GeneralPurpose = GeneralPurpose::new(
-    &base64::alphabet::URL_SAFE,
-    GeneralPurposeConfig::new()
-        .with_encode_padding(false)
-        .with_decode_padding_mode(DecodePaddingMode::RequireNone)
-        .with_decode_allow_trailing_bits(true),
-);
-const B64URL_LENIENT: GeneralPurpose = GeneralPurpose::new(
-    &base64::alphabet::URL_SAFE,
-    GeneralPurposeConfig::new()
-        .with_encode_padding(false)
-        .with_decode_padding_mode(DecodePaddingMode::Indifferent)
-        .with_decode_allow_trailing_bits(true),
-);
 const B64_SECRET: GeneralPurpose = GeneralPurpose::new(
     &base64::alphabet::STANDARD,
     GeneralPurposeConfig::new()
@@ -157,7 +142,7 @@ impl JwtService {
         match fs::read_to_string_if_exists(&path).map_err(io)? {
             Some(text) => {
                 let key = B64_SECRET
-                    .decode(crate::java::trim(&text))
+                    .decode(text.trim())
                     .map_err(|_| JwtError::NotBase64 { path: path.clone() })?;
                 if let Err(e) = fs::set_mode(&path, 0o600) {
                     tracing::warn!(error = %e, "Could not restrict the permissions of {}", path.display());
@@ -205,11 +190,11 @@ impl JwtService {
             format!("{{\"sub\":\"{user_id}\",\"isAdmin\":{is_admin},\"iat\":{iat},\"exp\":{exp}}}");
         let signing_input = format!(
             "{}.{}",
-            B64URL_STRICT.encode(header),
-            B64URL_STRICT.encode(payload)
+            URL_SAFE_NO_PAD.encode(header),
+            URL_SAFE_NO_PAD.encode(payload)
         );
         let signature = self.algorithm.sign(&self.key, signing_input.as_bytes());
-        format!("{signing_input}.{}", B64URL_STRICT.encode(signature))
+        format!("{signing_input}.{}", URL_SAFE_NO_PAD.encode(signature))
     }
 
     /// Verifies the token; `None` for any invalid, expired or tampered one.
@@ -219,109 +204,46 @@ impl JwtService {
 
     pub fn parse_user_id_at(&self, token: &str, now_millis: i64) -> Option<i32> {
         let claims = self.verify(token, now_millis)?;
-        match claims.get("sub") {
-            Some(JsonElement::String(sub)) => java_fmt::parse_int(sub).ok(),
-            _ => None,
-        }
+        claims.get("sub")?.as_str()?.parse().ok()
     }
 
-    fn verify(&self, token: &str, now_millis: i64) -> Option<JsonObject> {
-        if token.is_empty() || token.chars().any(char::is_whitespace) {
-            return None;
-        }
+    fn verify(&self, token: &str, now_millis: i64) -> Option<Map<String, Value>> {
         let mut parts = token.split('.');
         let (header_b64, payload_b64, signature_b64) =
             (parts.next()?, parts.next()?, parts.next()?);
-        if parts.next().is_some() || payload_b64.is_empty() {
+        if parts.next().is_some() {
             return None;
         }
-        let header = decode_json_object(&B64URL_STRICT.decode(header_b64).ok()?)?;
-        let algorithm = match header.get("alg") {
-            Some(JsonElement::String(name)) => JwtAlgorithm::from_name(name)?,
-            _ => return None,
-        };
-        if header.contains_key("crit") {
-            return None;
-        }
-        if let Some(cty) = header.get("cty").and_then(JsonElement::get_as_string)
-            && cty.eq_ignore_ascii_case("JWT")
-        {
-            return None;
-        }
+        let header = decode_object(header_b64)?;
+        let algorithm = JwtAlgorithm::from_name(header.get("alg")?.as_str()?)?;
         if self.key.len() < algorithm.min_key_bytes() {
             return None;
         }
-        let signature = B64URL_LENIENT.decode(signature_b64).ok()?;
-        if signature.is_empty() {
-            return None;
-        }
+        let signature = URL_SAFE_NO_PAD.decode(signature_b64).ok()?;
         let expected = algorithm.sign(&self.key, format!("{header_b64}.{payload_b64}").as_bytes());
-        if !bool::from(subtle::ConstantTimeEq::ct_eq(&expected[..], &signature[..])) {
+        if !bool::from(expected.ct_eq(&signature)) {
             return None;
         }
-
-        let mut payload = B64URL_STRICT.decode(payload_b64).ok()?;
-        match header.get("zip") {
-            None | Some(JsonElement::Null) => {}
-            Some(JsonElement::String(zip)) if zip == "DEF" => {
-                payload = inflate(flate2::read::ZlibDecoder::new(&payload[..]))?;
-            }
-            Some(JsonElement::String(zip)) if zip == "GZIP" => {
-                payload = inflate(flate2::read::GzDecoder::new(&payload[..]))?;
-            }
-            Some(_) => return None,
-        }
-        let claims = decode_json_object(&payload)?;
-
-        if let Some(exp) = date_claim(&claims, "exp")?
-            && now_millis > exp
+        let claims = decode_object(payload_b64)?;
+        let millis = |name: &str| match claims.get(name) {
+            None | Some(Value::Null) => Some(None),
+            Some(value) => value
+                .as_f64()
+                .map(|seconds| Some((seconds * 1000.0) as i64)),
+        };
+        if millis("exp")?.is_some_and(|exp| now_millis > exp)
+            || millis("nbf")?.is_some_and(|nbf| now_millis < nbf)
         {
             return None;
         }
-        if let Some(nbf) = date_claim(&claims, "nbf")?
-            && now_millis < nbf
-        {
-            return None;
-        }
-        date_claim(&claims, "iat")?;
         Some(claims)
     }
 }
 
-fn inflate(reader: impl Read) -> Option<Vec<u8>> {
-    let mut out = Vec::new();
-    reader.take(MAX_INFLATED).read_to_end(&mut out).ok()?;
-    Some(out)
-}
-
-fn decode_json_object(bytes: &[u8]) -> Option<JsonObject> {
-    let text = std::str::from_utf8(bytes).ok()?;
-    match JsonElement::parse(text).ok()? {
-        JsonElement::Object(object) => Some(object),
+fn decode_object(part: &str) -> Option<Map<String, Value>> {
+    match serde_json::from_slice(&URL_SAFE_NO_PAD.decode(part).ok()?).ok()? {
+        Value::Object(object) => Some(object),
         _ => None,
-    }
-}
-
-fn date_claim(claims: &JsonObject, name: &str) -> Option<Option<i64>> {
-    let seconds_to_millis = |seconds: f64| -> Option<i64> {
-        let millis = (seconds * 1000.0).trunc();
-        if !millis.is_finite() || millis.abs() >= 9.2e18 {
-            Some(i64::MIN)
-        } else {
-            Some(millis as i64)
-        }
-    };
-    match claims.get(name) {
-        None | Some(JsonElement::Null) => Some(None),
-        Some(JsonElement::Number(n)) => seconds_to_millis(n.double_value()).map(Some),
-        Some(JsonElement::String(s)) => {
-            if let Ok(seconds) = java_fmt::parse_double(s) {
-                return seconds_to_millis(seconds).map(Some);
-            }
-            let instant = JavaOffsetDateTime::parse(s).ok()?;
-            Some(Some(instant.to_epoch_milli().unwrap_or(i64::MIN)))
-        }
-        Some(_) => None,
     }
 }
 

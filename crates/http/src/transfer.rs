@@ -132,13 +132,9 @@ impl DataTransfer {
                 names.push(name);
             }
         }
-        names.sort_by(|a, b| java_compare(b, a));
+        names.sort_by(|a, b| b.cmp(a));
         Ok(names)
     }
-}
-
-fn java_compare(a: &str, b: &str) -> std::cmp::Ordering {
-    a.encode_utf16().cmp(b.encode_utf16())
 }
 
 async fn blocking<R: Send + 'static>(
@@ -198,7 +194,9 @@ fn ledger_error(e: ImportError) -> TransferError {
 
 fn catalog_error(e: CatalogError) -> TransferError {
     match e {
-        CatalogError::IllegalArgument(message) => TransferError::Invalid(message),
+        CatalogError::Invalid(message) | CatalogError::NotFound(message) => {
+            TransferError::Invalid(message)
+        }
         other => TransferError::Io(other.message()),
     }
 }
@@ -310,7 +308,7 @@ pub(crate) async fn restore(
     .map_err(TransferError::Io)?
     .map_err(|e| TransferError::Io(e.to_string()))?
     .ok_or_else(missing)?;
-    if crate::java::is_blank(&content) {
+    if content.trim().is_empty() {
         return Err(TransferError::Invalid("内容为空".to_owned()));
     }
     import(state, kind, content, false).await

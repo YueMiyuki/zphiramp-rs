@@ -30,7 +30,7 @@ fn proxied(setup: &mut Setup) {
 }
 
 #[tokio::test(start_paused = true)]
-async fn connection_life_cycle_logs_the_java_lines() {
+async fn connection_life_cycle_log_lines() {
     let w = World::new().await;
     let peer: SocketAddr = "127.0.0.1:5555".parse().unwrap();
     let c = w.connect_from(peer).await;
@@ -194,7 +194,7 @@ async fn proxy_v1_and_v2_give_the_real_address() {
     settle().await;
     assert!(
         w.logs
-            .contains("INFO Receive client version 1 from 2001:db8:0:0:0:0:0:7:4000")
+            .contains("INFO Receive client version 1 from [2001:db8::7]:4000")
     );
     drop(s2);
     drop(c1);
@@ -213,7 +213,7 @@ async fn proxy_header_failures() {
     settle().await;
     assert!(is_closed(&mut s1).await);
     assert!(w.logs.contains(
-        "WARN Disconnecting /127.0.0.1:6001 on HAProxy handshaking: unknown identifier: GET"
+        "WARN Disconnecting 127.0.0.1:6001 on HAProxy handshaking: unknown identifier: GET"
     ));
 
     let peer: SocketAddr = "127.0.0.1:6002".parse().unwrap();
@@ -222,7 +222,7 @@ async fn proxy_header_failures() {
     settle().await;
     assert!(is_closed(&mut s2).await);
     assert!(w.logs.contains(
-        "WARN Disconnecting /127.0.0.1:6002 on HAProxy handshaking: HAProxyMessage missing source address"
+        "WARN Disconnecting 127.0.0.1:6002 on HAProxy handshaking: HAProxyMessage missing source address"
     ));
 
     let peer: SocketAddr = "127.0.0.1:6003".parse().unwrap();
@@ -233,7 +233,7 @@ async fn proxy_header_failures() {
     sleep(0.2).await;
     assert!(is_closed(&mut s3).await);
     assert!(w.logs.contains(
-        "WARN Disconnecting /127.0.0.1:6003 on HAProxy handshaking: Proxy protocol handshake timeout"
+        "WARN Disconnecting 127.0.0.1:6003 on HAProxy handshaking: Proxy protocol handshake timeout"
     ));
 }
 
@@ -361,7 +361,7 @@ async fn g01_pre_auth_frame_cap() {
     settle().await;
     let port = c.peer.port();
     assert!(w.logs.contains(&format!(
-        "WARN Closing 127.0.0.1:{port}, frame length 1025 exceeds the limit of 1024 bytes"
+        "WARN Closing 127.0.0.1:{port}, frame of 1025 bytes exceeds the limit of 1024"
     )));
 
     let mut c = w.login(1, "A").await;
@@ -385,15 +385,14 @@ async fn g01_list_count_from_the_wire_is_not_trusted() {
     assert!(c.closed().await);
     settle().await;
     let port = c.peer.port();
+    assert!(w.logs.contains(&format!(
+        "INFO Client disconnected: 127.0.0.1:{port} (ACTIVE)"
+    )));
     assert!(
-        w.logs
+        !w.logs
             .lines()
             .iter()
-            .any(|l| l.starts_with(&format!("ERROR 127.0.0.1:{port}: exception encountered")))
-    );
-    assert!(
-        w.logs
-            .contains(&format!("Client disconnected: 127.0.0.1:{port} (ERROR)"))
+            .any(|l| l.starts_with("ERROR") || l.starts_with("WARN"))
     );
 }
 
@@ -408,7 +407,6 @@ async fn malformed_frames_close_silently() {
     assert!(w.logs.contains(&format!(
         "INFO Client disconnected: 127.0.0.1:{port} (ACTIVE)"
     )));
-    assert!(!w.logs.contains("exception encountered"));
     let c = w.login(1, "A").await;
     drop(c);
 }
@@ -456,4 +454,73 @@ async fn outbound_backpressure_drops_and_recovers() {
         .unwrap()
         .unwrap();
     assert_eq!(render(&next), "> again");
+}
+
+async fn served_tcp(w: &World) -> tokio::net::TcpStream {
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let client = tokio::net::TcpStream::connect(listener.local_addr().unwrap())
+        .await
+        .unwrap();
+    let (server, peer) = listener.accept().await.unwrap();
+    let ctx = w.ctx.clone();
+    tokio::spawn(async move {
+        // The client's bytes are queued in the socket before the server reads anything.
+        tokio::time::sleep(Duration::from_millis(50)).await;
+        ctx.serve_connection(server, peer).await;
+    });
+    client
+}
+
+async fn end_of_stream(client: &mut tokio::net::TcpStream) -> std::io::Result<()> {
+    let mut buf = vec![0u8; 4096];
+    tokio::time::timeout(MUST_ARRIVE, async {
+        loop {
+            if client.read(&mut buf).await? == 0 {
+                return Ok(());
+            }
+        }
+    })
+    .await
+    .expect("the server closes the connection")
+}
+
+#[tokio::test]
+async fn a_refused_connection_ends_with_end_of_stream_not_a_reset() {
+    let mut setup = Setup::default();
+    setup.args.max_connections = 1;
+    let w = World::with(setup).await;
+    let mut first = w.connect().await;
+    first.send(Sb::Ping).await;
+    assert_eq!(first.expect_next().await, "Pong");
+    let mut refused = served_tcp(&w).await;
+    refused.write_all(&[1; 4096]).await.unwrap();
+    end_of_stream(&mut refused).await.unwrap();
+    assert!(w.logs.contains("connection limit reached (1)"));
+}
+
+#[tokio::test]
+async fn a_failed_handshake_ends_with_end_of_stream_not_a_reset() {
+    let w = World::new().await;
+    let mut client = served_tcp(&w).await;
+    client.write_all(&[2; 4096]).await.unwrap();
+    end_of_stream(&mut client).await.unwrap();
+    assert!(
+        w.logs
+            .contains("on Phira handshaking: Unsupported version: 2")
+    );
+}
+
+#[tokio::test]
+async fn closing_an_open_connection_ends_with_end_of_stream_not_a_reset() {
+    let w = World::new().await;
+    let mut client = served_tcp(&w).await;
+    let mut bytes = vec![1];
+    bytes.extend_from_slice(&padded_ping(1025));
+    bytes.resize(bytes.len() + 32 * 1024, 0xAA);
+    client.write_all(&bytes).await.unwrap();
+    end_of_stream(&mut client).await.unwrap();
+    assert!(
+        w.logs
+            .contains("frame of 1025 bytes exceeds the limit of 1024")
+    );
 }

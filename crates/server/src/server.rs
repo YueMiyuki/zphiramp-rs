@@ -1,15 +1,14 @@
 use std::error::Error;
 use std::fmt;
 use std::io;
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::net::SocketAddr;
 use std::path::Path;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use zphira_catalog::{CatalogConfig, ChartIndex, ChartPool, Submissions, Upstream};
-use zphira_common::args::ServerArgs;
+use zphira_common::cli::ServerArgs;
 use zphira_common::i18n::I18n;
-use zphira_common::java_fmt;
 use zphira_game::{
     Background, GameContext, GameDeps, GameOptions, ListenerTask, TaskExit, TaskName, TaskOutcome,
 };
@@ -69,14 +68,7 @@ fn context(message: impl Into<String>, source: impl Into<BootError>) -> BootErro
 }
 
 pub async fn resolve_bind_address(host: &str, port: u16) -> io::Result<SocketAddr> {
-    if host.is_empty() {
-        return Ok(SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), port));
-    }
-    let name = host
-        .strip_prefix('[')
-        .and_then(|h| h.strip_suffix(']'))
-        .unwrap_or(host);
-    let addrs: Vec<SocketAddr> = tokio::net::lookup_host((name, port)).await?.collect();
+    let addrs: Vec<SocketAddr> = tokio::net::lookup_host((host, port)).await?.collect();
     addrs
         .iter()
         .find(|a| a.is_ipv4())
@@ -116,9 +108,6 @@ pub async fn graceful_stop<S: StopSteps>(steps: &mut S, started: Instant) {
     tracing::info!("Shutting down...");
     steps.stop_http().await;
     steps.stop_game().await;
-    // Log lines operators match on; there is no worker or boss group to stop.
-    tracing::info!("Shutting down worker group...");
-    tracing::info!("Shutting down boss group...");
     steps.stop_background();
     // Every store is flushed last, after the game stopped scoring and moving rooms.
     steps.flush_points().await;
@@ -411,10 +400,7 @@ async fn boot(
     let _ = Console::start(commands, cx.terminal.clone(), shutdown.clone());
 
     let total_ms = cx.boot.elapsed().as_millis();
-    tracing::info!(
-        "Done ({}s)!",
-        java_fmt::format_fixed(total_ms as f64 / 1000.0, 3)
-    );
+    tracing::info!("Done ({:.3}s)!", total_ms as f64 / 1000.0);
     Ok(())
 }
 

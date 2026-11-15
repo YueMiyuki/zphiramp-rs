@@ -430,7 +430,7 @@ async fn o03_update_validation_and_defaults() {
         );
         assert_eq!(w.ctx.room("r1").unwrap().config.all_ready_delay, ok);
     }
-    let json = zphira_common::gson::to_string_compact(&w.ctx.room("r1").unwrap()).unwrap();
+    let json = serde_json::to_string(&w.ctx.room("r1").unwrap()).unwrap();
     assert!(
         json.contains(r#""chatEnable":true,"cancelReadyInVote":false,"startWhenAllReady":true,"allReadyDelay":300}"#),
         "{json}"

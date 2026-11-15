@@ -112,7 +112,7 @@ fn tiny_frames_claiming_huge_counts_fail_fast() {
         for id in [serverbound_id::TOUCHES, serverbound_id::JUDGES] {
             let err = refused(&[&[id][..], count].concat());
             assert!(
-                matches!(err, ProtocolError::IndexOutOfBounds { .. }),
+                matches!(err, ProtocolError::Malformed(_)),
                 "id {id:#x}: {err}"
             );
         }
@@ -158,9 +158,6 @@ fn tiny_frames_claiming_huge_counts_fail_fast() {
         let mut bytes = packet.to_vec();
         bytes.extend_from_slice(count);
         let err = ClientBoundPacket::decode(&mut &bytes[..]).expect_err("must fail");
-        assert!(
-            matches!(err, ProtocolError::IndexOutOfBounds { .. }),
-            "{err}"
-        );
+        assert!(matches!(err, ProtocolError::Malformed(_)), "{err}");
     }
 }

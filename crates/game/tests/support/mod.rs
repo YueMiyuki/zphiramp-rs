@@ -15,10 +15,9 @@ use tracing::field::{Field, Visit};
 use tracing::{Event, Level, Subscriber};
 use tracing_subscriber::layer::{Context, Layer, SubscriberExt};
 use zphira_catalog::{BoxFuture as CatBoxFuture, CatalogConfig, ChartIndex, ChartPool};
-use zphira_common::args::ServerArgs;
-use zphira_common::gson;
+use zphira_common::cli::ServerArgs;
 use zphira_common::i18n::I18n;
-use zphira_common::time::JavaOffsetDateTime;
+use zphira_common::time::Timestamp;
 use zphira_game::{BoxFuture, GameContext, GameDeps, GameOptions, GameUpstream, UpstreamError};
 use zphira_ledger::{Points, RoundRecords};
 use zphira_phira::{ChartInfo, ChartListPage, GameRecord, UserInfo};
@@ -116,7 +115,7 @@ pub fn capture_logs() -> (CaptureGuard, Logs) {
 
 pub fn chart(id: i32, name: &str, level: &str) -> Arc<ChartInfo> {
     Arc::new(
-        gson::from_str(&format!(
+        serde_json::from_str(&format!(
             r#"{{"id":{id},"name":"{name}","level":"{level}"}}"#
         ))
         .unwrap(),
@@ -204,12 +203,13 @@ pub struct FakeUpstream {
 
 impl FakeUpstream {
     pub fn user(&self, token: &str, id: i32, name: &str) {
-        let user: UserInfo = gson::from_str(&format!(r#"{{"id":{id},"name":"{name}"}}"#)).unwrap();
+        let user: UserInfo =
+            serde_json::from_str(&format!(r#"{{"id":{id},"name":"{name}"}}"#)).unwrap();
         self.users.lock().unwrap().insert(token.to_owned(), user);
     }
 
     pub fn user_with_language(&self, token: &str, id: i32, name: &str, language: &str) {
-        let user: UserInfo = gson::from_str(&format!(
+        let user: UserInfo = serde_json::from_str(&format!(
             r#"{{"id":{id},"name":"{name}","language":"{language}"}}"#
         ))
         .unwrap();
@@ -318,7 +318,7 @@ pub fn game_record(
         good: 2,
         bad: 1,
         miss: 0,
-        time: JavaOffsetDateTime::from_epoch_millis(time_millis, 0),
+        time: Timestamp::from_epoch_millis(time_millis),
         ..GameRecord::default()
     }
 }

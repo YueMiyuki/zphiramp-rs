@@ -15,7 +15,7 @@ use crate::player::Player;
 use crate::services::Services;
 use crate::text;
 use crate::upstream::UpstreamError;
-use crate::util::{java_double_compare, lock};
+use crate::util::lock;
 
 const FORCE_FINISH_NOTICE_SECONDS: i32 = 10;
 
@@ -141,7 +141,7 @@ fn pick_recovered(
                 && candidate
                     .time
                     .as_ref()
-                    .and_then(|t| t.to_epoch_milli())
+                    .map(|t| t.epoch_millis())
                     .is_some_and(|t| t >= started_at - RECORD_TIME_TOLERANCE_MILLIS)
                 && !accepted.contains(candidate.id)
         })
@@ -151,8 +151,8 @@ fn pick_recovered(
 fn compare_records(a: &GameRecord, b: &GameRecord) -> Ordering {
     b.score
         .cmp(&a.score)
-        .then_with(|| java_double_compare(f64::from(b.accuracy), f64::from(a.accuracy)))
-        .then_with(|| java_double_compare(f64::from(a.std), f64::from(b.std)))
+        .then_with(|| b.accuracy.total_cmp(&a.accuracy))
+        .then_with(|| a.std.total_cmp(&b.std))
 }
 
 fn points_by_rank(rank: i32) -> i32 {
@@ -353,7 +353,7 @@ impl Tx<'_> {
             && record
                 .time
                 .as_ref()
-                .and_then(|t| t.to_epoch_milli())
+                .map(|t| t.epoch_millis())
                 .is_some_and(|t| t >= started_at - RECORD_TIME_TOLERANCE_MILLIS)
             && !lock(&self.svc().accepted).contains(record.id)
     }

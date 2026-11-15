@@ -93,6 +93,8 @@ pub fn normalize(value: &mut Value) {
                 && s[..4] >= *"2026"
             {
                 *s = "<now>".into();
+            } else if let Ok(instant) = zphira_common::time::Timestamp::parse(s) {
+                *s = instant.to_string();
             }
             if let Some(dash) = s.find('-')
                 && s.ends_with(".json")

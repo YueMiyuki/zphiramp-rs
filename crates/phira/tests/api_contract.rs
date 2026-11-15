@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use serde::Serialize;
 use serde::de::DeserializeOwned;
-use zphira_common::time::JavaOffsetDateTime;
+use zphira_common::time::Timestamp;
 use zphira_phira::{
     ChartInfo, ChartListPage, DEFAULT_BASE_URL, GameRecord, LoginResult, PhiraClient, PhiraError,
     UserInfo,
@@ -31,8 +31,8 @@ fn user_info_fields(u: &UserInfo) {
     let _: &Option<String> = &u.bio;
     let _: i32 = u.exp;
     let _: f64 = u.rks;
-    let _: &Option<JavaOffsetDateTime> = &u.joined;
-    let _: &Option<JavaOffsetDateTime> = &u.last_login;
+    let _: &Option<Timestamp> = &u.joined;
+    let _: &Option<Timestamp> = &u.last_login;
     let _: i32 = u.roles;
     let _: bool = u.banned;
     let _: bool = u.login_banned;
@@ -63,9 +63,9 @@ fn chart_info_fields(c: &ChartInfo) {
     let _: &Option<Vec<String>> = &c.tags;
     let _: f32 = c.rating;
     let _: i32 = c.rating_count;
-    let _: &Option<JavaOffsetDateTime> = &c.created;
-    let _: &Option<JavaOffsetDateTime> = &c.updated;
-    let _: &Option<JavaOffsetDateTime> = &c.chart_updated;
+    let _: &Option<Timestamp> = &c.created;
+    let _: &Option<Timestamp> = &c.updated;
+    let _: &Option<Timestamp> = &c.chart_updated;
     let _: &str = c.name_or_null();
     let _: &str = c.level_or_null();
     let _: bool = c.has_tag("regular");
@@ -90,7 +90,7 @@ fn game_record_fields(r: &GameRecord) {
     let _: bool = r.best_std;
     let _: i32 = r.mods;
     let _: bool = r.full_combo;
-    let _: &Option<JavaOffsetDateTime> = &r.time;
+    let _: &Option<Timestamp> = &r.time;
     let _: f32 = r.std;
     let _: f32 = r.std_score;
 }

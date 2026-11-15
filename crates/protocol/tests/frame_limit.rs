@@ -1,6 +1,7 @@
 mod common;
 
 use bytes::{Bytes, BytesMut};
+use common::NO_CAP;
 use futures_util::StreamExt;
 use tokio_util::codec::{Decoder, Encoder, FramedRead};
 use zphira_protocol::*;
@@ -15,7 +16,6 @@ fn prefixed(len: usize, body_len: usize) -> BytesMut {
 #[test]
 fn constants() {
     assert_eq!(DEFAULT_MAX_FRAME_LENGTH, 2 * 1024 * 1024);
-    assert_eq!(UNLIMITED_FRAME_LENGTH, i32::MAX as usize);
     assert_eq!(
         ServerCodec::new().max_frame_length(),
         DEFAULT_MAX_FRAME_LENGTH
@@ -31,14 +31,6 @@ fn constants() {
     assert_eq!(
         FrameDecoder::new().max_frame_length(),
         DEFAULT_MAX_FRAME_LENGTH
-    );
-    assert_eq!(
-        ServerCodec::unlimited().max_frame_length(),
-        UNLIMITED_FRAME_LENGTH
-    );
-    assert_eq!(
-        FrameDecoder::unlimited().max_frame_length(),
-        UNLIMITED_FRAME_LENGTH
     );
     assert_eq!(FrameDecoder::with_max_frame_length(7).max_frame_length(), 7);
 }
@@ -71,7 +63,7 @@ fn one_byte_over_fails_without_waiting_for_the_body() {
     let mut buf = prefixed(101, 0);
     assert_eq!(
         decode_frame(&mut buf, 100),
-        Err(ProtocolError::InboundFrameTooLarge {
+        Err(ProtocolError::FrameTooLarge {
             length: 101,
             max: 100
         })
@@ -84,16 +76,15 @@ fn one_byte_over_fails_without_waiting_for_the_body() {
     };
     assert_eq!(
         err,
-        ProtocolError::InboundFrameTooLarge {
+        ProtocolError::FrameTooLarge {
             length: DEFAULT_MAX_FRAME_LENGTH + 1,
             max: DEFAULT_MAX_FRAME_LENGTH
         }
     );
     assert_eq!(err.pipeline_action(), PipelineAction::WarnAndClose);
-    assert_eq!(err.java_exception(), None);
     assert_eq!(
         err.to_string(),
-        "frame length 2097153 exceeds the limit of 2097152 bytes"
+        "frame of 2097153 bytes exceeds the limit of 2097152"
     );
     assert!(
         ClientCodec::new()
@@ -109,7 +100,7 @@ fn one_byte_over_fails_without_waiting_for_the_body() {
     let mut buf = prefixed(11, 11);
     assert!(matches!(
         ServerCodec::with_max_frame_length(10).decode(&mut buf),
-        Err(CodecError::Protocol(ProtocolError::InboundFrameTooLarge {
+        Err(CodecError::Protocol(ProtocolError::FrameTooLarge {
             length: 11,
             max: 10
         }))
@@ -120,7 +111,7 @@ fn one_byte_over_fails_without_waiting_for_the_body() {
     buf.extend_from_slice(&[0x02]);
     assert_eq!(
         decode_frame(&mut buf, 100),
-        Err(ProtocolError::InboundFrameTooLarge {
+        Err(ProtocolError::FrameTooLarge {
             length: 256,
             max: 100
         })
@@ -133,7 +124,7 @@ fn nul_padding_does_not_bypass_the_limit() {
     buf.extend_from_slice(&prefixed(101, 0));
     assert_eq!(
         decode_frame(&mut buf, 100),
-        Err(ProtocolError::InboundFrameTooLarge {
+        Err(ProtocolError::FrameTooLarge {
             length: 101,
             max: 100
         })
@@ -146,9 +137,7 @@ fn nul_padding_does_not_bypass_the_limit() {
     buf.extend_from_slice(&prefixed(101, 0));
     assert!(matches!(
         codec.decode(&mut buf),
-        Err(CodecError::Protocol(
-            ProtocolError::InboundFrameTooLarge { .. }
-        ))
+        Err(CodecError::Protocol(ProtocolError::FrameTooLarge { .. }))
     ));
 
     let mut buf = BytesMut::from(&vec![0u8; 500][..]);
@@ -161,7 +150,7 @@ fn nul_padding_does_not_bypass_the_limit() {
     assert_eq!(decode_frame(&mut buf, 100).unwrap().unwrap().len(), 1);
     assert_eq!(
         decode_frame(&mut buf, 100),
-        Err(ProtocolError::InboundFrameTooLarge {
+        Err(ProtocolError::FrameTooLarge {
             length: 101,
             max: 100
         })
@@ -173,25 +162,38 @@ fn existing_prefix_errors_come_first_and_zero_length_frames_still_pass() {
     let mut buf = BytesMut::from(&[0xff, 0xff, 0xff, 0xff, 0x0f][..]);
     assert_eq!(
         decode_frame(&mut buf, 100),
-        Err(ProtocolError::BadPacketLength)
+        Err(ProtocolError::Malformed("negative frame length"))
     );
     let mut buf = BytesMut::from(&[0xff; 5][..]);
-    assert_eq!(decode_frame(&mut buf, 100), Err(ProtocolError::BadVarInt));
+    assert_eq!(
+        decode_frame(&mut buf, 100),
+        Err(ProtocolError::Malformed("bad varint"))
+    );
 
     let mut buf = BytesMut::from(&[0x80, 0x00][..]);
     assert_eq!(decode_frame(&mut buf, 0).unwrap(), Some(Bytes::new()));
 }
 
 #[test]
-fn unlimited_mode_waits_like_java() {
+fn a_huge_cap_waits_for_the_body() {
     let mut buf = BytesMut::from(&[0x80, 0x80, 0x80, 0x80, 0x01, 0x00][..]);
-    assert_eq!(decode_frame(&mut buf, UNLIMITED_FRAME_LENGTH), Ok(None));
-    assert_eq!(FrameDecoder::unlimited().decode(&mut buf).unwrap(), None);
-    assert_eq!(ServerCodec::unlimited().decode(&mut buf).unwrap(), None);
+    assert_eq!(decode_frame(&mut buf, NO_CAP), Ok(None));
+    assert_eq!(
+        FrameDecoder::with_max_frame_length(NO_CAP)
+            .decode(&mut buf)
+            .unwrap(),
+        None
+    );
+    assert_eq!(
+        ServerCodec::with_max_frame_length(NO_CAP)
+            .decode(&mut buf)
+            .unwrap(),
+        None
+    );
 
     assert!(matches!(
         decode_frame(&mut buf, DEFAULT_MAX_FRAME_LENGTH),
-        Err(ProtocolError::InboundFrameTooLarge {
+        Err(ProtocolError::FrameTooLarge {
             length: 268_435_456,
             ..
         })
@@ -209,7 +211,7 @@ async fn framed_stream_yields_earlier_packets_then_the_error_then_ends() {
         ServerBoundPacket::Ping
     );
     match framed.next().await.unwrap() {
-        Err(CodecError::Protocol(e @ ProtocolError::InboundFrameTooLarge { .. })) => {
+        Err(CodecError::Protocol(e @ ProtocolError::FrameTooLarge { .. })) => {
             assert_eq!(e.pipeline_action(), PipelineAction::WarnAndClose);
         }
         other => panic!("{other:?}"),
@@ -288,7 +290,7 @@ fn changing_the_cap_applies_to_the_next_frame_even_with_a_partial_frame_buffered
     let mut buf = prefixed(5000, 10);
     assert!(matches!(
         pre.decode(&mut buf),
-        Err(CodecError::Protocol(ProtocolError::InboundFrameTooLarge {
+        Err(CodecError::Protocol(ProtocolError::FrameTooLarge {
             length: 5000,
             max: 1024
         }))
@@ -304,7 +306,7 @@ fn lowering_the_cap_and_a_partly_buffered_prefix() {
     dec.set_max_frame_length(40);
     assert!(matches!(
         dec.decode(&mut buf),
-        Err(CodecError::Protocol(ProtocolError::InboundFrameTooLarge {
+        Err(CodecError::Protocol(ProtocolError::FrameTooLarge {
             length: 50,
             max: 40
         }))

@@ -7,7 +7,7 @@ use std::time::{Duration, Instant};
 use tokio::runtime::Handle;
 use tokio::sync::Semaphore;
 use tokio::task::JoinSet;
-use zphira_common::{fs, gson};
+use zphira_common::{fs, json};
 use zphira_phira::ChartInfo;
 
 use crate::cache::ChartInfoCache;
@@ -186,9 +186,7 @@ impl ChartIndex {
             .filter(|chart| rule.matches(chart))
             .cloned()
             .collect();
-        matched.sort_by(|a, b| {
-            java_double_compare(f64::from(b.rating), f64::from(a.rating)).then(a.id.cmp(&b.id))
-        });
+        matched.sort_by(|a, b| b.rating.total_cmp(&a.rating).then(a.id.cmp(&b.id)));
         matched.truncate(limit);
         matched
     }
@@ -254,7 +252,7 @@ impl ChartIndex {
             }
             return Err(e);
         }
-        self.save().await.map_err(CatalogError::io)?;
+        self.save().await.map_err(CatalogError::storage)?;
         let indexed = self.indexed_count();
         tracing::info!(
             "Chart index refreshed: {} charts (division={})",
@@ -609,36 +607,13 @@ fn read_index(config: &CatalogConfig) -> Result<ChartMap, String> {
     let text = fs::read_to_string_if_exists(config.path(INDEX_FILE)).map_err(|e| e.to_string())?;
     match text {
         None => Ok(ChartMap::new()),
-        Some(text) => gson::from_str_opt::<BTreeMap<i32, ChartInfo>>(&text)
+        Some(text) => json::from_str_opt::<BTreeMap<i32, ChartInfo>>(&text)
             .map(|map| {
                 map.unwrap_or_default()
                     .into_iter()
                     .map(|(id, chart)| (id, Arc::new(chart)))
                     .collect()
             })
-            .map_err(|e| e.message().to_owned()),
-    }
-}
-
-fn java_double_compare(a: f64, b: f64) -> std::cmp::Ordering {
-    match (a.is_nan(), b.is_nan()) {
-        (true, true) => std::cmp::Ordering::Equal,
-        (true, false) => std::cmp::Ordering::Greater,
-        (false, true) => std::cmp::Ordering::Less,
-        (false, false) => a.total_cmp(&b),
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn double_compare_matches_java() {
-        use std::cmp::Ordering::*;
-        assert_eq!(java_double_compare(-0.0, 0.0), Less);
-        assert_eq!(java_double_compare(f64::NAN, f64::INFINITY), Greater);
-        assert_eq!(java_double_compare(-f64::NAN, f64::NAN), Equal);
-        assert_eq!(java_double_compare(1.0, 2.0), Less);
+            .map_err(|e| e.to_string()),
     }
 }

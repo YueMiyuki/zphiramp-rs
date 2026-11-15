@@ -1,6 +1,6 @@
 use bytes::{Buf, BufMut};
 
-use crate::error::ProtocolError;
+use crate::error::{IdKind, ProtocolError};
 use crate::wire::{
     Decode, Encode, decode_string_default, encode_string, get_bool, get_f32_le, get_i8, get_i32_le,
 };
@@ -204,7 +204,12 @@ impl Decode for Message {
             0x0f => Message::CycleRoom {
                 cycle: get_bool(buf)?,
             },
-            id => return Err(ProtocolError::UnknownMessageId(id)),
+            id => {
+                return Err(ProtocolError::UnknownId {
+                    kind: IdKind::Message,
+                    id: i32::from(id),
+                });
+            }
         })
     }
 }

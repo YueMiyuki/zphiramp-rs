@@ -3,7 +3,7 @@
 use std::fmt::Debug;
 use std::path::PathBuf;
 
-use zphira_protocol::ProtocolError;
+pub const NO_CAP: usize = usize::MAX;
 
 pub fn fixture_path(name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -13,9 +13,8 @@ pub fn fixture_path(name: &str) -> PathBuf {
 }
 
 pub fn fixture_text(name: &str) -> String {
-    std::fs::read_to_string(fixture_path(name)).unwrap_or_else(|e| {
-        panic!("cannot read fixture {name}: {e}; regenerate with tests/java/regen.sh")
-    })
+    std::fs::read_to_string(fixture_path(name))
+        .unwrap_or_else(|e| panic!("cannot read fixture {name}: {e}"))
 }
 
 pub fn rows(name: &str) -> Vec<Vec<String>> {
@@ -61,7 +60,7 @@ pub fn crc32(data: &[u8]) -> String {
     format!("{:08x}", !crc)
 }
 
-// splitmix64; mutate() and the stream recipes must draw in the same order as tests/java/GenFixtures.java.
+// splitmix64; mutate() and the stream recipes must draw in the order the recorded fixtures were made with.
 pub struct Rng(pub u64);
 
 impl Rng {
@@ -116,23 +115,6 @@ pub fn mutate(r: &mut Rng, base: &[u8], ops: usize) -> Vec<u8> {
         }
     }
     b
-}
-
-pub fn code(e: &ProtocolError) -> &'static str {
-    match e {
-        ProtocolError::IndexOutOfBounds { .. } => "I",
-        ProtocolError::NeedMoreData => "N",
-        ProtocolError::BadVarInt => "V",
-        ProtocolError::IllegalCapacity(_) => "A",
-        ProtocolError::BadStringLength { .. } => "S",
-        ProtocolError::UnknownPacketId { .. }
-        | ProtocolError::UnknownGameStateId(_)
-        | ProtocolError::UnknownMessageId(_)
-        | ProtocolError::UnknownJudgementId(_) => "U",
-        ProtocolError::BadPacketLength
-        | ProtocolError::FrameTooLarge(_)
-        | ProtocolError::InboundFrameTooLarge { .. } => "X",
-    }
 }
 
 pub fn assert_same<T: PartialEq + Debug>(got: &T, want: &T, what: &str) {

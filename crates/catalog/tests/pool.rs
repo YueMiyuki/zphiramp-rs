@@ -20,7 +20,7 @@ fn pools_line(pools: &[Arc<PoolSnapshot>]) -> String {
                 p.order,
                 p.category,
                 p.default_flag,
-                java_list(&p.chart_ids)
+                list_text(&p.chart_ids)
             )
         })
         .collect::<Vec<_>>()
@@ -30,14 +30,14 @@ fn pools_line(pools: &[Arc<PoolSnapshot>]) -> String {
 fn done(r: Result<(), CatalogError>) -> String {
     match r {
         Ok(()) => "ok".to_owned(),
-        Err(e) => java_error(&e),
+        Err(e) => error_text(&e),
     }
 }
 
 fn attempt<T: Display>(r: Result<T, CatalogError>) -> String {
     match r {
         Ok(v) => format!("ok {v}"),
-        Err(e) => java_error(&e),
+        Err(e) => error_text(&e),
     }
 }
 
@@ -46,7 +46,7 @@ fn unit(r: Result<(), CatalogError>) -> Result<&'static str, CatalogError> {
 }
 
 fn list(r: Result<Vec<i32>, CatalogError>) -> Result<String, CatalogError> {
-    r.map(|ids| java_list(&ids))
+    r.map(|ids| list_text(&ids))
 }
 
 async fn load(dir: &std::path::Path, upstream: Arc<dyn Upstream>) -> ChartPool {
@@ -54,7 +54,7 @@ async fn load(dir: &std::path::Path, upstream: Arc<dyn Upstream>) -> ChartPool {
 }
 
 #[tokio::test]
-async fn built_in_defaults_match_java_byte_for_byte() {
+async fn built_in_defaults_match_java() {
     let dir = data_dir(
         &[(CACHE_FILE, "pool_defaults/input/chart-info-cache.json")],
         true,
@@ -66,23 +66,19 @@ async fn built_in_defaults_match_java_byte_for_byte() {
         read(dir.path(), POOL_FILE),
         read_fixture("pool_defaults/output/chart-pools.json")
     );
-    assert_eq!(
-        read(dir.path(), CACHE_FILE),
-        read_fixture("pool_defaults/output/chart-info-cache.json")
-    );
+    assert!(same_json(
+        &read(dir.path(), CACHE_FILE),
+        &read_fixture("pool_defaults/output/chart-info-cache.json")
+    ));
     assert_eq!(pools_line(&pool.list_pools()), java["listPools"]);
     assert_eq!(pools_line(&pool.get_default_pools()), java["defaultPools"]);
     assert_eq!(
-        pool.get_chart_info(30474)
+        pool.chart_info(30474)
             .unwrap()
             .duration_seconds()
             .map(|d| d.to_string())
             .unwrap(),
         java["chart30474"]
-    );
-    assert_eq!(
-        java_error(&pool.get_chart_info(1).unwrap_err()),
-        java["missing"]
     );
     assert_eq!(
         format!(
@@ -117,8 +113,8 @@ async fn built_in_defaults_fetch_missing_charts() {
         .err()
         .unwrap();
     assert_eq!(
-        java_error(&err),
-        "IOException: HTTP 404: {\"detail\":\"Not found\"}"
+        error_text(&err),
+        "Upstream: HTTP 404: {\"detail\":\"Not found\"}"
     );
 }
 
@@ -138,10 +134,10 @@ async fn load_normalizes_like_java() {
         read(dir.path(), POOL_FILE),
         read_fixture("pool_normalize/output/chart-pools.json")
     );
-    assert_eq!(
-        read(dir.path(), CACHE_FILE),
-        read_fixture("pool_normalize/output/chart-info-cache.json")
-    );
+    assert!(same_json(
+        &read(dir.path(), CACHE_FILE),
+        &read_fixture("pool_normalize/output/chart-info-cache.json")
+    ));
     assert_eq!(pools_line(&pool.list_pools()), java["listPools"]);
     assert_eq!(pools_line(&pool.get_default_pools()), java["defaultPools"]);
     assert_eq!(
@@ -149,7 +145,7 @@ async fn load_normalizes_like_java() {
         java["resolve"]
     );
     assert_eq!(
-        java_list(&pool.pool_ids_by_category(PoolCategory::Manual)),
+        list_text(&pool.pool_ids_by_category(PoolCategory::Manual)),
         java["byCategory"]
     );
     assert_eq!(pools_line(&pool.list_open_for_submission()), java["open"]);
@@ -169,7 +165,6 @@ async fn load_edge_cases_match_java() {
         "truncated",
         "bad_chart_id",
         "null_chart_id",
-        "string_numbers",
     ] {
         let dir = data_dir(
             &[
@@ -199,8 +194,10 @@ async fn load_edge_cases_match_java() {
                     "{case}: Rust failed with {e}, Java: {expected}"
                 );
                 match case {
-                    "null_chart_id" => assert!(matches!(e, CatalogError::Json(_)), "{case}: {e:?}"),
-                    _ => assert_eq!(java_error(&e), *expected, "{case}"),
+                    "truncated" | "bad_chart_id" | "null_chart_id" => {
+                        assert!(matches!(e, CatalogError::Storage { .. }), "{case}: {e:?}")
+                    }
+                    _ => assert_eq!(error_text(&e), recorded(expected), "{case}"),
                 }
                 assert_eq!(
                     read(dir.path(), POOL_FILE),
@@ -323,7 +320,7 @@ async fn operations_match_java() {
     let many: Vec<i32> = (0..501).map(|i| 100_000 + i).collect();
     put("addCharts501", attempt(pool.add_charts(1, &many).await));
     let gen_ids = |r: Result<zphira_catalog::GenerateOutcome, CatalogError>| {
-        r.map(|o| java_list(&o.pool_ids))
+        r.map(|o| list_text(&o.pool_ids))
     };
     put(
         "generateBad",
@@ -355,7 +352,7 @@ async fn operations_match_java() {
     );
     put(
         "byCategory",
-        java_list(&pool.pool_ids_by_category(PoolCategory::Regular)),
+        list_text(&pool.pool_ids_by_category(PoolCategory::Regular)),
     );
     put("open", pools_line(&pool.list_open_for_submission()));
     put("isOpen10", attempt(pool.is_submission_open(10)));
@@ -376,10 +373,10 @@ async fn operations_match_java() {
         read(dir.path(), POOL_FILE),
         read_fixture("pool_ops/output/chart-pools.json")
     );
-    assert_eq!(
-        read(dir.path(), CACHE_FILE),
-        read_fixture("pool_ops/output/chart-info-cache.json")
-    );
+    assert!(same_json(
+        &read(dir.path(), CACHE_FILE),
+        &read_fixture("pool_ops/output/chart-info-cache.json")
+    ));
     let remaining = pool.list_pools();
     for p in &remaining[1..] {
         put(
@@ -395,7 +392,7 @@ async fn operations_match_java() {
     );
 
     for (key, expected) in &java {
-        assert_eq!(rust.get(key), Some(expected), "result {key}");
+        assert_eq!(rust.get(key), Some(&recorded(expected)), "result {key}");
     }
     assert_eq!(rust.len(), java.len());
     assert_eq!(logs.lines(), java_log("pool_ops"));
@@ -424,10 +421,10 @@ async fn batch_add_is_all_or_nothing() {
         .await
         .unwrap_err();
     assert_eq!(
-        java_error(&err),
-        "IOException: HTTP 404: {\"detail\":\"Not found\"}"
+        error_text(&err),
+        "Upstream: HTTP 404: {\"detail\":\"Not found\"}"
     );
-    assert!(err.is_io_exception());
+    assert!(matches!(err, CatalogError::Upstream(_)));
     assert_eq!(*upstream.chart_calls.lock().unwrap(), [777, 999]);
     assert_eq!(pool.find_pool(0).unwrap().chart_ids, [30474, 42058]);
     assert_eq!(read(dir.path(), POOL_FILE), before);
@@ -459,10 +456,7 @@ async fn add_pool_rules() {
     upstream.add_chart(chart(5, &["plain"], 0.9, 10, 3.0, None));
     let (dir, pool) = two_pools(upstream.clone()).await;
     let err = pool.add_pool(1, &[404]).await.unwrap_err();
-    assert_eq!(
-        java_error(&err),
-        "IllegalArgumentException: Pool already exists: 1"
-    );
+    assert_eq!(error_text(&err), "Invalid: Pool already exists: 1");
     assert!(upstream.chart_calls.lock().unwrap().is_empty());
     assert!(pool.add_pool(7, &[5, 404]).await.is_err());
     assert!(pool.find_pool(7).is_none());
@@ -604,8 +598,8 @@ async fn generation_slices_best_rated_first_and_is_idempotent() {
         .await
         .unwrap_err();
     assert_eq!(
-        java_error(&err),
-        "IllegalArgumentException: Pool size limit must be positive"
+        error_text(&err),
+        "Invalid: Pool size limit must be positive"
     );
 }
 
@@ -644,7 +638,7 @@ async fn every_published_chart_has_its_info_loaded() {
         .await
         .unwrap();
     for snapshot in pool.list_pools() {
-        let published = pool.find_published_pool(snapshot.id).unwrap();
+        let published = pool.find_pool(snapshot.id).unwrap();
         assert!(
             published
                 .chart_ids
@@ -654,7 +648,7 @@ async fn every_published_chart_has_its_info_loaded() {
         let infos: Vec<_> = published
             .chart_ids
             .iter()
-            .map(|&c| pool.get_chart_info(c).unwrap())
+            .map(|&c| pool.chart_info(c).unwrap())
             .collect();
         assert!(
             published
@@ -687,7 +681,7 @@ async fn a_slow_fetch_does_not_delay_the_room_path() {
         std::thread::spawn(move || {
             let start = Instant::now();
             for _ in 0..1000 {
-                let current = pool.find_published_pool(0).unwrap();
+                let current = pool.find_pool(0).unwrap();
                 assert!(
                     current
                         .chart_ids
@@ -717,10 +711,7 @@ async fn a_slow_fetch_does_not_delay_the_room_path() {
 
     gate.open();
     assert_eq!(adder.await.unwrap().unwrap(), 1);
-    assert_eq!(
-        pool.find_published_pool(0).unwrap().chart_ids,
-        [30474, 42058, 777]
-    );
+    assert_eq!(pool.find_pool(0).unwrap().chart_ids, [30474, 42058, 777]);
     assert!(pool.is_chart_info_loaded(777));
     assert_eq!(pool.find_pool(1).unwrap().favorite_id, Some(9));
 }
@@ -748,18 +739,18 @@ async fn a_failed_write_changes_nothing() {
     let file_before = read(dir.path(), POOL_FILE);
     let list_before = pool.list_pools();
     let check = |what: &str, err: CatalogError, expected: &str| {
-        assert_eq!(java_error(&err), expected, "{what}");
+        assert_eq!(error_text(&err), expected, "{what}");
         assert_eq!(pool.list_pools(), list_before, "{what}: memory");
         assert_eq!(
-            pool.find_published_pool(0),
+            pool.find_pool(0),
             Some(list_before[0].clone()),
             "{what}: snapshot"
         );
         assert_eq!(read(dir.path(), POOL_FILE), file_before, "{what}: file");
         assert_eq!(pool.export_json().unwrap(), file_before, "{what}: export");
     };
-    let unchecked = "IllegalStateException: Failed to save chart pools";
-    let checked = "IOException: injected write failure";
+    let unchecked = "Storage: Failed to save chart pools";
+    let checked = "Storage: injected write failure";
     check(
         "add_charts",
         pool.add_charts(0, &[777, 52087]).await.unwrap_err(),
@@ -823,7 +814,7 @@ async fn a_failed_write_changes_nothing() {
     let err = pool.remove_pool(1).await.unwrap_err();
     assert!(
         std::error::Error::source(&err).is_some(),
-        "the IOException is the cause"
+        "the write error is the source"
     );
 
     assert!(pool.is_chart_info_loaded(777));
@@ -855,12 +846,10 @@ async fn an_unreadable_chart_cache_is_rebuilt() {
         upstream.add_chart(chart(id, &["regular"], 0.9, 10, 17.0, None));
     }
     let pool = load(dir.path(), upstream.clone()).await;
-    let reason = zphira_common::gson::from_str::<
-        std::collections::BTreeMap<i32, zphira_phira::ChartInfo>,
-    >(damaged)
-    .unwrap_err()
-    .message()
-    .to_owned();
+    let reason =
+        serde_json::from_str::<std::collections::BTreeMap<i32, zphira_phira::ChartInfo>>(damaged)
+            .unwrap_err()
+            .to_string();
     assert_eq!(
         logs.lines(),
         [format!(
@@ -873,7 +862,7 @@ async fn an_unreadable_chart_cache_is_rebuilt() {
     );
     assert!(pool.is_chart_info_loaded(52087));
     let rebuilt: std::collections::BTreeMap<i32, zphira_phira::ChartInfo> =
-        zphira_common::gson::from_str(&read(dir.path(), CACHE_FILE)).unwrap();
+        serde_json::from_str(&read(dir.path(), CACHE_FILE)).unwrap();
     assert_eq!(
         rebuilt.keys().copied().collect::<Vec<_>>(),
         [30474, 33530, 42058, 52087]
@@ -885,7 +874,7 @@ async fn an_unreadable_chart_cache_is_rebuilt() {
         .await
         .err()
         .unwrap();
-    assert!(matches!(err, CatalogError::Io(_)), "{err:?}");
+    assert!(matches!(err, CatalogError::Storage { .. }), "{err:?}");
 }
 
 #[tokio::test]
@@ -899,13 +888,13 @@ async fn a_chart_answered_under_another_id_is_refused() {
 
     let err = pool.add_charts(0, &[776, 777]).await.unwrap_err();
     assert_eq!(
-        java_error(&err),
-        "IOException: Phira returned chart 778 for request 777"
+        error_text(&err),
+        "Upstream: Phira returned chart 778 for request 777"
     );
     let err = pool.add_pool(5, &[779]).await.unwrap_err();
     assert_eq!(
-        java_error(&err),
-        "IOException: Phira returned chart 0 for request 779"
+        error_text(&err),
+        "Upstream: Phira returned chart 0 for request 779"
     );
     assert_eq!(read(dir.path(), POOL_FILE), file);
     assert!(pool.find_pool(5).is_none());
@@ -924,8 +913,8 @@ async fn a_chart_answered_under_another_id_is_refused() {
         .err()
         .unwrap();
     assert_eq!(
-        java_error(&err),
-        "IOException: Phira returned chart 778 for request 777"
+        error_text(&err),
+        "Upstream: Phira returned chart 778 for request 777"
     );
 }
 
@@ -988,7 +977,7 @@ async fn create_sets_the_favorite_in_the_same_write() {
         )
         .await
         .unwrap_err();
-    assert_eq!(java_error(&err), "IOException: injected write failure");
+    assert_eq!(error_text(&err), "Storage: injected write failure");
     assert!(pool.find_pool(7).is_none());
     assert_eq!(read(dir.path(), POOL_FILE), file);
 
@@ -1004,7 +993,7 @@ async fn create_sets_the_favorite_in_the_same_write() {
     )
     .await
     .unwrap();
-    let created = pool.find_published_pool(7).unwrap();
+    let created = pool.find_pool(7).unwrap();
     assert_eq!(
         (
             created.favorite_id,

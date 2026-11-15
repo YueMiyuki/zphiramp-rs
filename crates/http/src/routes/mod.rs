@@ -9,11 +9,11 @@ mod submission;
 
 use std::sync::Arc;
 
+use std::fmt::Display;
+
 use axum::body::Body;
 use http::{Response, StatusCode};
-use zphira_common::java_fmt;
 
-use crate::java;
 use crate::reply::{self, BAD_PARAM, Failure};
 use crate::request::Ctx;
 use crate::router::Endpoint;
@@ -85,7 +85,6 @@ pub(crate) static ENDPOINTS: &[Endpoint] = &[
     ep("POST", "/api/v1/room/{id}/create", Route::RoomCreate),
     ep("PUT", "/api/v1/room/{id}/update", Route::RoomUpdate),
     ep("GET", "/api/v1/room/list", Route::RoomList),
-    ep("GET", "/api/v1/room/{id}/", Route::RoomGet),
     ep("GET", "/api/v1/room/{id}", Route::RoomGet),
     ep("DELETE", "/api/v1/room/{id}", Route::RoomDelete),
     ep("POST", "/api/v1/room/{id}/end", Route::RoomEnd),
@@ -173,7 +172,7 @@ pub(crate) async fn handle(
     ctx: &mut Ctx,
 ) -> Result<Response<Body>, Failure> {
     match route {
-        Route::Options => Ok(reply::empty(StatusCode::NO_CONTENT)),
+        Route::Options => Ok(reply::plain(StatusCode::NO_CONTENT, "")),
         Route::Login => login::login(state, ctx).await,
         Route::RoomCreate => room::create(state, ctx).await,
         Route::RoomUpdate => room::update(state, ctx).await,
@@ -225,31 +224,41 @@ pub(crate) async fn handle(
 
 const MAX_PAGE_SIZE: i32 = 200;
 
-pub(crate) fn path_int(ctx: &Ctx, name: &str) -> Result<i32, Failure> {
-    let raw = ctx.path_param(name)?;
-    java_fmt::parse_int(&raw).map_err(|_| Failure::bad_request(BAD_PARAM))
+pub(crate) fn non_blank(value: Option<&str>) -> Option<&str> {
+    value.filter(|v| !v.trim().is_empty())
 }
 
-pub(crate) fn query_number(ctx: &mut Ctx, name: &str) -> Result<Option<f64>, Failure> {
-    let Some(raw) = java::blank_to_null(ctx.query_param(name)) else {
+pub(crate) fn or_null<T: Display>(value: Option<T>) -> String {
+    value.map_or_else(|| "null".to_owned(), |v| v.to_string())
+}
+
+pub(crate) fn path_int(ctx: &Ctx, name: &str) -> Result<i32, Failure> {
+    ctx.path_param(name)?
+        .parse()
+        .map_err(|_| Failure::bad_request(BAD_PARAM))
+}
+
+pub(crate) fn query_number(ctx: &Ctx, name: &str) -> Result<Option<f64>, Failure> {
+    let Some(raw) = non_blank(ctx.query_param(name)) else {
         return Ok(None);
     };
-    java_fmt::parse_double(java::trim(raw))
+    raw.trim()
+        .parse::<f64>()
         .map(Some)
         .map_err(|_| Failure::bad_request(format!("参数格式错误：{name}")))
 }
 
-pub(crate) fn query_double(ctx: &mut Ctx, name: &str, fallback: f64) -> Result<f64, Failure> {
+pub(crate) fn query_double(ctx: &Ctx, name: &str, fallback: f64) -> Result<f64, Failure> {
     Ok(query_number(ctx, name)?.unwrap_or(fallback))
 }
 
-pub(crate) fn query_limit(ctx: &mut Ctx) -> Result<usize, Failure> {
-    let limit = java::double_to_int(query_double(ctx, "limit", 50.0)?).clamp(1, MAX_PAGE_SIZE);
+pub(crate) fn query_limit(ctx: &Ctx, max: i32) -> Result<usize, Failure> {
+    let limit = (query_double(ctx, "limit", 50.0)? as i32).clamp(1, max);
     Ok(usize::try_from(limit).unwrap_or(1))
 }
 
-pub(crate) fn query_int_or_null(ctx: &mut Ctx, name: &str) -> Result<Option<i32>, Failure> {
-    Ok(query_number(ctx, name)?.map(java::double_to_int))
+pub(crate) fn query_page_size(ctx: &Ctx) -> Result<usize, Failure> {
+    query_limit(ctx, MAX_PAGE_SIZE)
 }
 
 pub(crate) async fn blocking<R: Send + 'static>(

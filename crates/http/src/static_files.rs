@@ -5,6 +5,7 @@ use http::header::{CACHE_CONTROL, HeaderValue};
 use http::{Response, StatusCode};
 
 use crate::reply::{TEXT_HTML_UTF8, TEXT_PLAIN, text};
+use crate::request::percent_decode;
 
 fn mime_for(name: &str) -> &'static str {
     let ext = name.rfind('.').map_or("", |dot| &name[dot + 1..]);
@@ -89,7 +90,8 @@ pub(crate) async fn serve(frontend_dir: &Path, path: &str) -> Response<Body> {
 
     let mut relative = raw.to_owned();
     // The web manager links some assets percent-encoded (`[id]` as `%5Bid%5D`).
-    if let Some(decoded) = percent_decode_utf8(raw).filter(|d| d != raw) {
+    let decoded = percent_decode(raw, false).and_then(|bytes| String::from_utf8(bytes).ok());
+    if let Some(decoded) = decoded.filter(|d| d != raw) {
         if decoded.contains('\\') {
             return bad_request();
         }
@@ -136,24 +138,6 @@ async fn is_regular_file(file: &Path) -> bool {
         .is_ok_and(|meta| meta.is_file())
 }
 
-fn percent_decode_utf8(s: &str) -> Option<String> {
-    let bytes = s.as_bytes();
-    let mut out = Vec::with_capacity(bytes.len());
-    let mut i = 0;
-    while i < bytes.len() {
-        if bytes[i] == b'%' {
-            let hex = |b: Option<&u8>| b.and_then(|b| char::from(*b).to_digit(16));
-            let (hi, lo) = (hex(bytes.get(i + 1))?, hex(bytes.get(i + 2))?);
-            out.push(u8::try_from(hi * 16 + lo).ok()?);
-            i += 3;
-        } else {
-            out.push(bytes[i]);
-            i += 1;
-        }
-    }
-    String::from_utf8(out).ok()
-}
-
 async fn serve_file(frontend_dir: &Path, file: &Path, html: bool) -> Response<Body> {
     let name = file
         .file_name()
@@ -190,7 +174,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn resolve_like_java() {
+    fn resolve_normalizes_lexically() {
         let base = Path::new("/srv/frontend/dist");
         assert_eq!(
             resolve(base, "a/b.js"),
@@ -212,20 +196,6 @@ mod tests {
         );
         assert!(!resolve(base, "../dist2/x").starts_with(base));
         assert_eq!(resolve(Path::new("/"), "../../x"), Path::new("/x"));
-    }
-
-    #[test]
-    fn percent_decoding() {
-        assert_eq!(percent_decode_utf8("a%20b").as_deref(), Some("a b"));
-        assert_eq!(
-            percent_decode_utf8("%5Bid%5D/x+y").as_deref(),
-            Some("[id]/x+y")
-        );
-        assert_eq!(percent_decode_utf8("%E4%B8%AD").as_deref(), Some("中"));
-        assert_eq!(percent_decode_utf8("%zz"), None);
-        assert_eq!(percent_decode_utf8("a%2"), None);
-        assert_eq!(percent_decode_utf8("%C3%28"), None);
-        assert_eq!(percent_decode_utf8("%252e").as_deref(), Some("%2e"));
     }
 
     #[test]

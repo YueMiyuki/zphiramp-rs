@@ -1,7 +1,6 @@
 use std::io::{self, Write};
 
 use zphira_common::fs::{self, AtomicWriteOptions};
-use zphira_common::gson;
 
 fn temp_files(dir: &std::path::Path) -> Vec<String> {
     std::fs::read_dir(dir)
@@ -16,7 +15,8 @@ fn read_missing_and_present() {
     let dir = tempfile::tempdir().unwrap();
     let p = dir.path().join("a.json");
     assert_eq!(fs::read_to_string_if_exists(&p).unwrap(), None);
-    fs::write_string(dir.path().join("sub/dir/a.json"), "x").unwrap();
+    std::fs::create_dir_all(dir.path().join("sub/dir")).unwrap();
+    std::fs::write(dir.path().join("sub/dir/a.json"), "x").unwrap();
     assert_eq!(
         fs::read_to_string_if_exists(dir.path().join("sub/dir/a.json"))
             .unwrap()
@@ -42,10 +42,7 @@ fn atomic_write_creates_and_replaces() {
 
     let mut m = std::collections::BTreeMap::new();
     m.insert(1, "a");
-    fs::write_atomic_with(&p, &AtomicWriteOptions::new(), |w| {
-        gson::to_writer_pretty(w, &m)
-    })
-    .unwrap();
+    fs::write_json_pretty(&p, &m).unwrap();
     assert_eq!(std::fs::read_to_string(&p).unwrap(), "{\n  \"1\": \"a\"\n}");
 }
 
@@ -63,10 +60,9 @@ fn failure_leaves_target_and_no_temp() {
     assert_eq!(std::fs::read_to_string(&p).unwrap(), "old");
     assert!(temp_files(dir.path()).is_empty());
 
-    let r = fs::write_atomic_with(&p, &AtomicWriteOptions::new(), |w| {
-        gson::to_writer_pretty(w, &f64::NAN)
-    });
-    assert_eq!(r.unwrap_err().kind(), gson::GsonErrorKind::Serialize);
+    let mut bad = std::collections::BTreeMap::new();
+    bad.insert(vec![1], 1);
+    assert!(fs::write_json_pretty(&p, &bad).is_err());
     assert_eq!(std::fs::read_to_string(&p).unwrap(), "old");
     assert!(temp_files(dir.path()).is_empty());
 

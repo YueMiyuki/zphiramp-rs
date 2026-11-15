@@ -14,11 +14,10 @@ use hyper_util::rt::TokioExecutor;
 use reqwest::Url;
 
 use crate::PhiraError;
+use crate::client::MAX_REDIRECTS;
 use crate::error::Kind;
 
 const USER_AGENT_VALUE: &str = "JPhira/1";
-// Four redirects are followed; the fifth 3xx answer is returned as is.
-const MAX_REDIRECTS: usize = 4;
 
 pub(crate) struct Response {
     pub(crate) status: u16,
@@ -149,8 +148,7 @@ fn redirect_target(
         return None;
     }
     let next = from.join(location?.to_str().ok()?).ok()?;
-    let downgrade = from.scheme() == "https" && next.scheme() == "http";
-    (matches!(next.scheme(), "http" | "https") && !downgrade).then_some(next)
+    matches!(next.scheme(), "http" | "https").then_some(next)
 }
 
 fn content_range_total(value: &str) -> Option<u64> {
@@ -194,7 +192,7 @@ mod tests {
     }
 
     #[test]
-    fn redirects_follow_the_jdk_rules() {
+    fn which_redirects_are_followed() {
         let http = Url::parse("http://a.example/x/y").unwrap();
         let https = Url::parse("https://a.example/x/y").unwrap();
         let location = |v: &'static str| Some(HeaderValue::from_static(v));
@@ -230,7 +228,6 @@ mod tests {
                 .as_str(),
             "https://c.example/"
         );
-        assert!(redirect_target(&https, 302, location("http://c.example/").as_ref()).is_none());
         assert!(redirect_target(&http, 302, None).is_none());
         assert!(redirect_target(&http, 302, location("ftp://x/").as_ref()).is_none());
         assert!(redirect_target(&http, 302, location("http://[bad").as_ref()).is_none());
@@ -475,7 +472,7 @@ mod tests {
             match target {
                 "/start" => "HTTP/1.1 303 See Other\r\nLocation: /next\r\nContent-Length: 0\r\n\r\n".to_owned(),
                 "/next" => "HTTP/1.1 206 Partial Content\r\nContent-Range: bytes 0-1/9\r\nContent-Length: 2\r\n\r\nok".to_owned(),
-                _ => "HTTP/1.1 302 Found\r\nLocation: http://127.0.0.1:9/plain\r\nContent-Length: 0\r\n\r\n".to_owned(),
+                _ => "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n".to_owned(),
             }
         })
         .await;
@@ -492,12 +489,6 @@ mod tests {
             assert_eq!(header_names(&heads[1]), ["host", "range", "user-agent"]);
             assert!(heads[1].contains("range: bytes=0-1\r\n"));
         }
-        let downgrade = Url::parse(&format!("https://127.0.0.1:{port}/downgrade")).unwrap();
-        let response = tokio::time::timeout(BOUND, probe.get(&downgrade, "bytes=0-1"))
-            .await
-            .unwrap()
-            .unwrap();
-        assert_eq!(response.status, 302);
         server.abort();
     }
 }

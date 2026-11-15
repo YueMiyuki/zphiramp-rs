@@ -7,7 +7,7 @@ use zphira_ledger::RemoveOutcome;
 
 use super::{blocking, path_int};
 use crate::auth::require_admin;
-use crate::body::{body_or_null, primitive};
+use crate::body::body_or_null;
 use crate::reply::{self, Failure};
 use crate::request::Ctx;
 use crate::state::AppState;
@@ -28,7 +28,7 @@ pub(super) async fn list(state: &Arc<AppState>, ctx: &mut Ctx) -> Result<Respons
 #[derive(Deserialize, Default)]
 #[serde(default)]
 struct AdminBody {
-    #[serde(rename = "userId", deserialize_with = "primitive")]
+    #[serde(rename = "userId")]
     user_id: i32,
 }
 

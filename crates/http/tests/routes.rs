@@ -154,16 +154,16 @@ async fn missing_frontend_is_404() {
 }
 
 #[tokio::test]
-async fn json_is_compact_gson() {
+async fn json_is_compact() {
     let env = Env::new().await;
     let r = env.get("/api/v1/record/r1-1735689600000-1").await;
     assert_eq!(
         r.text(),
-        "{\"ok\":true,\"record\":{\"id\":\"r1-1735689600000-1\",\"roomId\":\"r1\",\"chartId\":1000,\"chartName\":\"C1000\",\"startedAt\":1735689500000,\"finishedAt\":1735689600000,\"results\":[{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":1,\"score\":998765,\"accuracy\":0.9876543,\"std\":0.012,\"gainedPoints\":100,\"totalPoints\":100},{\"playerId\":102,\"playerName\":\"Bob\\u003c\\u0026\\u003e\",\"rank\":2,\"score\":900000,\"accuracy\":0.95,\"std\":0.0,\"gainedPoints\":20,\"totalPoints\":20}]}}"
+        "{\"ok\":true,\"record\":{\"id\":\"r1-1735689600000-1\",\"roomId\":\"r1\",\"chartId\":1000,\"chartName\":\"C1000\",\"startedAt\":1735689500000,\"finishedAt\":1735689600000,\"results\":[{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":1,\"score\":998765,\"accuracy\":0.9876543,\"std\":0.012,\"gainedPoints\":100,\"totalPoints\":100},{\"playerId\":102,\"playerName\":\"Bob<&>\",\"rank\":2,\"score\":900000,\"accuracy\":0.95,\"std\":0.0,\"gainedPoints\":20,\"totalPoints\":20}]}}"
     );
     let r = env.get("/api/v1/chart/search?minRating=0.94&limit=1").await;
     assert_eq!(
         r.text(),
-        "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":3,\"pendingDuration\":false,\"charts\":[{\"id\":1008,\"name\":\"C1008\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1008\",\"composer\":\"comp1008\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1008.png\",\"preview\":null,\"file\":\"https://files.example/1008\",\"uploader\":0,\"tags\":[\"regular\"],\"rating\":0.99,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null}]}}"
+        "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":3,\"pendingDuration\":false,\"charts\":[{\"id\":1008,\"name\":\"C1008\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1008\",\"composer\":\"comp1008\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1008.png\",\"preview\":null,\"file\":\"https://files.example/1008\",\"uploader\":0,\"tags\":[\"regular\"],\"rating\":0.99,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06:00Z\",\"durationSeconds\":null}]}}"
     );
 }

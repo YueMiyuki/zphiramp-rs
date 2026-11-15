@@ -3,7 +3,7 @@ mod support;
 use std::path::Path;
 use std::sync::{Arc, Barrier};
 
-use support::{ManualClock, Script, capture_logs, read_fixture, read_tsv};
+use support::{ManualClock, Script, capture_logs, read_fixture};
 use tracing::Level;
 use zphira_ledger::{Admins, ImportMode, RemoveOutcome};
 
@@ -84,26 +84,15 @@ fn replays_the_java_scenario() {
     assert_eq!(show(&admins.list()), java.expect("list_odd_ids")[0]);
     assert_eq!(file(dir.path()), java.expect("file_odd_ids")[0]);
 
-    replay_imports(&admins, &clock, dir.path(), &mut java);
+    replay_imports(&admins, &mut java);
 }
 
-const REFUSED: [&str; 6] = [
-    "replace_dups",
-    "merge_dups",
-    "replace_float_frac",
-    "replace_bool",
-    "replace_null_elem",
-    "replace_empty",
-];
+const REFUSED: [&str; 3] = ["replace_dups", "merge_dups", "replace_empty"];
 
-fn replay_imports(admins: &Admins, clock: &ManualClock, dir: &Path, java: &mut Script) {
+fn replay_imports(admins: &Admins, java: &mut Script) {
     let mut last_case = String::new();
     while let Some(row) = java.next_row() {
         let label = row[0].as_str();
-        if label.starts_with("load_") {
-            check_load(admins, clock, dir, &row);
-            continue;
-        }
         if label == "import_base" {
             let report = admins.import(&row[2], ImportMode::Replace).unwrap();
             assert_eq!(report.imported.to_string(), row[4]);
@@ -123,11 +112,6 @@ fn replay_imports(admins: &Admins, clock: &ManualClock, dir: &Path, java: &mut S
                     if case == "replace_empty" {
                         assert_eq!(err.to_string(), "至少保留一名管理员");
                     }
-                }
-                "merge_float_dup" => {
-                    let report = outcome.unwrap();
-                    assert_eq!((report.imported, report.total), (4, 4));
-                    assert_eq!(row[4], "5");
                 }
                 _ => {
                     let report = outcome.unwrap();
@@ -149,25 +133,6 @@ fn replay_imports(admins: &Admins, clock: &ManualClock, dir: &Path, java: &mut S
             panic!("unexpected row {label}");
         }
     }
-}
-
-fn check_load(admins: &Admins, clock: &ManualClock, dir: &Path, row: &[String]) {
-    let (name, document, java) = (row[0].as_str(), &row[1], &row[2]);
-    assert_eq!(show(&admins.list()), "[7]", "{name}: starts from [7]");
-    edit(dir, document);
-    clock.advance(1000);
-    let after = show(&admins.list());
-    let expected = match name {
-        "load_empty_file" | "load_null_doc" => "[7]".to_owned(),
-        _ => match java.strip_prefix("OK ") {
-            Some(list) => list.to_owned(),
-            None => "[7]".to_owned(),
-        },
-    };
-    assert_eq!(after, expected, "{name}");
-    edit(dir, "[7]");
-    clock.advance(1000);
-    assert_eq!(show(&admins.list()), "[7]");
 }
 
 #[test]
@@ -244,6 +209,9 @@ fn a_malformed_file_keeps_the_list_and_logs_the_java_line_once() {
         "{\"a\":1}",
         "[true]",
         "[1.5]",
+        "[\"5\"]",
+        "[1,]",
+        "[1] x",
         "",
         "   ",
         "null",
@@ -533,10 +501,4 @@ fn the_documents_of_both_servers_load_in_the_other() {
     admins.remove(9).unwrap();
     admins.add(9).unwrap();
     assert_eq!(file(dir.path()), read_fixture("admins_java.json"));
-    for row in read_tsv("ledger_admins.tsv")
-        .into_iter()
-        .filter(|r| r[0] == "load_unsorted")
-    {
-        assert_eq!(row[2], "OK [1, 2, 3]");
-    }
 }
