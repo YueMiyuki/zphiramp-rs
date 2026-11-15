@@ -1,0 +1,2 @@
+INFO Chart index is empty, running a full sweep (slow on first run)
+INFO Chart index refreshed: 9 charts (division=all)

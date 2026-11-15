@@ -1,0 +1,61 @@
+{
+  "submissions": [
+    {
+      "pool_id": 1,
+      "chart_id": 1005,
+      "status": "REJECTED",
+      "submitters": [
+        {
+          "user_id": 3,
+          "name": "player3",
+          "at": "2025-05-01T10:00:00+08:00"
+        }
+      ],
+      "created_at": "2025-05-01T10:00:00+08:00",
+      "reviewed_at": "2025-05-03T09:30:00Z",
+      "reviewer_id": 1,
+      "reason": "too easy"
+    },
+    {
+      "pool_id": 2,
+      "chart_id": 1001,
+      "status": "PENDING",
+      "submitters": [
+        {
+          "user_id": 3,
+          "name": "player3",
+          "at": "2025-05-01T10:00:00+08:00"
+        }
+      ],
+      "created_at": "2025-05-01T10:00:00+08:00"
+    },
+    {
+      "pool_id": 2,
+      "chart_id": 1003,
+      "status": "APPROVED",
+      "submitters": [
+        {
+          "user_id": 4,
+          "name": "player4",
+          "at": "2025-05-01T11:00:00.5+08:00"
+        }
+      ],
+      "created_at": "2025-05-01T11:00:00.5+08:00",
+      "reviewed_at": "2025-05-02T10:00:00Z",
+      "reviewer_id": 1
+    },
+    {
+      "pool_id": 2,
+      "chart_id": 900007,
+      "status": "PENDING",
+      "submitters": [
+        {
+          "user_id": 2,
+          "name": "player2",
+          "at": "2025-05-04T08:00:00Z"
+        }
+      ],
+      "created_at": "2025-05-04T08:00:00Z"
+    }
+  ]
+}

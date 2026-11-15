@@ -1,0 +1,29 @@
+[package]
+name = "zphira-game"
+description = "Connections, players, sessions, rooms and the round state machine."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+zphira-protocol = { path = "../protocol" }
+zphira-common = { path = "../common" }
+zphira-phira = { path = "../phira" }
+zphira-catalog = { path = "../catalog" }
+zphira-ledger = { path = "../ledger" }
+tokio = { version = "1.54.1", features = ["rt", "rt-multi-thread", "net", "io-util", "time", "sync", "macros"] }
+tokio-util = { version = "0.7.20", features = ["codec"] }
+tracing = "0.1.44"
+bytes = "1.12.1"
+futures-util = "0.3.34"
+serde = { version = "1.0.229", features = ["derive"] }
+
+[dev-dependencies]
+futures-util = { version = "0.3.34", features = ["sink"] }
+tempfile = "3.27.0"
+tokio = { version = "1.54.1", features = ["test-util", "rt", "macros", "time", "io-util", "net", "sync"] }
+tracing-subscriber = { version = "0.3.23", default-features = false, features = ["registry", "std"] }

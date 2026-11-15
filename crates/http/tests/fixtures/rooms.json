@@ -1,0 +1,3362 @@
+{
+  "scenario": "rooms",
+  "exchanges": [
+    {
+      "name": "list empty",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "22"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"rooms\":[],\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "list as player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "22"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"rooms\":[],\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "list no auth",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/list",
+        "headers": []
+      },
+      "response": {
+        "status": 401,
+        "reason": "Unauthorized",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要登录\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "create default pools",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r1/create",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "WARN Server: Room r1 has a single chart pool (0), so it will never rotate",
+        "INFO Server: HTTP create room: r1 pools=[0]"
+      ]
+    },
+    {
+      "name": "create again",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r1/create",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "39"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"房间已存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "create exists before type",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r1/create",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"type\":\"remote\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "39"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"房间已存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "create bad id",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/bad!/create",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "65"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"房间名仅限字母、数字、-、_。\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "create id too long",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/abcdefghijklmnopqrstu/create",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "65"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"房间名仅限字母、数字、-、_。\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "create encoded id",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/a%20b/create",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "65"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"房间名仅限字母、数字、-、_。\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "create type",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r2/create",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"type\":\"remote\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "57"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"不支持的房间类型：remote\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "create unknown pools",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r2/create",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"pools\":[77]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"指定的谱池不存在或均为空池\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "create bad body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r2/create",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "["
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"请检查是否传入了错误的格式\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "create as player",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r2/create",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要权限\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "create pool list",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r2/create",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"type\":\"local\",\"pools\":[2,0,2]}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP create room: r2 pools=[2, 0]"
+      ]
+    },
+    {
+      "name": "create no body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r3/create",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "WARN Server: Room r3 has a single chart pool (0), so it will never rotate",
+        "INFO Server: HTTP create room: r3 pools=[0]"
+      ]
+    },
+    {
+      "name": "create null pool",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r4/create",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"pools\":[null]}"
+      },
+      "response": {
+        "status": 500,
+        "reason": "Server Error",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"服务器内部错误\",\"ok\":false}"
+      },
+      "log": [
+        "ERROR Server: HTTP API error on /api/v1/room/r4/create\n  java.lang.NullPointerException: Cannot invoke \"java.lang.Integer.intValue()\" because the return value of \"java.util.Iterator.next()\" is null"
+      ]
+    },
+    {
+      "name": "get",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/r1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "785"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"info\":{\"roomId\":\"r1\",\"state\":\"SelectChart\",\"live\":false,\"locked\":false,\"cycle\":false,\"host\":null,\"chart\":null,\"type\":\"local\",\"config\":{\"minPlayer\":2,\"maxPlayer\":1000,\"selectCountdown\":150,\"readyCountdown\":60,\"forceFinish\":3600,\"interval\":5,\"adminIds\":[]},\"effectiveForceFinish\":3600,\"pool\":{\"currentPool\":{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},\"pools\":[{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false}],\"pendingPoolId\":null,\"favoriteId\":null,\"finishedRoundsSinceRefresh\":0,\"refreshIntervalRounds\":5,\"effectiveRoundsPerStay\":3},\"players\":[],\"monitors\":[]},\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "get slash",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/r1/",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "785"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"info\":{\"roomId\":\"r1\",\"state\":\"SelectChart\",\"live\":false,\"locked\":false,\"cycle\":false,\"host\":null,\"chart\":null,\"type\":\"local\",\"config\":{\"minPlayer\":2,\"maxPlayer\":1000,\"selectCountdown\":150,\"readyCountdown\":60,\"forceFinish\":3600,\"interval\":5,\"adminIds\":[]},\"effectiveForceFinish\":3600,\"pool\":{\"currentPool\":{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},\"pools\":[{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false}],\"pendingPoolId\":null,\"favoriteId\":null,\"finishedRoundsSinceRefresh\":0,\"refreshIntervalRounds\":5,\"effectiveRoundsPerStay\":3},\"players\":[],\"monitors\":[]},\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "get as player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/r1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要权限\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "get unknown",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/nope",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "51"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"欲请求的内容不存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "get unknown as player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/nope",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "51"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"欲请求的内容不存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "list",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "2473"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"rooms\":[{\"roomId\":\"r2\",\"state\":\"SelectChart\",\"live\":false,\"locked\":false,\"cycle\":false,\"host\":null,\"chart\":null,\"type\":\"local\",\"config\":{\"minPlayer\":2,\"maxPlayer\":1000,\"selectCountdown\":150,\"readyCountdown\":60,\"forceFinish\":3600,\"interval\":5,\"adminIds\":[]},\"effectiveForceFinish\":3600,\"pool\":{\"currentPool\":{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},\"pools\":[{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false}],\"pendingPoolId\":null,\"favoriteId\":null,\"finishedRoundsSinceRefresh\":0,\"refreshIntervalRounds\":5,\"effectiveRoundsPerStay\":5},\"players\":[],\"monitors\":[]},{\"roomId\":\"r3\",\"state\":\"SelectChart\",\"live\":false,\"locked\":false,\"cycle\":false,\"host\":null,\"chart\":null,\"type\":\"local\",\"config\":{\"minPlayer\":2,\"maxPlayer\":1000,\"selectCountdown\":150,\"readyCountdown\":60,\"forceFinish\":3600,\"interval\":5,\"adminIds\":[]},\"effectiveForceFinish\":3600,\"pool\":{\"currentPool\":{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},\"pools\":[{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false}],\"pendingPoolId\":null,\"favoriteId\":null,\"finishedRoundsSinceRefresh\":0,\"refreshIntervalRounds\":5,\"effectiveRoundsPerStay\":3},\"players\":[],\"monitors\":[]},{\"roomId\":\"r1\",\"state\":\"SelectChart\",\"live\":false,\"locked\":false,\"cycle\":false,\"host\":null,\"chart\":null,\"type\":\"local\",\"config\":{\"minPlayer\":2,\"maxPlayer\":1000,\"selectCountdown\":150,\"readyCountdown\":60,\"forceFinish\":3600,\"interval\":5,\"adminIds\":[]},\"effectiveForceFinish\":3600,\"pool\":{\"currentPool\":{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},\"pools\":[{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false}],\"pendingPoolId\":null,\"favoriteId\":null,\"finishedRoundsSinceRefresh\":0,\"refreshIntervalRounds\":5,\"effectiveRoundsPerStay\":3},\"players\":[],\"monitors\":[]}],\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "update all",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r1/update",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"live\":true,\"lock\":true,\"chatEnable\":false,\"minPlayer\":2,\"maxPlayer\":4,\"selectCountdown\":20,\"readyCountdown\":30,\"forceFinish\":600,\"interval\":3,\"adminIds\":[5,5,6]}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP update room: r1 fields updated"
+      ]
+    },
+    {
+      "name": "get after update",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/r1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "781"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"info\":{\"roomId\":\"r1\",\"state\":\"SelectChart\",\"live\":true,\"locked\":false,\"cycle\":false,\"host\":null,\"chart\":null,\"type\":\"local\",\"config\":{\"minPlayer\":2,\"maxPlayer\":4,\"selectCountdown\":20,\"readyCountdown\":30,\"forceFinish\":600,\"interval\":3,\"adminIds\":[5,6]},\"effectiveForceFinish\":600,\"pool\":{\"currentPool\":{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},\"pools\":[{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false}],\"pendingPoolId\":null,\"favoriteId\":null,\"finishedRoundsSinceRefresh\":0,\"refreshIntervalRounds\":3,\"effectiveRoundsPerStay\":3},\"players\":[],\"monitors\":[]},\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "update partial then fail",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r1/update",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"minPlayer\":7,\"maxPlayer\":3,\"chatEnable\":true,\"selectCountdown\":5}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "61"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"selectCountdown 必须大于等于 10\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "get after failed update",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/r1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "781"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"info\":{\"roomId\":\"r1\",\"state\":\"SelectChart\",\"live\":true,\"locked\":false,\"cycle\":false,\"host\":null,\"chart\":null,\"type\":\"local\",\"config\":{\"minPlayer\":7,\"maxPlayer\":3,\"selectCountdown\":20,\"readyCountdown\":30,\"forceFinish\":600,\"interval\":3,\"adminIds\":[5,6]},\"effectiveForceFinish\":600,\"pool\":{\"currentPool\":{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},\"pools\":[{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false}],\"pendingPoolId\":null,\"favoriteId\":null,\"finishedRoundsSinceRefresh\":0,\"refreshIntervalRounds\":3,\"effectiveRoundsPerStay\":3},\"players\":[],\"monitors\":[]},\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "update min above max",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/update",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"minPlayer\":7,\"maxPlayer\":3}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP update room: r2 fields updated"
+      ]
+    },
+    {
+      "name": "update admin id zero",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/update",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"adminIds\":[3,0]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "55"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"管理员 ID 必须是正整数\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "update min zero",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/update",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"minPlayer\":0}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "48"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"minPlayer 必须大于 0\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "update max zero",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/update",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"maxPlayer\":0}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "48"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"maxPlayer 必须大于 0\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "update ready zero",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/update",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"readyCountdown\":0}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "53"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"readyCountdown 必须大于 0\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "update force zero",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/update",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"forceFinish\":0}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "50"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"forceFinish 必须大于 0\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "update interval zero",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/update",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"interval\":0}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "47"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"interval 必须大于 0\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "update empty object",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/update",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP update room: r2 fields updated"
+      ]
+    },
+    {
+      "name": "update no body",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/update",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"请检查是否传入了错误的格式\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "update unknown",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/nope/update",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "51"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"欲请求的内容不存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "update as player",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/update",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要权限\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "get r2",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/r2",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "933"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"info\":{\"roomId\":\"r2\",\"state\":\"SelectChart\",\"live\":false,\"locked\":false,\"cycle\":false,\"host\":null,\"chart\":null,\"type\":\"local\",\"config\":{\"minPlayer\":7,\"maxPlayer\":3,\"selectCountdown\":150,\"readyCountdown\":60,\"forceFinish\":3600,\"interval\":5,\"adminIds\":[]},\"effectiveForceFinish\":3600,\"pool\":{\"currentPool\":{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},\"pools\":[{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false}],\"pendingPoolId\":null,\"favoriteId\":null,\"finishedRoundsSinceRefresh\":0,\"refreshIntervalRounds\":5,\"effectiveRoundsPerStay\":5},\"players\":[],\"monitors\":[]},\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "pool",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/r2/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "624"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"pool\":{\"currentPool\":{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},\"pools\":[{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false}],\"pendingPoolId\":null,\"favoriteId\":null,\"finishedRoundsSinceRefresh\":0,\"refreshIntervalRounds\":5,\"effectiveRoundsPerStay\":5},\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "pool as player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/r2/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要权限\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "pool unknown",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/nope/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "51"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"欲请求的内容不存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "switch not in room",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/pool/switch",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"poolId\":1}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "59"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"Pool not in room chart pool list: 1\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "switch",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/pool/switch",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"poolId\":0}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP switch room r2 pending pool to 0"
+      ]
+    },
+    {
+      "name": "switch missing key",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r1/pool/switch",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP switch room r1 pending pool to 0"
+      ]
+    },
+    {
+      "name": "switch null",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/pool/switch",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"poolId\":null}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"请检查是否传入了错误的格式\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "switch no body",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/pool/switch",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"请检查是否传入了错误的格式\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "switch unknown room",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/nope/pool/switch",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"poolId\":0}"
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "51"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"欲请求的内容不存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "favorite",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/pool/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":99}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP room r2 pool favorite set to 99"
+      ]
+    },
+    {
+      "name": "favorite null",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r1/pool/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":null}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP room r1 pool favorite set to null"
+      ]
+    },
+    {
+      "name": "favorite missing key",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/r2/pool/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"请检查是否传入了错误的格式\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "favorite unknown room",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/room/nope/pool/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":1}"
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "51"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"欲请求的内容不存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "pool after",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/r2/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "617"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"pool\":{\"currentPool\":{\"id\":2,\"favoriteId\":99,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},\"pools\":[{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false}],\"pendingPoolId\":0,\"favoriteId\":99,\"finishedRoundsSinceRefresh\":0,\"refreshIntervalRounds\":5,\"effectiveRoundsPerStay\":5},\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "end not playing",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r1/end",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"房间不在游戏中\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "end unknown",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/nope/end",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "51"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"欲请求的内容不存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "end as player",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r1/end",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要权限\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "say",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r1/say",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"message\":\"  hi\\r\\n\\nthere  \"}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "25"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"delivered\":0,\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP room message to r1: hi there"
+      ]
+    },
+    {
+      "name": "say long",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r1/say",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"message\":\"长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长\"}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "25"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"delivered\":0,\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP room message to r1: 长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长"
+      ]
+    },
+    {
+      "name": "say blank",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r1/say",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"message\":\" \\n \"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "42"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"消息不能为空\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "say missing",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r1/say",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "42"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"消息不能为空\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "say no body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r1/say",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "42"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"消息不能为空\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "say unknown room",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/nope/say",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"message\":\"x\"}"
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "51"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"欲请求的内容不存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "broadcast",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/broadcast",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"message\":\"全体 <通知>\"}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "25"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"delivered\":0,\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP global message: 全体 <通知>"
+      ]
+    },
+    {
+      "name": "broadcast blank",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/broadcast",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"message\":\"\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "42"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"消息不能为空\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "broadcast as player",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/broadcast",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"message\":\"x\"}"
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要权限\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "clear",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/room/r2/clear",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "text/plain"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "Endpoint POST /api/v1/room/r2/clear not found"
+      },
+      "log": []
+    },
+    {
+      "name": "delete as player",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/room/r1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要权限\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "delete",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/room/r1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP delete room: r1"
+      ]
+    },
+    {
+      "name": "delete again",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/room/r1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "51"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"欲请求的内容不存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "list final",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/room/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1696"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"rooms\":[{\"roomId\":\"r2\",\"state\":\"SelectChart\",\"live\":false,\"locked\":false,\"cycle\":false,\"host\":null,\"chart\":null,\"type\":\"local\",\"config\":{\"minPlayer\":7,\"maxPlayer\":3,\"selectCountdown\":150,\"readyCountdown\":60,\"forceFinish\":3600,\"interval\":5,\"adminIds\":[]},\"effectiveForceFinish\":3600,\"pool\":{\"currentPool\":{\"id\":2,\"favoriteId\":99,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},\"pools\":[{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false}],\"pendingPoolId\":0,\"favoriteId\":99,\"finishedRoundsSinceRefresh\":0,\"refreshIntervalRounds\":5,\"effectiveRoundsPerStay\":5},\"players\":[],\"monitors\":[]},{\"roomId\":\"r3\",\"state\":\"SelectChart\",\"live\":false,\"locked\":false,\"cycle\":false,\"host\":null,\"chart\":null,\"type\":\"local\",\"config\":{\"minPlayer\":2,\"maxPlayer\":1000,\"selectCountdown\":150,\"readyCountdown\":60,\"forceFinish\":3600,\"interval\":5,\"adminIds\":[]},\"effectiveForceFinish\":3600,\"pool\":{\"currentPool\":{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},\"pools\":[{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false}],\"pendingPoolId\":null,\"favoriteId\":null,\"finishedRoundsSinceRefresh\":0,\"refreshIntervalRounds\":5,\"effectiveRoundsPerStay\":3},\"players\":[],\"monitors\":[]}],\"ok\":true}"
+      },
+      "log": []
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+listPools	0:0:MANUAL:true:[30474, 42058] 1:0:MANUAL:false:[33530, 52087]
+defaultPools	0:0:MANUAL:true:[30474, 42058]
+chart30474	400
+missing	IllegalStateException: Chart info is not loaded: 1
+isLoaded	true false

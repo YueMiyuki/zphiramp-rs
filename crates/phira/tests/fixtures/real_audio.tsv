@@ -1,0 +1,12 @@
+lame_vbr_v0_44k	mp3	345279	24000	21
+lame_cbr128_info_44k	mp3	384939	24000	24
+lame_cbr128_notag_44k	mp3	384522	24033	24
+lame_vbr_v4_mono_22k	mp3	86921	24000	6
+lame_cbr64_notag_22k	mp3	192470	24059	13
+lame_cbr32_notag_mono_11k	mp3	96548	24137	13
+lame_vbr_v5_8k	mp3	34632	24000	4
+lame_vbr_crc_44k	mp3	246473	24000	15
+lame_cbr128_crc_44k	mp3	384939	24000	24
+lame_cbr128_cover_44k	mp3	149189	6034	9
+ffmpeg_vorbis_96k	ogg	376960	24001	null
+ffmpeg_pcm_44k	wav	4233678	24000	24

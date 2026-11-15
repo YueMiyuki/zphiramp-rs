@@ -1,0 +1,5 @@
+listPools	2:-5:MANUAL:false:[52087] 5:0:MANUAL:false:[] 7:20:MANUAL:true:[30474, 42058] 8:20:TB:false:[33530]
+defaultPools	7:20:MANUAL:true:[30474, 42058]
+resolve	8:20:TB:false:[33530] 7:20:MANUAL:true:[30474, 42058] 2:-5:MANUAL:false:[52087]
+byCategory	[2, 5, 7]
+open	7:20:MANUAL:true:[30474, 42058]

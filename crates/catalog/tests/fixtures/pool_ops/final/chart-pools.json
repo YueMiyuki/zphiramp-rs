@@ -1,0 +1,17 @@
+{
+  "pools": [
+    {
+      "id": 1,
+      "default_flag": true,
+      "chart_ids": [
+        33530,
+        52087,
+        30474,
+        42058
+      ],
+      "category": "MANUAL",
+      "order": 0,
+      "submission_open": false
+    }
+  ]
+}

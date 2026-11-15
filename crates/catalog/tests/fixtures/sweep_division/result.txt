@@ -1,0 +1,5 @@
+refresh	ok 2
+requests	chart?page=1&division=plain chart?page=2&division=plain
+indexed	2
+remote	9
+refreshing	false

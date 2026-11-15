@@ -1,0 +1,5 @@
+merge	ok ImportResult[imported=3, total=3, backupFile=data/backups/pools-20261115-003315-178.json]
+afterMerge	0:0:MANUAL:true:[30474, 42058] 77:0:MANUAL:false:[42058] 1:4:TB:false:[30474]
+replace	ok ImportResult[imported=2, total=2, backupFile=data/backups/pools-20261115-003315-186.json]
+afterReplace	3:0:MANUAL:true:[33530] 4:0:MANUAL:false:[]
+export	{\n  "pools": [\n    {\n      "id": 3,\n      "default_flag": true,\n      "chart_ids": [\n        33530\n      ],\n      "category": "MANUAL",\n      "order": 0,\n      "submission_open": false\n    },\n    {\n      "id": 4,\n      "default_flag": false,\n      "chart_ids": [],\n      "category": "MANUAL",\n      "order": 0,\n      "submission_open": false\n    }\n  ]\n}

@@ -1,0 +1,1 @@
+WARN Pool 5 is empty, rooms will skip it

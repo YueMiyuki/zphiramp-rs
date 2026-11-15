@@ -1,0 +1,23 @@
+[package]
+name = "zphira-catalog"
+description = "Chart pools, screening rules, the chart index and player submissions."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+arc-swap = "1.9.5"
+serde = { version = "1.0.229", features = ["derive"] }
+tokio = { version = "1.54.1", features = ["rt", "sync", "time"] }
+tracing = "0.1.44"
+zphira-common = { path = "../common" }
+zphira-phira = { path = "../phira" }
+
+[dev-dependencies]
+tempfile = "3.27.0"
+tokio = { version = "1.54.1", features = ["rt", "rt-multi-thread", "macros", "sync", "time"] }
+tracing-subscriber = { version = "0.3.23", default-features = false, features = ["registry", "std"] }

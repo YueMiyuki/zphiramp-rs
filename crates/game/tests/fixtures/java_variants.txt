@@ -1,0 +1,123 @@
+== C join monitor
+OnJoinRoom 300 Carol monitor
+msg JoinRoom 300 Carol
+> Carol（#300） 进入房间观战
+> ————————————————————————————————————————
+> 当前积分：0，积分排名：#2
+> r1 本轮谱池 #1
+> 使用选谱操作投票，只能选择下列歌曲。票数最高者开局。
+> [0票] Alpha  |  Lv.IN 12  |  ID:1
+> [0票] Beta  |  Lv.AT 14  |  ID:2
+> ————————————————————————————————————————
+JoinRoom ok SelectChart [100,200,300m] live=false
+host true
+> 房间玩法：选谱阶段投票 → 准备阶段 → 游戏，票数最高者开局。
+> 投票仅限当前谱池，重复投票会改票，观战者不能投票。
+> 当前积分：0，积分排名：#2
+== A on C join
+OnJoinRoom 300 Carol monitor
+msg JoinRoom 300 Carol
+> Carol（#300） 进入房间观战
+== C vote
+SelectChart failed: 你没有权限
+== A vote outside
+SelectChart failed: 谱面信息获取失败
+== B start
+OnJoinRoom 300 Carol monitor
+msg JoinRoom 300 Carol
+> Carol（#300） 进入房间观战
+RequestStart failed: 你不是房主
+== A vote 2
+> Alice 已投票：Beta | Lv.AT 14 | ID:2
+msg SelectChart 100 Beta 2
+state SelectChart(2)
+> 点击锁定房间按钮查看当前谱池状态。
+SelectChart ok
+== A start
+> Alice 提前开始本轮，曲目：Beta | Lv.AT 14 | ID:2
+state WaitForReady
+> 进入准备阶段：请在 60 秒内准备。未准备玩家将作为观战跳过本轮。
+RequestStart ok
+> 准备倒计时：60 秒。
+== C on A start
+> Alice 提前开始本轮，曲目：Beta | Lv.AT 14 | ID:2
+state WaitForReady
+> 进入准备阶段：请在 60 秒内准备。未准备玩家将作为观战跳过本轮。
+> 准备倒计时：60 秒。
+== A start again
+RequestStart failed: 你没有权限
+== B cancel ready
+msg CancelReady 200
+CancelReady ok
+== A ready
+msg Ready 100
+Ready ok
+== C leave
+LeaveRoom ok
+== A on C leave
+msg LeaveRoom 300 Carol
+== B on C leave
+msg LeaveRoom 300 Carol
+== B ready
+msg Ready 200
+state Playing
+msg StartPlaying
+Ready ok
+== A on B ready
+msg Ready 200
+state Playing
+msg StartPlaying
+== A played fails
+> 网络错误导致成绩提交失败，本轮将视为放弃。
+> 因网络错误导致 Alice 成绩提交失败，已视为放弃本轮。
+msg Abort 100
+host true
+state SelectChart(2)
+Played failed: 成绩提交失败，请稍后重试
+== B on A played
+> 因网络错误导致 Alice 成绩提交失败，已视为放弃本轮。
+msg Abort 100
+== B chat while playing
+[200] hello
+Chat ok
+== B abort
+msg Abort 200
+host true
+state SelectChart(2)
+host true
+msg GameEnd
+state SelectChart
+> 当前谱池 #1 已进行 1/5 轮。
+> 点击锁定房间按钮查看当前谱池状态。
+> 已达到开局人数，150 秒后锁定投票并进入准备阶段。人数不足会取消倒计时。
+Abort ok
+== A on B abort
+msg Abort 200
+host true
+msg GameEnd
+state SelectChart
+> 当前谱池 #1 已进行 1/5 轮。
+> 点击锁定房间按钮查看当前谱池状态。
+> 已达到开局人数，150 秒后锁定投票并进入准备阶段。人数不足会取消倒计时。
+== B cycle
+CycleRoom failed: 你不是房主
+== A cycle
+msg CycleRoom true
+CycleRoom ok
+== B on A cycle
+msg CycleRoom true
+== B lock
+> ————————————————————————————————————————
+> 当前积分：0，积分排名：#2
+> r1 本轮谱池 #1
+> 使用选谱操作投票，只能选择下列歌曲。票数最高者开局。
+> [0票] Alpha  |  Lv.IN 12  |  ID:1
+> [0票] Beta  |  Lv.AT 14  |  ID:2
+> ————————————————————————————————————————
+LockRoom ok
+== B leave
+LeaveRoom ok
+== A on B leave
+msg LeaveRoom 200 Bob
+> 点击锁定房间按钮查看当前谱池状态。
+> 在线玩家不足，开局倒计时已取消。

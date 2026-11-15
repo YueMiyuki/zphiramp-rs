@@ -1,0 +1,1007 @@
+{
+  "scenario": "admin",
+  "exchanges": [
+    {
+      "name": "list",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "24"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"admins\":[1],\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "list as player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要权限\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "user 5 before",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {user5}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要权限\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "add 5",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"userId\":5}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "39"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"admins\":[1,5],\"added\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP admin add: 5 (2 now)"
+      ]
+    },
+    {
+      "name": "user 5 after add",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {user5}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "481"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"pools\":[{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},{\"id\":1,\"favoriteId\":42,\"default\":false,\"chartIds\":[1001],\"category\":\"CONFIGURED\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":20,\"submissionOpen\":false},{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true}],\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "add 5 again",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"userId\":5}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "40"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"admins\":[1,5],\"added\":false}"
+      },
+      "log": [
+        "INFO Server: HTTP admin add: 5 (2 now)"
+      ]
+    },
+    {
+      "name": "add zero",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"userId\":0}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"请检查是否传入了错误的格式\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "add negative",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"userId\":-3}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"请检查是否传入了错误的格式\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "add missing",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"请检查是否传入了错误的格式\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "add no body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"请检查是否传入了错误的格式\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "add null",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"userId\":null}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"请检查是否传入了错误的格式\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "add text number",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"userId\":\"7\"}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "41"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"admins\":[1,5,7],\"added\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP admin add: 7 (3 now)"
+      ]
+    },
+    {
+      "name": "add as player",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"userId\":2}"
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要权限\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "remove not admin",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/admin/9",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "44"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"admins\":[1,5,7],\"removed\":false}"
+      },
+      "log": [
+        "INFO Server: HTTP admin remove: 9 (3 left)"
+      ]
+    },
+    {
+      "name": "remove 5",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/admin/5",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "41"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"admins\":[1,7],\"removed\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP admin remove: 5 (2 left)"
+      ]
+    },
+    {
+      "name": "user 5 after remove",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {user5}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要权限\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "remove 7",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/admin/7",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "39"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"admins\":[1],\"removed\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP admin remove: 7 (1 left)"
+      ]
+    },
+    {
+      "name": "remove not admin, one left",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/admin/9",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "51"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"至少保留一名管理员\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "remove last",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/admin/1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "51"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"至少保留一名管理员\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "remove bad id",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/admin/x",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "42"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"参数格式错误\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "list final",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "24"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"admins\":[1],\"ok\":true}"
+      },
+      "log": []
+    }
+  ]
+}

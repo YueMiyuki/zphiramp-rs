@@ -1,0 +1,3 @@
+INFO Imported pools (3 rows, merge=true), previous copy at data/backups/pools-20261115-003315-178.json
+WARN Pool 4 is empty, rooms will skip it
+INFO Imported pools (2 rows, merge=false), previous copy at data/backups/pools-20261115-003315-186.json

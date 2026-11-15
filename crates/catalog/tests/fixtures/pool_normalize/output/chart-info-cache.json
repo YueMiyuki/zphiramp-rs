@@ -1,0 +1,110 @@
+{
+  "99": {
+    "id": 99,
+    "name": "Ninety-nine",
+    "level": "AT Lv.17",
+    "difficulty": 1.0E7,
+    "charter": "ch99",
+    "ranked": false,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/99",
+    "uploader": 1,
+    "tags": [
+      "plain"
+    ],
+    "rating": 1.0E-4,
+    "ratingCount": 0,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z",
+    "duration_seconds": 361
+  },
+  "30474": {
+    "id": 30474,
+    "name": "Spe\u003cc\u003eial \u0026 \u0027q\u0027 \u003d \"x\" 测试曲",
+    "level": "AT Lv.17",
+    "difficulty": 17.5,
+    "charter": "ch30474",
+    "ranked": true,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/30474",
+    "uploader": 3,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.93999,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z",
+    "duration_seconds": 400
+  },
+  "33530": {
+    "id": 33530,
+    "name": "Third",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch33530",
+    "ranked": true,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/33530",
+    "uploader": 0,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.84,
+    "ratingCount": 5,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z",
+    "duration_seconds": 359
+  },
+  "42058": {
+    "id": 42058,
+    "name": "Second\u2028line",
+    "level": "AT Lv.17",
+    "difficulty": 16.9,
+    "charter": "ch42058",
+    "ranked": true,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/42058",
+    "uploader": 2,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.85,
+    "ratingCount": 5,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  },
+  "52087": {
+    "id": 52087,
+    "name": "Fourth",
+    "level": "AT Lv.17",
+    "difficulty": 15.5,
+    "charter": "ch52087",
+    "ranked": false,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/52087",
+    "uploader": 0,
+    "tags": [
+      "plain"
+    ],
+    "rating": 0.91,
+    "ratingCount": 12,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  }
+}

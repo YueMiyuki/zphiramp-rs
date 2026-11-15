@@ -1,0 +1,1 @@
+INFO Chart index refreshed: 2 charts (division=plain)

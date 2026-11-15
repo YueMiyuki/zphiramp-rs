@@ -1,0 +1,16 @@
+INFO Created 2 empty TB pools: [21, 22]
+INFO Created 1 empty null pools: [23]
+INFO Generated 4 REGULAR pools from 8 charts (sizeLimit=2)
+INFO Generated 1 TB pools from 2 charts (sizeLimit=15)
+WARN Pool 21 is empty, rooms will skip it
+WARN Pool 22 is empty, rooms will skip it
+WARN Pool 23 is empty, rooms will skip it
+WARN Pool 21 is empty, rooms will skip it
+WARN Pool 22 is empty, rooms will skip it
+WARN Pool 23 is empty, rooms will skip it
+WARN Pool 21 is empty, rooms will skip it
+WARN Pool 22 is empty, rooms will skip it
+WARN Pool 23 is empty, rooms will skip it
+WARN Pool 22 is empty, rooms will skip it
+WARN Pool 23 is empty, rooms will skip it
+WARN Pool 23 is empty, rooms will skip it

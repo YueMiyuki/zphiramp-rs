@@ -1,0 +1,122 @@
+{
+  "pools": [
+    {
+      "id": 1,
+      "default_flag": true,
+      "chart_ids": [
+        33530,
+        52087,
+        30474,
+        42058
+      ],
+      "category": "MANUAL",
+      "order": 0,
+      "submission_open": false
+    },
+    {
+      "id": 10,
+      "default_flag": false,
+      "chart_ids": [
+        30474,
+        42058
+      ],
+      "category": "CONFIGURED",
+      "size_limit": 9,
+      "rounds_per_stay": 5,
+      "order": 0,
+      "submission_open": true
+    },
+    {
+      "id": 21,
+      "default_flag": false,
+      "chart_ids": [],
+      "category": "TB",
+      "size_limit": 15,
+      "rounds_per_stay": 1,
+      "order": 30,
+      "submission_open": false
+    },
+    {
+      "id": 22,
+      "default_flag": false,
+      "chart_ids": [],
+      "category": "TB",
+      "size_limit": 15,
+      "rounds_per_stay": 1,
+      "order": 40,
+      "submission_open": false
+    },
+    {
+      "id": 23,
+      "default_flag": false,
+      "chart_ids": [],
+      "category": "MANUAL",
+      "order": 50,
+      "submission_open": false
+    },
+    {
+      "id": 24,
+      "default_flag": false,
+      "chart_ids": [
+        1000,
+        1001
+      ],
+      "category": "REGULAR",
+      "size_limit": 2,
+      "rounds_per_stay": 3,
+      "order": 60,
+      "submission_open": false
+    },
+    {
+      "id": 25,
+      "default_flag": false,
+      "chart_ids": [
+        30474,
+        1002
+      ],
+      "category": "REGULAR",
+      "size_limit": 2,
+      "rounds_per_stay": 3,
+      "order": 70,
+      "submission_open": false
+    },
+    {
+      "id": 26,
+      "default_flag": false,
+      "chart_ids": [
+        1003,
+        1004
+      ],
+      "category": "REGULAR",
+      "size_limit": 2,
+      "rounds_per_stay": 3,
+      "order": 80,
+      "submission_open": false
+    },
+    {
+      "id": 27,
+      "default_flag": false,
+      "chart_ids": [
+        1005,
+        1006
+      ],
+      "category": "REGULAR",
+      "size_limit": 2,
+      "rounds_per_stay": 3,
+      "order": 90,
+      "submission_open": false
+    },
+    {
+      "id": 28,
+      "default_flag": false,
+      "chart_ids": [
+        30474,
+        1003
+      ],
+      "category": "TB",
+      "size_limit": 15,
+      "order": 100,
+      "submission_open": false
+    }
+  ]
+}

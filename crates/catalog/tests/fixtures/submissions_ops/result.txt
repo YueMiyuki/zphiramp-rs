@@ -1,0 +1,18 @@
+submit1	1:true:null 2:true:null 3:true:null 2:false:你已经投过这张谱面
+submit2	2:true:null
+submit3	2:true:null
+approve	true
+approveMissing	false
+submitApproved	1:false:已经在该谱池里了
+reject	true
+submitRejected	3:true:null
+withdraw	true
+withdrawApproved	false
+withdrawMissing	false
+withdrawNotMine	false
+withdrawLast	true
+submitFull	9:false:这张谱面的投稿人数已达上限
+byPool0	0/1/APPROVED/[7=Alice]/99/null 0/2/PENDING/[8=Bob <&> "q"]/null/null 0/3/PENDING/[7=Alice, 9=Carol]/98/太短
+byPool0Pending	0/2/PENDING/[8=Bob <&> "q"]/null/null 0/3/PENDING/[7=Alice, 9=Carol]/98/太短
+pending	3
+bySubmitter8	0/2/PENDING/[8=Bob <&> "q"]/null/null

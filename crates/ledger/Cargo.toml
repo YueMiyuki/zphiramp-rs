@@ -1,0 +1,20 @@
+[package]
+name = "zphira-ledger"
+description = "Player points, round history and the admin list."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+serde = { version = "1.0.229", features = ["derive"] }
+tokio = { version = "1.54.1", features = ["rt", "time", "sync"] }
+tracing = "0.1.44"
+zphira-common = { path = "../common" }
+
+[dev-dependencies]
+tempfile = "3.27.0"
+tokio = { version = "1.54.1", features = ["rt", "rt-multi-thread", "macros", "time", "sync"] }

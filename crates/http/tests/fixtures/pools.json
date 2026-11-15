@@ -1,0 +1,3198 @@
+{
+  "scenario": "pools",
+  "exchanges": [
+    {
+      "name": "list",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "481"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"pools\":[{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},{\"id\":1,\"favoriteId\":42,\"default\":false,\"chartIds\":[1001],\"category\":\"CONFIGURED\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":20,\"submissionOpen\":false},{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "list as player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"需要权限\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "create: empty object",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "46"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"Pool already exists: 0\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "create: no body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "create: as player",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"id\":50}"
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"需要权限\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "create: full",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"id\":10,\"chartIds\":[1000,1002,1000],\"favoriteId\":77,\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP create pool: 10 charts=[1000, 1002, 1000]"
+      ]
+    },
+    {
+      "name": "create: unknown chart",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"id\":11,\"chartIds\":[900001]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "60"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"HTTP 404: {\\\"detail\\\":\\\"Not found\\\"}\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "create: lower-case category",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"id\":12,\"category\":\"regular\",\"chartIds\":null,\"favoriteId\":null}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP create pool: 12 charts=null"
+      ]
+    },
+    {
+      "name": "create: unknown category",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"id\":13,\"category\":\"bogus\"}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP create pool: 13 charts=null"
+      ]
+    },
+    {
+      "name": "create: id text",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"id\":\"x\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "create: id null",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"id\":null}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "create: chart ids with null",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"id\":14,\"chartIds\":[1004,null]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "136"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"Cannot invoke \\\"java.lang.Integer.intValue()\\\" because the return value of \\\"java.util.Iterator.next()\\\" is null\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "list after create",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "936"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"pools\":[{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},{\"id\":1,\"favoriteId\":42,\"default\":false,\"chartIds\":[1001],\"category\":\"CONFIGURED\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":20,\"submissionOpen\":false},{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},{\"id\":10,\"favoriteId\":null,\"default\":false,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":40,\"submissionOpen\":false},{\"id\":12,\"favoriteId\":null,\"default\":false,\"chartIds\":[],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":50,\"submissionOpen\":false},{\"id\":13,\"favoriteId\":null,\"default\":false,\"chartIds\":[],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":60,\"submissionOpen\":false}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "update: fields",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"category\":\"TB\",\"sizeLimit\":-1,\"roundsPerStay\":5,\"order\":-5,\"submissionOpen\":true}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP update pool 10: category=TB sizeLimit=-1 roundsPerStay=5 order=-5 submissionOpen=true"
+      ]
+    },
+    {
+      "name": "update: no body",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "update: unknown pool",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/999",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "43"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"Pool not found: 999\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "update: bad id",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/abc",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "42"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"参数格式错误\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "update: lower-case category",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"category\":\"configured\"}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP update pool 10: category=null sizeLimit=null roundsPerStay=null order=null submissionOpen=null"
+      ]
+    },
+    {
+      "name": "update: order huge",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"order\":2147483647}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP update pool 1: category=null sizeLimit=null roundsPerStay=null order=2147483647 submissionOpen=null"
+      ]
+    },
+    {
+      "name": "batch: ok",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/batch",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"count\":2,\"category\":\"CONFIGURED\",\"sizeLimit\":10}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "29"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"poolIds\":[14,15]}"
+      },
+      "log": [
+        "INFO Server: Created 2 empty CONFIGURED pools: [14, 15]"
+      ]
+    },
+    {
+      "name": "batch: zero",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/batch",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"count\":0}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "batch: too many",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/batch",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"count\":51}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "59"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"Pool count must be between 1 and 50\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "batch: no body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/batch",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "chart add: ok",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/10/chart",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartId\":1004}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP add chart 1004 to pool 10"
+      ]
+    },
+    {
+      "name": "chart add: unknown chart",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/10/chart",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartId\":900002}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "60"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"HTTP 404: {\\\"detail\\\":\\\"Not found\\\"}\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "chart add: unknown pool",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/999/chart",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartId\":1004}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "43"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"Pool not found: 999\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "chart add: no body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/10/chart",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "chart add: null id",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/10/chart",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartId\":null}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "charts add: ok",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/10/charts",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[1004,1006,1006]}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "21"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"added\":1}"
+      },
+      "log": [
+        "INFO Server: HTTP add 1 charts to pool 10 (requested 3)"
+      ]
+    },
+    {
+      "name": "charts add: empty",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/10/charts",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "charts add: missing",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/10/charts",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "charts add: one fails",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/10/charts",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[1008,900003]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "60"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"HTTP 404: {\\\"detail\\\":\\\"Not found\\\"}\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "charts add: unknown pool",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/999/charts",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[1008]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "43"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"Pool not found: 999\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "chart remove: ok",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/pool/10/chart/1004",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP remove chart 1004 from pool 10"
+      ]
+    },
+    {
+      "name": "chart remove: absent chart",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/pool/10/chart/1234",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP remove chart 1234 from pool 10"
+      ]
+    },
+    {
+      "name": "chart remove: bad id",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/pool/10/chart/abc",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "42"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"参数格式错误\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "chart remove: unknown pool",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/pool/999/chart/1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "43"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"Pool not found: 999\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "favorite: set",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":5}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP pool 10 favorite set to 5"
+      ]
+    },
+    {
+      "name": "favorite: null",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":null}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP pool 10 favorite set to null"
+      ]
+    },
+    {
+      "name": "favorite: missing key",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "favorite: no body",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "favorite: text",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":\"abc\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "favorite: numeric text",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":\"12\"}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP pool 10 favorite set to 12"
+      ]
+    },
+    {
+      "name": "favorite: fraction",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":5.7}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP pool 10 favorite set to 5"
+      ]
+    },
+    {
+      "name": "favorite: huge",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":1e10}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP pool 10 favorite set to 1410065408"
+      ]
+    },
+    {
+      "name": "favorite: one-element array",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":[8]}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP pool 10 favorite set to 8"
+      ]
+    },
+    {
+      "name": "favorite: bool",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":true}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "favorite: object",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":{}}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "favorite: array body",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "[1]"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "favorite: lenient",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{favoriteId:9}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP pool 10 favorite set to 9"
+      ]
+    },
+    {
+      "name": "favorite: trailing",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":9} x"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "favorite: unknown pool",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/999/favorite",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"favoriteId\":1}"
+      },
+      "response": {
+        "status": 500,
+        "reason": "Server Error",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"服务器内部错误\"}"
+      },
+      "log": [
+        "ERROR Server: HTTP API error on /api/v1/pool/999/favorite\n  java.lang.IllegalArgumentException: Pool not found: 999"
+      ]
+    },
+    {
+      "name": "default: on",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/default",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"enabled\":true}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP pool 10 default set to true"
+      ]
+    },
+    {
+      "name": "default: missing key",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/default",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP pool 10 default set to false"
+      ]
+    },
+    {
+      "name": "default: null",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/default",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"enabled\":null}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "default: text",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/default",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"enabled\":\"TRUE\"}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP pool 10 default set to true"
+      ]
+    },
+    {
+      "name": "default: no body",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/10/default",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "default: unknown pool",
+      "request": {
+        "method": "PUT",
+        "target": "/api/v1/pool/999/default",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"enabled\":true}"
+      },
+      "response": {
+        "status": 500,
+        "reason": "Server Error",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"服务器内部错误\"}"
+      },
+      "log": [
+        "ERROR Server: HTTP API error on /api/v1/pool/999/default\n  java.lang.IllegalArgumentException: Pool not found: 999"
+      ]
+    },
+    {
+      "name": "list after edits",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1267"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"pools\":[{\"id\":14,\"favoriteId\":null,\"default\":false,\"chartIds\":[],\"category\":\"CONFIGURED\",\"sizeLimit\":10,\"roundsPerStay\":null,\"order\":-2147483639,\"submissionOpen\":false},{\"id\":15,\"favoriteId\":null,\"default\":false,\"chartIds\":[],\"category\":\"CONFIGURED\",\"sizeLimit\":10,\"roundsPerStay\":null,\"order\":-2147483629,\"submissionOpen\":false},{\"id\":10,\"favoriteId\":9,\"default\":true,\"chartIds\":[1000,1002,1006,1008],\"category\":\"TB\",\"sizeLimit\":null,\"roundsPerStay\":5,\"order\":0,\"submissionOpen\":true},{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},{\"id\":12,\"favoriteId\":null,\"default\":false,\"chartIds\":[],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":50,\"submissionOpen\":false},{\"id\":13,\"favoriteId\":null,\"default\":false,\"chartIds\":[],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":60,\"submissionOpen\":false},{\"id\":1,\"favoriteId\":42,\"default\":false,\"chartIds\":[1001],\"category\":\"CONFIGURED\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":2147483647,\"submissionOpen\":false}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "remove: unknown",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/pool/11",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "42"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"Pool not found: 11\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "remove: bad id",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/pool/x",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "42"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"参数格式错误\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "remove: ok",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/pool/1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "WARN Server: Pool 12 is empty, rooms will skip it",
+        "WARN Server: Pool 13 is empty, rooms will skip it",
+        "WARN Server: Pool 14 is empty, rooms will skip it",
+        "WARN Server: Pool 15 is empty, rooms will skip it",
+        "INFO Server: HTTP remove pool: 1"
+      ]
+    },
+    {
+      "name": "remove: last default",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/pool/0",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "WARN Server: Pool 12 is empty, rooms will skip it",
+        "WARN Server: Pool 13 is empty, rooms will skip it",
+        "WARN Server: Pool 14 is empty, rooms will skip it",
+        "WARN Server: Pool 15 is empty, rooms will skip it",
+        "INFO Server: HTTP remove pool: 0"
+      ]
+    },
+    {
+      "name": "list final",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "951"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"pools\":[{\"id\":14,\"favoriteId\":null,\"default\":false,\"chartIds\":[],\"category\":\"CONFIGURED\",\"sizeLimit\":10,\"roundsPerStay\":null,\"order\":-2147483639,\"submissionOpen\":false},{\"id\":15,\"favoriteId\":null,\"default\":false,\"chartIds\":[],\"category\":\"CONFIGURED\",\"sizeLimit\":10,\"roundsPerStay\":null,\"order\":-2147483629,\"submissionOpen\":false},{\"id\":10,\"favoriteId\":9,\"default\":true,\"chartIds\":[1000,1002,1006,1008],\"category\":\"TB\",\"sizeLimit\":null,\"roundsPerStay\":5,\"order\":0,\"submissionOpen\":true},{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},{\"id\":12,\"favoriteId\":null,\"default\":false,\"chartIds\":[],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":50,\"submissionOpen\":false},{\"id\":13,\"favoriteId\":null,\"default\":false,\"chartIds\":[],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":60,\"submissionOpen\":false}]}"
+      },
+      "log": []
+    }
+  ]
+}

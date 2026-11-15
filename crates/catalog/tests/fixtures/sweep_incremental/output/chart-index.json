@@ -1,0 +1,109 @@
+{
+  "1": {
+    "id": 1,
+    "name": "P1",
+    "level": "AT Lv.17",
+    "difficulty": 3.0,
+    "charter": "ch1",
+    "ranked": false,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/1",
+    "uploader": 1,
+    "tags": [
+      "plain"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z",
+    "duration_seconds": 200
+  },
+  "10": {
+    "id": 10,
+    "name": "Ten v3",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch10",
+    "ranked": true,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/10",
+    "uploader": 3,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z",
+    "duration_seconds": 333
+  },
+  "11": {
+    "id": 11,
+    "name": "Eleven v2",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch11",
+    "ranked": false,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/11",
+    "uploader": 4,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  },
+  "20": {
+    "id": 20,
+    "name": "New",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch20",
+    "ranked": true,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/20",
+    "uploader": 6,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  },
+  "21": {
+    "id": 21,
+    "name": "New2",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch21",
+    "ranked": false,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/21",
+    "uploader": 0,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  }
+}

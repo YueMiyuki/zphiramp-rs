@@ -1,0 +1,53 @@
+[
+  {
+    "room_id": "alpha",
+    "pool_ids": [
+      1,
+      2
+    ],
+    "setting": {
+      "auto_destroy": false,
+      "host": false,
+      "max_player": 1000,
+      "locked": false,
+      "cycle": false,
+      "live": false,
+      "chat": true,
+      "min_player": 2,
+      "select_chart_countdown_seconds": 150,
+      "ready_countdown_seconds": 60,
+      "force_finish_seconds": 3600,
+      "refresh_interval_rounds": 5,
+      "admin_ids": [
+        9,
+        3
+      ]
+    },
+    "current_pool_id": 1,
+    "pending_pool_id": 2,
+    "finished_rounds": 0
+  },
+  {
+    "room_id": "zeta",
+    "pool_ids": [
+      1
+    ],
+    "setting": {
+      "auto_destroy": false,
+      "host": false,
+      "max_player": 1000,
+      "locked": false,
+      "cycle": false,
+      "live": false,
+      "chat": true,
+      "min_player": 2,
+      "select_chart_countdown_seconds": 150,
+      "ready_countdown_seconds": 60,
+      "force_finish_seconds": 3600,
+      "refresh_interval_rounds": 5,
+      "admin_ids": []
+    },
+    "current_pool_id": 1,
+    "finished_rounds": 0
+  }
+]

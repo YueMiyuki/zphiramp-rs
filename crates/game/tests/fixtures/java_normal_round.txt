@@ -1,0 +1,145 @@
+== A login
+Authenticate ok 100 Alice room=-
+> ————————————————————————————————————————
+> 欢迎加入 Zenith 音游战队 服务器！
+> 玩家：Alice（#100）
+> 当前积分：0，积分排名：#1
+> 输入房间名可创建或加入房间，房间名仅限字母、数字、-、_。
+> ————————————————————————————————————————
+== B login
+Authenticate ok 200 Bob room=-
+> ————————————————————————————————————————
+> 欢迎加入 Zenith 音游战队 服务器！
+> 玩家：Bob（#200）
+> 当前积分：0，积分排名：#2
+> 输入房间名可创建或加入房间，房间名仅限字母、数字、-、_。
+> ————————————————————————————————————————
+== A create
+CreateRoom ok
+> ————————————————————————————————————————
+> 当前积分：0，积分排名：#1
+> r1 本轮谱池 #1
+> 使用选谱操作投票，只能选择下列歌曲。票数最高者开局。
+> [0票] Alpha  |  Lv.IN 12  |  ID:1
+> [0票] Beta  |  Lv.AT 14  |  ID:2
+> ————————————————————————————————————————
+== B join
+OnJoinRoom 200 Bob
+msg JoinRoom 200 Bob
+> 欢迎 Bob（#200） 加入房间
+> ————————————————————————————————————————
+> 当前积分：0，积分排名：#2
+> r1 本轮谱池 #1
+> 使用选谱操作投票，只能选择下列歌曲。票数最高者开局。
+> [0票] Alpha  |  Lv.IN 12  |  ID:1
+> [0票] Beta  |  Lv.AT 14  |  ID:2
+> ————————————————————————————————————————
+> 已达到开局人数，150 秒后锁定投票并进入准备阶段。人数不足会取消倒计时。
+JoinRoom ok SelectChart [100,200] live=false
+host true
+> 房间玩法：选谱阶段投票 → 准备阶段 → 游戏，票数最高者开局。
+> 投票仅限当前谱池，重复投票会改票，观战者不能投票。
+> 当前积分：0，积分排名：#2
+== A on B join
+OnJoinRoom 200 Bob
+msg JoinRoom 200 Bob
+> 欢迎 Bob（#200） 加入房间
+> 已达到开局人数，150 秒后锁定投票并进入准备阶段。人数不足会取消倒计时。
+== A vote
+> Alice 已投票：Alpha | Lv.IN 12 | ID:1
+msg SelectChart 100 Alpha 1
+state SelectChart(1)
+> 点击锁定房间按钮查看当前谱池状态。
+SelectChart ok
+== B on A vote
+> Alice 已投票：Alpha | Lv.IN 12 | ID:1
+msg SelectChart 100 Alpha 1
+state SelectChart(1)
+> 点击锁定房间按钮查看当前谱池状态。
+== B vote
+> Bob 已投票：Alpha | Lv.IN 12 | ID:1
+msg SelectChart 100 Alpha 1
+state SelectChart(1)
+> 点击锁定房间按钮查看当前谱池状态。
+> 全员已投票，倒计时缩短为 10 秒，锁定前仍可改票。
+SelectChart ok
+== A on B vote
+> Bob 已投票：Alpha | Lv.IN 12 | ID:1
+msg SelectChart 100 Alpha 1
+state SelectChart(1)
+> 点击锁定房间按钮查看当前谱池状态。
+> 全员已投票，倒计时缩短为 10 秒，锁定前仍可改票。
+== A countdown
+> 投票锁定倒计时：5 秒
+> 投票锁定倒计时：3 秒
+> 投票锁定倒计时：2 秒
+> 投票锁定倒计时：1 秒
+> 本轮曲目已锁定，无法继续改票。
+> ————————————————————————————————————————
+state SelectChart(1)
+> 投票结束，本轮曲目：Alpha | Lv.IN 12 | ID:1
+state WaitForReady
+> 进入准备阶段：请在 60 秒内准备。未准备玩家将作为观战跳过本轮。
+> 准备倒计时：60 秒。
+== B countdown
+> 投票锁定倒计时：5 秒
+> 投票锁定倒计时：3 秒
+> 投票锁定倒计时：2 秒
+> 投票锁定倒计时：1 秒
+> 本轮曲目已锁定，无法继续改票。
+> ————————————————————————————————————————
+state SelectChart(1)
+> 投票结束，本轮曲目：Alpha | Lv.IN 12 | ID:1
+state WaitForReady
+> 进入准备阶段：请在 60 秒内准备。未准备玩家将作为观战跳过本轮。
+> 准备倒计时：60 秒。
+== A ready
+msg Ready 100
+Ready ok
+== B on A ready
+msg Ready 100
+== B ready
+msg Ready 200
+state Playing
+msg StartPlaying
+Ready ok
+== A on B ready
+msg Ready 200
+state Playing
+msg StartPlaying
+== A played
+> [100] Alice 的分数: 990000, 准度: 98.765396%, 误差: ±12.3456ms, 无暇度分数: 95.5\n    Perfect: 100, Good: 2, Bad: 1, Miss: 0\n
+host true
+state SelectChart(1)
+Played ok
+== B on A played
+> [100] Alice 的分数: 990000, 准度: 98.765396%, 误差: ±12.3456ms, 无暇度分数: 95.5\n    Perfect: 100, Good: 2, Bad: 1, Miss: 0\n
+== B played
+> [200] Bob 的分数: 950000, 准度: 99.299995%, 误差: ±7.1ms, 无暇度分数: 90.5\n    Perfect: 100, Good: 2, Bad: 1, Miss: 0\n
+host true
+state SelectChart(1)
+> ————————————————————————————————————————
+> 本轮排名
+> 1. Alice - 分数: 990000, 准度: 98.765396%, 误差: ±12.3456ms, 积分: +100, 总积分: 100
+> 2. Bob - 分数: 950000, 准度: 99.299995%, 误差: ±7.1ms, 积分: +75, 总积分: 75
+> ————————————————————————————————————————
+host true
+msg GameEnd
+state SelectChart
+> 当前谱池 #1 已进行 1/5 轮。
+> 点击锁定房间按钮查看当前谱池状态。
+> 已达到开局人数，150 秒后锁定投票并进入准备阶段。人数不足会取消倒计时。
+Played ok
+== A on B played
+> [200] Bob 的分数: 950000, 准度: 99.299995%, 误差: ±7.1ms, 无暇度分数: 90.5\n    Perfect: 100, Good: 2, Bad: 1, Miss: 0\n
+> ————————————————————————————————————————
+> 本轮排名
+> 1. Alice - 分数: 990000, 准度: 98.765396%, 误差: ±12.3456ms, 积分: +100, 总积分: 100
+> 2. Bob - 分数: 950000, 准度: 99.299995%, 误差: ±7.1ms, 积分: +75, 总积分: 75
+> ————————————————————————————————————————
+host true
+msg GameEnd
+state SelectChart
+> 当前谱池 #1 已进行 1/5 轮。
+> 点击锁定房间按钮查看当前谱池状态。
+> 已达到开局人数，150 秒后锁定投票并进入准备阶段。人数不足会取消倒计时。

@@ -1,0 +1,10 @@
+null_pools	ok 0:0:MANUAL:true:[30474, 42058] 1:0:MANUAL:false:[33530, 52087]
+empty_file	ok 0:0:MANUAL:true:[30474, 42058] 1:0:MANUAL:false:[33530, 52087]
+null_doc	ok 0:0:MANUAL:true:[30474, 42058] 1:0:MANUAL:false:[33530, 52087]
+empty_object	IllegalStateException: No chart pools configured
+empty_list	IllegalStateException: No chart pools configured
+only_null_rows	IllegalStateException: No chart pools configured
+truncated	JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated string at line 1 column 54 path $.pools[1].id\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json
+bad_chart_id	JsonSyntaxException: java.lang.NumberFormatException: For input string: "x"
+null_chart_id	NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "java.util.Iterator.next()" is null
+string_numbers	ok 12:3:MANUAL:true:[30474, 42058]

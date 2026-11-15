@@ -1,0 +1,408 @@
+{
+  "scenario": "static_missing",
+  "exchanges": [
+    {
+      "name": "root",
+      "request": {
+        "method": "GET",
+        "target": "/",
+        "headers": []
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "text/html;charset=utf-8"
+          ],
+          [
+            "Content-Length",
+            "9"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "Not Found"
+      },
+      "log": []
+    },
+    {
+      "name": "index.html",
+      "request": {
+        "method": "GET",
+        "target": "/index.html",
+        "headers": []
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "text/plain"
+          ],
+          [
+            "Content-Length",
+            "9"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "Not Found"
+      },
+      "log": []
+    },
+    {
+      "name": "room fallback",
+      "request": {
+        "method": "GET",
+        "target": "/room/x",
+        "headers": []
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "text/html;charset=utf-8"
+          ],
+          [
+            "Content-Length",
+            "9"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "Not Found"
+      },
+      "log": []
+    },
+    {
+      "name": "pool fallback",
+      "request": {
+        "method": "GET",
+        "target": "/pool/1",
+        "headers": []
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "text/html;charset=utf-8"
+          ],
+          [
+            "Content-Length",
+            "9"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "Not Found"
+      },
+      "log": []
+    },
+    {
+      "name": "other route",
+      "request": {
+        "method": "GET",
+        "target": "/records",
+        "headers": []
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "text/html;charset=utf-8"
+          ],
+          [
+            "Content-Length",
+            "9"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "Not Found"
+      },
+      "log": []
+    },
+    {
+      "name": "asset with extension",
+      "request": {
+        "method": "GET",
+        "target": "/missing.js",
+        "headers": []
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "text/plain"
+          ],
+          [
+            "Content-Length",
+            "9"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "Not Found"
+      },
+      "log": []
+    },
+    {
+      "name": "nested asset",
+      "request": {
+        "method": "GET",
+        "target": "/_next/static/chunks/app.js",
+        "headers": []
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "text/plain"
+          ],
+          [
+            "Content-Length",
+            "9"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "Not Found"
+      },
+      "log": []
+    },
+    {
+      "name": "api path",
+      "request": {
+        "method": "GET",
+        "target": "/api/x",
+        "headers": []
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "text/plain"
+          ],
+          [
+            "Content-Length",
+            "9"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "Not Found"
+      },
+      "log": []
+    },
+    {
+      "name": "api v1 unknown",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/nope",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "text/plain"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "9"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "Not Found"
+      },
+      "log": []
+    },
+    {
+      "name": "traversal",
+      "request": {
+        "method": "GET",
+        "target": "//etc/passwd",
+        "headers": []
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "text/plain"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "Bad Request"
+      },
+      "log": []
+    },
+    {
+      "name": "HEAD root",
+      "request": {
+        "method": "HEAD",
+        "target": "/",
+        "headers": []
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "text/plain"
+          ],
+          [
+            "Content-Length",
+            "0"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": ""
+      },
+      "log": []
+    },
+    {
+      "name": "root accept json",
+      "request": {
+        "method": "GET",
+        "target": "/",
+        "headers": [
+          [
+            "Accept",
+            "application/json"
+          ]
+        ]
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "text/html;charset=utf-8"
+          ],
+          [
+            "Content-Length",
+            "9"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "Not Found"
+      },
+      "log": []
+    },
+    {
+      "name": "api still works",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "24"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"admins\":[1],\"ok\":true}"
+      },
+      "log": []
+    }
+  ]
+}

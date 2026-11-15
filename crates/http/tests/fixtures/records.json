@@ -1,0 +1,1427 @@
+{
+  "scenario": "records",
+  "exchanges": [
+    {
+      "name": "list",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1142"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"total\":3,\"records\":[{\"id\":\"r1-1735689800000-3\",\"roomId\":\"r1\",\"chartId\":1003,\"chartName\":\"C1003\",\"startedAt\":1735689750000,\"finishedAt\":1735689800000,\"results\":[{\"playerId\":102,\"playerName\":\"Bob\\u003c\\u0026\\u003e\",\"rank\":1,\"score\":999999,\"accuracy\":1.0,\"std\":0.005,\"gainedPoints\":100,\"totalPoints\":120},{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":2,\"score\":800000,\"accuracy\":0.8999999761581421,\"std\":0.25,\"gainedPoints\":20,\"totalPoints\":120}]},{\"id\":\"r2-1735689700000-2\",\"roomId\":\"r2\",\"chartId\":1002,\"chartName\":null,\"startedAt\":1735689650000,\"finishedAt\":1735689700000,\"results\":[{\"playerId\":103,\"playerName\":\"Carol\",\"rank\":1,\"score\":500000,\"accuracy\":0.5,\"std\":1.0E-4,\"gainedPoints\":7,\"totalPoints\":7}]},{\"id\":\"r1-1735689600000-1\",\"roomId\":\"r1\",\"chartId\":1000,\"chartName\":\"C1000\",\"startedAt\":1735689500000,\"finishedAt\":1735689600000,\"results\":[{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":1,\"score\":998765,\"accuracy\":0.9876543,\"std\":0.012,\"gainedPoints\":100,\"totalPoints\":100},{\"playerId\":102,\"playerName\":\"Bob\\u003c\\u0026\\u003e\",\"rank\":2,\"score\":900000,\"accuracy\":0.95,\"std\":0.0,\"gainedPoints\":20,\"totalPoints\":20}]}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "list as player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"需要权限\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "list page",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/list?limit=1&offset=1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "306"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"total\":3,\"records\":[{\"id\":\"r2-1735689700000-2\",\"roomId\":\"r2\",\"chartId\":1002,\"chartName\":null,\"startedAt\":1735689650000,\"finishedAt\":1735689700000,\"results\":[{\"playerId\":103,\"playerName\":\"Carol\",\"rank\":1,\"score\":500000,\"accuracy\":0.5,\"std\":1.0E-4,\"gainedPoints\":7,\"totalPoints\":7}]}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "list room",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/list?roomId=r1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "880"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"total\":3,\"records\":[{\"id\":\"r1-1735689800000-3\",\"roomId\":\"r1\",\"chartId\":1003,\"chartName\":\"C1003\",\"startedAt\":1735689750000,\"finishedAt\":1735689800000,\"results\":[{\"playerId\":102,\"playerName\":\"Bob\\u003c\\u0026\\u003e\",\"rank\":1,\"score\":999999,\"accuracy\":1.0,\"std\":0.005,\"gainedPoints\":100,\"totalPoints\":120},{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":2,\"score\":800000,\"accuracy\":0.8999999761581421,\"std\":0.25,\"gainedPoints\":20,\"totalPoints\":120}]},{\"id\":\"r1-1735689600000-1\",\"roomId\":\"r1\",\"chartId\":1000,\"chartName\":\"C1000\",\"startedAt\":1735689500000,\"finishedAt\":1735689600000,\"results\":[{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":1,\"score\":998765,\"accuracy\":0.9876543,\"std\":0.012,\"gainedPoints\":100,\"totalPoints\":100},{\"playerId\":102,\"playerName\":\"Bob\\u003c\\u0026\\u003e\",\"rank\":2,\"score\":900000,\"accuracy\":0.95,\"std\":0.0,\"gainedPoints\":20,\"totalPoints\":20}]}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "list player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/list?playerId=103",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "306"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"total\":3,\"records\":[{\"id\":\"r2-1735689700000-2\",\"roomId\":\"r2\",\"chartId\":1002,\"chartName\":null,\"startedAt\":1735689650000,\"finishedAt\":1735689700000,\"results\":[{\"playerId\":103,\"playerName\":\"Carol\",\"rank\":1,\"score\":500000,\"accuracy\":0.5,\"std\":1.0E-4,\"gainedPoints\":7,\"totalPoints\":7}]}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "list room and player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/list?roomId=r1&playerId=103",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"total\":3,\"records\":[]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "list limit zero",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/list?limit=0",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "467"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"total\":3,\"records\":[{\"id\":\"r1-1735689800000-3\",\"roomId\":\"r1\",\"chartId\":1003,\"chartName\":\"C1003\",\"startedAt\":1735689750000,\"finishedAt\":1735689800000,\"results\":[{\"playerId\":102,\"playerName\":\"Bob\\u003c\\u0026\\u003e\",\"rank\":1,\"score\":999999,\"accuracy\":1.0,\"std\":0.005,\"gainedPoints\":100,\"totalPoints\":120},{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":2,\"score\":800000,\"accuracy\":0.8999999761581421,\"std\":0.25,\"gainedPoints\":20,\"totalPoints\":120}]}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "list limit huge",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/list?limit=5000",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1142"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"total\":3,\"records\":[{\"id\":\"r1-1735689800000-3\",\"roomId\":\"r1\",\"chartId\":1003,\"chartName\":\"C1003\",\"startedAt\":1735689750000,\"finishedAt\":1735689800000,\"results\":[{\"playerId\":102,\"playerName\":\"Bob\\u003c\\u0026\\u003e\",\"rank\":1,\"score\":999999,\"accuracy\":1.0,\"std\":0.005,\"gainedPoints\":100,\"totalPoints\":120},{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":2,\"score\":800000,\"accuracy\":0.8999999761581421,\"std\":0.25,\"gainedPoints\":20,\"totalPoints\":120}]},{\"id\":\"r2-1735689700000-2\",\"roomId\":\"r2\",\"chartId\":1002,\"chartName\":null,\"startedAt\":1735689650000,\"finishedAt\":1735689700000,\"results\":[{\"playerId\":103,\"playerName\":\"Carol\",\"rank\":1,\"score\":500000,\"accuracy\":0.5,\"std\":1.0E-4,\"gainedPoints\":7,\"totalPoints\":7}]},{\"id\":\"r1-1735689600000-1\",\"roomId\":\"r1\",\"chartId\":1000,\"chartName\":\"C1000\",\"startedAt\":1735689500000,\"finishedAt\":1735689600000,\"results\":[{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":1,\"score\":998765,\"accuracy\":0.9876543,\"std\":0.012,\"gainedPoints\":100,\"totalPoints\":100},{\"playerId\":102,\"playerName\":\"Bob\\u003c\\u0026\\u003e\",\"rank\":2,\"score\":900000,\"accuracy\":0.95,\"std\":0.0,\"gainedPoints\":20,\"totalPoints\":20}]}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "get",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/r1-1735689600000-1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "433"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"record\":{\"id\":\"r1-1735689600000-1\",\"roomId\":\"r1\",\"chartId\":1000,\"chartName\":\"C1000\",\"startedAt\":1735689500000,\"finishedAt\":1735689600000,\"results\":[{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":1,\"score\":998765,\"accuracy\":0.9876543,\"std\":0.012,\"gainedPoints\":100,\"totalPoints\":100},{\"playerId\":102,\"playerName\":\"Bob\\u003c\\u0026\\u003e\",\"rank\":2,\"score\":900000,\"accuracy\":0.95,\"std\":0.0,\"gainedPoints\":20,\"totalPoints\":20}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "get no chart name",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/r2-1735689700000-2",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "282"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"record\":{\"id\":\"r2-1735689700000-2\",\"roomId\":\"r2\",\"chartId\":1002,\"chartName\":null,\"startedAt\":1735689650000,\"finishedAt\":1735689700000,\"results\":[{\"playerId\":103,\"playerName\":\"Carol\",\"rank\":1,\"score\":500000,\"accuracy\":0.5,\"std\":1.0E-4,\"gainedPoints\":7,\"totalPoints\":7}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "get missing",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/nope",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "39"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"记录不存在\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "get as player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/nope",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"需要权限\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/player/101",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "557"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"playerId\":101,\"rounds\":[{\"recordId\":\"r1-1735689800000-3\",\"roomId\":\"r1\",\"chartId\":1003,\"chartName\":\"C1003\",\"finishedAt\":1735689800000,\"result\":{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":2,\"score\":800000,\"accuracy\":0.8999999761581421,\"std\":0.25,\"gainedPoints\":20,\"totalPoints\":120}},{\"recordId\":\"r1-1735689600000-1\",\"roomId\":\"r1\",\"chartId\":1000,\"chartName\":\"C1000\",\"finishedAt\":1735689600000,\"result\":{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":1,\"score\":998765,\"accuracy\":0.9876543,\"std\":0.012,\"gainedPoints\":100,\"totalPoints\":100}}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "player limit",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/player/101?limit=1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "306"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"playerId\":101,\"rounds\":[{\"recordId\":\"r1-1735689800000-3\",\"roomId\":\"r1\",\"chartId\":1003,\"chartName\":\"C1003\",\"finishedAt\":1735689800000,\"result\":{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":2,\"score\":800000,\"accuracy\":0.8999999761581421,\"std\":0.25,\"gainedPoints\":20,\"totalPoints\":120}}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "player limit zero",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/player/101?limit=0",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "306"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"playerId\":101,\"rounds\":[{\"recordId\":\"r1-1735689800000-3\",\"roomId\":\"r1\",\"chartId\":1003,\"chartName\":\"C1003\",\"finishedAt\":1735689800000,\"result\":{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":2,\"score\":800000,\"accuracy\":0.8999999761581421,\"std\":0.25,\"gainedPoints\":20,\"totalPoints\":120}}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "player unknown",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/player/999",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "49"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"playerId\":999,\"rounds\":[]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "player bad id",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/player/x?limit=y",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "42"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"参数格式错误\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "player bad limit",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/player/101?limit=y",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "50"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"参数格式错误：limit\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "ranking",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/point/ranking",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "248"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"ranking\":[{\"playerId\":101,\"name\":\"Alice\",\"points\":120,\"rank\":1},{\"playerId\":102,\"name\":\"Bob\\u003c\\u0026\\u003e\",\"points\":120,\"rank\":2},{\"playerId\":103,\"name\":\"Carol\",\"points\":7,\"rank\":3},{\"playerId\":104,\"name\":null,\"points\":0,\"rank\":4}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "ranking limit",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/point/ranking?limit=2",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "147"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"ranking\":[{\"playerId\":101,\"name\":\"Alice\",\"points\":120,\"rank\":1},{\"playerId\":102,\"name\":\"Bob\\u003c\\u0026\\u003e\",\"points\":120,\"rank\":2}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "ranking as player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/point/ranking",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"需要权限\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "login: ok",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/login",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"email\":\"user1@x\",\"password\":\"right\"}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "223"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"isAdmin\":true,\"ok\":true,\"phira_token\":\"phira-token-1\",\"userId\":1,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNzk0Njc2NzAyLCJleHAiOjE3OTQ3NjMxMDJ9.qZ5yt3kaN9W7HPesPiYqS2ZCHAuAsCLOs-wChy82JtI\"}"
+      },
+      "log": [
+        "INFO Server: HTTP login: user 1 isAdmin=true"
+      ]
+    },
+    {
+      "name": "login: player",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/login",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"email\":\"user2@x\",\"password\":\"right\"}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "226"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"isAdmin\":false,\"ok\":true,\"phira_token\":\"phira-token-2\",\"userId\":2,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc5NDY3NjcwMiwiZXhwIjoxNzk0NzYzMTAyfQ.SIof89u36Idui3Va625CdW11PCbvnKrO47waFbg9T4c\"}"
+      },
+      "log": [
+        "INFO Server: HTTP login: user 2 isAdmin=false"
+      ]
+    },
+    {
+      "name": "login: wrong password",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/login",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"email\":\"user1@x\",\"password\":\"wrong\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"登录失败，请检查邮箱与密码\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "login: missing password",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/login",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"email\":\"user1@x\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "login: no body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/login",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "login: bad body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/login",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "[]"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "login: no token from phira",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/login",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"email\":\"notoken@x\",\"password\":\"right\"}"
+      },
+      "response": {
+        "status": 500,
+        "reason": "Server Error",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"服务器内部错误\"}"
+      },
+      "log": [
+        "INFO Server: HTTP login: user 9 isAdmin=false",
+        "ERROR Server: HTTP API error on /api/v1/login\n  java.lang.NullPointerException: null"
+      ]
+    },
+    {
+      "name": "login: empty answer from phira",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/login",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"email\":\"empty@x\",\"password\":\"right\"}"
+      },
+      "response": {
+        "status": 500,
+        "reason": "Server Error",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"服务器内部错误\"}"
+      },
+      "log": [
+        "ERROR Server: HTTP API error on /api/v1/login\n  java.lang.NullPointerException: Cannot invoke \"top.rymc.phira.main.util.PhiraFetcher$LoginResult.id()\" because \"result\" is null"
+      ]
+    },
+    {
+      "name": "login: html answer from phira",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/login",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"email\":\"html@x\",\"password\":\"right\"}"
+      },
+      "response": {
+        "status": 500,
+        "reason": "Server Error",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"服务器内部错误\"}"
+      },
+      "log": [
+        "ERROR Server: HTTP API error on /api/v1/login\n  com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_OBJECT but was STRING at line 1 column 1 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#unexpected-json-structure"
+      ]
+    },
+    {
+      "name": "login: with stale token",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/login",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Authorization",
+            "Bearer junk"
+          ]
+        ],
+        "body": "{\"email\":\"user2@x\",\"password\":\"right\"}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "226"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"isAdmin\":false,\"ok\":true,\"phira_token\":\"phira-token-2\",\"userId\":2,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTc5NDY3NjcwNiwiZXhwIjoxNzk0NzYzMTA2fQ.BovcVs7Qq7pTicq1YMKp9RrD0k7orehkMQBWJE3LuyU\"}"
+      },
+      "log": [
+        "INFO Server: HTTP login: user 2 isAdmin=false"
+      ]
+    }
+  ]
+}

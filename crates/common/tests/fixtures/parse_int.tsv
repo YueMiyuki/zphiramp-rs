@@ -1,0 +1,41 @@
+	ERR For input string: ""	ERR For input string: ""	false
+0	0	0	false
+-0	0	0	false
++0	0	0	false
+5	5	5	false
++5	5	5	false
+-5	-5	-5	false
+05	5	5	false
+2147483647	2147483647	2147483647	false
+2147483648	ERR For input string: "2147483648"	2147483648	false
+-2147483648	-2147483648	-2147483648	false
+-2147483649	ERR For input string: "-2147483649"	-2147483649	false
+9223372036854775807	ERR For input string: "9223372036854775807"	9223372036854775807	false
+9223372036854775808	ERR For input string: "9223372036854775808"	ERR For input string: "9223372036854775808"	false
+-9223372036854775808	ERR For input string: "-9223372036854775808"	-9223372036854775808	false
+-9223372036854775809	ERR For input string: "-9223372036854775809"	ERR For input string: "-9223372036854775809"	false
+1.0	ERR For input string: "1.0"	ERR For input string: "1.0"	false
+1e3	ERR For input string: "1e3"	ERR For input string: "1e3"	false
+ 5	ERR For input string: " 5"	ERR For input string: " 5"	false
+5 	ERR For input string: "5 "	ERR For input string: "5 "	false
++	ERR For input string: "+"	ERR For input string: "+"	false
+-	ERR For input string: "-"	ERR For input string: "-"	false
+--5	ERR For input string: "--5"	ERR For input string: "--5"	false
++-5	ERR For input string: "+-5"	ERR For input string: "+-5"	false
+٥	5	5	false
+１２	12	12	false
+໐	0	0	false
+꩙	9	9	false
+𝟓	ERR For input string: "𝟓"	ERR For input string: "𝟓"	false
+0x10	ERR For input string: "0x10"	ERR For input string: "0x10"	false
+abc	ERR For input string: "abc"	ERR For input string: "abc"	false
+12a	ERR For input string: "12a"	ERR For input string: "12a"	false
+99999999999999999999999	ERR For input string: "99999999999999999999999"	ERR For input string: "99999999999999999999999"	false
+true	ERR For input string: "true"	ERR For input string: "true"	true
+TRUE	ERR For input string: "TRUE"	ERR For input string: "TRUE"	true
+tRuE	ERR For input string: "tRuE"	ERR For input string: "tRuE"	true
+ true	ERR For input string: " true"	ERR For input string: " true"	false
+true 	ERR For input string: "true "	ERR For input string: "true "	false
+false	ERR For input string: "false"	ERR For input string: "false"	false
+yes	ERR For input string: "yes"	ERR For input string: "yes"	false
+1	1	1	false

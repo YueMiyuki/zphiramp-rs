@@ -1,0 +1,79 @@
+list_initial	[]
+file_created	[]
+add	true	true	true	false
+list_after_add	[3, 5, 9]
+file_after_add	[\n  3,\n  5,\n  9\n]
+remove	true	false	false
+list_after_remove	[3, 9]
+is_admin	true	false
+list_odd_ids	[-2, 0, 3, 9, 2147483647]
+file_odd_ids	[\n  -2,\n  0,\n  3,\n  9,\n  2147483647\n]
+import_base	admins replace	[1,2,3]	OK	3	3
+state_base	[1, 2, 3]
+import_base	admins replace	[1,2,3]	OK	3	3
+import_merge_overlap	admins merge	[3,4]	OK	4	4
+state_merge_overlap	[1, 2, 3, 4]
+import_base	admins replace	[1,2,3]	OK	3	3
+import_replace_small	admins replace	[7]	OK	1	1
+state_replace_small	[7]
+import_base	admins replace	[1,2,3]	OK	3	3
+import_replace_dups	admins replace	[7,7,8]	OK	3	3
+state_replace_dups	[7, 8]
+import_base	admins replace	[1,2,3]	OK	3	3
+import_merge_float_dup	admins merge	[1.0,4]	OK	5	5
+state_merge_float_dup	[1, 2, 3, 4]
+import_base	admins replace	[1,2,3]	OK	3	3
+import_merge_dups	admins merge	[5,5]	OK	5	5
+state_merge_dups	[1, 2, 3, 5]
+import_base	admins replace	[1,2,3]	OK	3	3
+import_replace_string	admins replace	["9"]	OK	1	1
+state_replace_string	[9]
+import_base	admins replace	[1,2,3]	OK	3	3
+import_replace_empty	admins replace	[]	OK	0	0
+state_replace_empty	[]
+import_base	admins replace	[1,2,3]	OK	3	3
+import_merge_into_empty	admins merge	[2,1]	OK	3	3
+state_merge_into_empty	[1, 2, 3]
+import_base	admins replace	[1,2,3]	OK	3	3
+import_replace_float_frac	admins replace	[1.5]	OK	1	1
+state_replace_float_frac	[1, 2, 3]
+import_base	admins replace	[1,2,3]	OK	3	3
+import_replace_null_elem	admins replace	[null]	ERR java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because "<local3>[<local5>]" is null
+state_replace_null_elem	[1, 2, 3]
+import_base	admins replace	[1,2,3]	OK	3	3
+import_replace_bool	admins replace	[true]	OK	1	1
+state_replace_bool	[1, 2, 3]
+import_base	admins replace	[7]	OK	1	1
+load_empty_file		OK []
+import_base	admins replace	[7]	OK	1	1
+load_null_doc	null	OK []
+import_base	admins replace	[7]	OK	1	1
+load_empty_arr	[]	OK []
+import_base	admins replace	[7]	OK	1	1
+load_unsorted	[3,1,2]	OK [1, 2, 3]
+import_base	admins replace	[7]	OK	1	1
+load_dups	[1,1]	OK [1]
+import_base	admins replace	[7]	OK	1	1
+load_string	["5"]	OK [5]
+import_base	admins replace	[7]	OK	1	1
+load_float_int	[5.0]	OK [5]
+import_base	admins replace	[7]	OK	1	1
+load_float_frac	[5.5]	OK [7]
+import_base	admins replace	[7]	OK	1	1
+load_null_elem	[null]	ERR java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because "<local3>[<local5>]" is null | still [7]
+import_base	admins replace	[7]	OK	1	1
+load_bool	[true]	OK [7]
+import_base	admins replace	[7]	OK	1	1
+load_object	{}	OK [7]
+import_base	admins replace	[7]	OK	1	1
+load_string_top	"x"	OK [7]
+import_base	admins replace	[7]	OK	1	1
+load_truncated	[1,2	OK [7]
+import_base	admins replace	[7]	OK	1	1
+load_missing_comma	[1 2]	OK [7]
+import_base	admins replace	[7]	OK	1	1
+load_overflow	[2147483648]	OK [7]
+import_base	admins replace	[7]	OK	1	1
+load_trailing_garbage	[1] x	OK [7]
+import_base	admins replace	[7]	OK	1	1
+load_unquoted_str	[abc]	OK [7]

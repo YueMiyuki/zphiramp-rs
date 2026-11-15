@@ -1,0 +1,85 @@
+	OK null	null
+ 	OK null	null
+\n\t 	OK null	null
+null	OK null	null
+null garbage	OK null	null
+nul	OK "nul"	"nul"
+{}	OK {}	{}
+[]	OK []	[]
+1	OK 1	1
+-0	OK -0	-0
+1.50	OK 1.50	1.50
+1e5	OK 1e5	1e5
+01	OK "01"	"01"
+-	OK "-"	"-"
+"x"	OK "x"	"x"
+'x'	OK "x"	"x"
+x	OK "x"	"x"
+not-json	OK "not-json"	"not-json"
+true	OK true	true
+TRUE	OK true	true
+tRuE	OK true	true
+True	OK true	true
+NULL	OK null	null
+nullx	OK "nullx"	"nullx"
+{} {}	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1 column 5 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+{} x	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1 column 5 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+{} }	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1 column 5 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+[1,]	OK [1,null]	[\n  1,\n  null\n]
+[,]	OK [null,null]	[\n  null,\n  null\n]
+[1,,2]	OK [1,null,2]	[\n  1,\n  null,\n  2\n]
+[1;2]	OK [1,2]	[\n  1,\n  2\n]
+{a:1}	OK {"a":1}	{\n  "a": 1\n}
+{'a':1}	OK {"a":1}	{\n  "a": 1\n}
+{"a"=1}	OK {"a":1}	{\n  "a": 1\n}
+{"a"=>1}	OK {"a":1}	{\n  "a": 1\n}
+{"a":1;"b":2}	OK {"a":1,"b":2}	{\n  "a": 1,\n  "b": 2\n}
+{"a":1,}	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Expected name at line 1 column 9 path $.a\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+{"a":1,"a":2,"b":3}	OK {"a":2,"b":3}	{\n  "a": 2,\n  "b": 3\n}
+// c\n{"a":1}	OK {"a":1}	{\n  "a": 1\n}
+# c\n[1]	OK [1]	[\n  1\n]
+/* c */ [1]	OK [1]	[\n  1\n]
+/* c [1]	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated comment at line 1 column 8 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+[1] // trailing	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1 column 6 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+[1] /* x	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 1 column 6 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+)]}'\n[1]	OK [1]	[\n  1\n]
+﻿[1]	OK [1]	[\n  1\n]
+{"a":"\\u0041\\n\\/\\'"}	OK {"a":"A\\n/'"}	{\n  "a": "A\\n/\\u0027"\n}
+"\\x"	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Invalid escape sequence at line 1 column 4 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+"\\u12"	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated escape sequence at line 1 column 4 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+"\\u12G4"	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Malformed Unicode escape \\u12G4 at line 1 column 4 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+"unterminated	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated string at line 1 column 14 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+[1, 2	ERR com.google.gson.JsonSyntaxException: java.io.EOFException: End of input at line 1 column 6 path $[2]	
+{"a":	ERR com.google.gson.JsonSyntaxException: java.io.EOFException: End of input at line 1 column 6 path $.a	
+{"a" 1}	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Expected ':' at line 1 column 7 path $.a\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+{,}	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Expected name at line 1 column 2 path $.\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+{"a":1 "b":2}	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated object at line 1 column 9 path $.a\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+["a" "b"]	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated array at line 1 column 7 path $[1]\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+{1:2}	OK {"1":2}	{\n  "1": 2\n}
+{"a":{"b":[1,{"c":nul}]}}	OK {"a":{"b":[1,{"c":"nul"}]}}	{\n  "a": {\n    "b": [\n      1,\n      {\n        "c": "nul"\n      }\n    ]\n  }\n}
+"\\ud83d\\ude00"	OK "😀"	"😀"
+"\\ud83d"	OK "\ud83d"	"\ud83d"
+[1e400]	OK [1e400]	[\n  1e400\n]
+[-1.5e-3]	OK [-1.5e-3]	[\n  -1.5e-3\n]
+[123abc]	OK ["123abc"]	[\n  "123abc"\n]
+[1.5.3]	OK ["1.5.3"]	[\n  "1.5.3"\n]
+[NaN]	OK ["NaN"]	[\n  "NaN"\n]
+[-Infinity]	OK ["-Infinity"]	[\n  "-Infinity"\n]
+[0x10]	OK ["0x10"]	[\n  "0x10"\n]
+[+1]	OK ["+1"]	[\n  "+1"\n]
+[.5]	OK [".5"]	[\n  ".5"\n]
+[5.]	OK ["5."]	[\n  "5."\n]
+{"":1}	OK {"":1}	{\n  "": 1\n}
+{"a":[1,2],"b":{"c":null}}	OK {"a":[1,2],"b":{"c":null}}	{\n  "a": [\n    1,\n    2\n  ],\n  "b": {}\n}
+["\\u2028"]	OK ["\\u2028"]	[\n  "\\u2028"\n]
+"a\nb"	OK "a\\nb"	"a\\nb"
+{"a":1}\n\n x	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Use JsonReader.setStrictness(Strictness.LENIENT) to accept malformed JSON at line 3 column 3 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+[\n1,\n2\n,\n]	OK [1,2,null]	[\n  1,\n  2,\n  null\n]
+{"a":\n\n1\n,\n}	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Expected name at line 5 column 2 path $.a\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+[[[[[[[[[[1]]]]]]]]]]	OK [[[[[[[[[[1]]]]]]]]]]	[\n  [\n    [\n      [\n        [\n          [\n            [\n              [\n                [\n                  [\n                    1\n                  ]\n                ]\n              ]\n            ]\n          ]\n        ]\n      ]\n    ]\n  ]\n]
+{a b:1}	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Expected ':' at line 1 column 5 path $.a\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+{"a":b c}	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated object at line 1 column 9 path $.a\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+[a=b]	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated array at line 1 column 4 path $[1]\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json	
+["<&>='"]	OK ["<&>='"]	[\n  "\\u003c\\u0026\\u003e\\u003d\\u0027"\n]
+[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]	ERR com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Nesting limit 255 reached at line 1 column 257 path $[0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0]	
+[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]	OK 510	

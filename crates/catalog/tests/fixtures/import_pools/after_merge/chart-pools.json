@@ -1,0 +1,35 @@
+{
+  "pools": [
+    {
+      "id": 1,
+      "default_flag": false,
+      "chart_ids": [
+        30474
+      ],
+      "category": "TB",
+      "order": 4,
+      "submission_open": false
+    },
+    {
+      "id": 77,
+      "default_flag": false,
+      "chart_ids": [
+        42058
+      ],
+      "category": "MANUAL",
+      "order": 0,
+      "submission_open": false
+    },
+    {
+      "id": 0,
+      "default_flag": true,
+      "chart_ids": [
+        30474,
+        42058
+      ],
+      "category": "MANUAL",
+      "order": 0,
+      "submission_open": false
+    }
+  ]
+}

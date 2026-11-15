@@ -1,0 +1,1889 @@
+{
+  "scenario": "submissions",
+  "exchanges": [
+    {
+      "name": "open pools",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/submission/open-pools",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "173"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"pools\":[{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "open pools no auth",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/submission/open-pools",
+        "headers": []
+      },
+      "response": {
+        "status": 401,
+        "reason": "Unauthorized",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"需要登录\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "submit: mixed",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/2/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[1000,1001,1003,1000]}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "273"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"results\":[{\"chartId\":1000,\"accepted\":true,\"reason\":null},{\"chartId\":1001,\"accepted\":true,\"reason\":null},{\"chartId\":1003,\"accepted\":false,\"reason\":\"已经在该谱池里了\"},{\"chartId\":1000,\"accepted\":false,\"reason\":\"你已经投过这张谱面\"}],\"ok\":true,\"accepted\":2}"
+      },
+      "log": [
+        "INFO Server: HTTP submission: user 2 backed 4 chart(s) in pool 2 (accepted 2)"
+      ]
+    },
+    {
+      "name": "submit: again",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/2/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[1000]}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "109"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"results\":[{\"chartId\":1000,\"accepted\":false,\"reason\":\"你已经投过这张谱面\"}],\"ok\":true,\"accepted\":0}"
+      },
+      "log": [
+        "INFO Server: HTTP submission: user 2 backed 1 chart(s) in pool 2 (accepted 0)"
+      ]
+    },
+    {
+      "name": "submit: empty",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/2/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "submit: no body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/2/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "submit: too many",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/2/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "55"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"一次最多投稿 20 张谱面\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "submit: unknown pool",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/77/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[1000]}"
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "39"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"谱池不存在\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "submit: closed pool",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/1/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[1000]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "48"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"该谱池未开启投稿\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "submit: bad pool id",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/x/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[1000]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "42"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"参数格式错误\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "submit: chart not indexed",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/2/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[1002,424242]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "77"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"这些谱面不在索引里，无法投稿：[424242]\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "submit: chart unknown to phira",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/2/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[900005]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "77"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"这些谱面不在索引里，无法投稿：[900005]\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "submit: as user 5",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/2/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {user5}"
+          ]
+        ],
+        "body": "{\"chartIds\":[1002]}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "83"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"results\":[{\"chartId\":1002,\"accepted\":true,\"reason\":null}],\"ok\":true,\"accepted\":1}"
+      },
+      "log": [
+        "INFO Server: HTTP submission: user 5 backed 1 chart(s) in pool 2 (accepted 1)"
+      ]
+    },
+    {
+      "name": "mine",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/submission/mine",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1893"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"submissions\":[{\"poolId\":2,\"chartId\":1000,\"status\":\"PENDING\",\"chart\":{\"id\":1000,\"name\":\"Spe\\u003cc\\u003eial \\u0026 \\u0027q\\u0027 \\u003d \\\"x\\\" 测试曲\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1000\",\"composer\":\"comp1000\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1000.png\",\"preview\":null,\"file\":\"https://files.example/1000\",\"uploader\":6,\"tags\":[\"regular\"],\"rating\":0.95,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":1,\"submitters\":[{\"userId\":2,\"name\":\"player2\",\"at\":\"2026-11-15T01:18:04.544313+08:00\"}],\"createdAt\":\"2026-11-15T01:18:04.544180+08:00\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null},{\"poolId\":2,\"chartId\":900007,\"status\":\"PENDING\",\"chart\":null,\"submitterCount\":1,\"submitters\":[{\"userId\":2,\"name\":\"player2\",\"at\":\"2025-05-04T08:00Z\"}],\"createdAt\":\"2025-05-04T08:00Z\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null},{\"poolId\":2,\"chartId\":1001,\"status\":\"PENDING\",\"chart\":{\"id\":1001,\"name\":\"C1001\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1001\",\"composer\":null,\"illustrator\":null,\"description\":\"line1\\nline2\",\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1001.png\",\"preview\":null,\"file\":\"https://files.example/1001\",\"uploader\":0,\"tags\":[\"plain\"],\"rating\":0.93,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":2,\"submitters\":[{\"userId\":3,\"name\":\"player3\",\"at\":\"2025-05-01T10:00+08:00\"},{\"userId\":2,\"name\":\"player2\",\"at\":\"2026-11-15T01:18:04.544682+08:00\"}],\"createdAt\":\"2025-05-01T10:00+08:00\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "mine user 5",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/submission/mine",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {user5}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "787"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"submissions\":[{\"poolId\":2,\"chartId\":1002,\"status\":\"PENDING\",\"chart\":{\"id\":1002,\"name\":\"C1002\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1002\",\"composer\":\"comp1002\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1002.png\",\"preview\":null,\"file\":\"https://files.example/1002\",\"uploader\":1,\"tags\":[\"regular\"],\"rating\":0.9,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":1,\"submitters\":[{\"userId\":5,\"name\":\"player5\",\"at\":\"2026-11-15T01:18:04.944623+08:00\"}],\"createdAt\":\"2026-11-15T01:18:04.944606+08:00\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "pending",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/submission/pending",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "2653"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"submissions\":[{\"poolId\":2,\"chartId\":1002,\"status\":\"PENDING\",\"chart\":{\"id\":1002,\"name\":\"C1002\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1002\",\"composer\":\"comp1002\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1002.png\",\"preview\":null,\"file\":\"https://files.example/1002\",\"uploader\":1,\"tags\":[\"regular\"],\"rating\":0.9,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":1,\"submitters\":[{\"userId\":5,\"name\":\"player5\",\"at\":\"2026-11-15T01:18:04.944623+08:00\"}],\"createdAt\":\"2026-11-15T01:18:04.944606+08:00\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null},{\"poolId\":2,\"chartId\":1000,\"status\":\"PENDING\",\"chart\":{\"id\":1000,\"name\":\"Spe\\u003cc\\u003eial \\u0026 \\u0027q\\u0027 \\u003d \\\"x\\\" 测试曲\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1000\",\"composer\":\"comp1000\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1000.png\",\"preview\":null,\"file\":\"https://files.example/1000\",\"uploader\":6,\"tags\":[\"regular\"],\"rating\":0.95,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":1,\"submitters\":[{\"userId\":2,\"name\":\"player2\",\"at\":\"2026-11-15T01:18:04.544313+08:00\"}],\"createdAt\":\"2026-11-15T01:18:04.544180+08:00\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null},{\"poolId\":2,\"chartId\":900007,\"status\":\"PENDING\",\"chart\":null,\"submitterCount\":1,\"submitters\":[{\"userId\":2,\"name\":\"player2\",\"at\":\"2025-05-04T08:00Z\"}],\"createdAt\":\"2025-05-04T08:00Z\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null},{\"poolId\":2,\"chartId\":1001,\"status\":\"PENDING\",\"chart\":{\"id\":1001,\"name\":\"C1001\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1001\",\"composer\":null,\"illustrator\":null,\"description\":\"line1\\nline2\",\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1001.png\",\"preview\":null,\"file\":\"https://files.example/1001\",\"uploader\":0,\"tags\":[\"plain\"],\"rating\":0.93,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":2,\"submitters\":[{\"userId\":3,\"name\":\"player3\",\"at\":\"2025-05-01T10:00+08:00\"},{\"userId\":2,\"name\":\"player2\",\"at\":\"2026-11-15T01:18:04.544682+08:00\"}],\"createdAt\":\"2025-05-01T10:00+08:00\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "pending as player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/submission/pending",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"需要权限\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "pool list",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/2/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "3413"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"submissions\":[{\"poolId\":2,\"chartId\":1000,\"status\":\"PENDING\",\"chart\":{\"id\":1000,\"name\":\"Spe\\u003cc\\u003eial \\u0026 \\u0027q\\u0027 \\u003d \\\"x\\\" 测试曲\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1000\",\"composer\":\"comp1000\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1000.png\",\"preview\":null,\"file\":\"https://files.example/1000\",\"uploader\":6,\"tags\":[\"regular\"],\"rating\":0.95,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":1,\"submitters\":[{\"userId\":2,\"name\":\"player2\",\"at\":\"2026-11-15T01:18:04.544313+08:00\"}],\"createdAt\":\"2026-11-15T01:18:04.544180+08:00\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null},{\"poolId\":2,\"chartId\":1001,\"status\":\"PENDING\",\"chart\":{\"id\":1001,\"name\":\"C1001\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1001\",\"composer\":null,\"illustrator\":null,\"description\":\"line1\\nline2\",\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1001.png\",\"preview\":null,\"file\":\"https://files.example/1001\",\"uploader\":0,\"tags\":[\"plain\"],\"rating\":0.93,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":2,\"submitters\":[{\"userId\":3,\"name\":\"player3\",\"at\":\"2025-05-01T10:00+08:00\"},{\"userId\":2,\"name\":\"player2\",\"at\":\"2026-11-15T01:18:04.544682+08:00\"}],\"createdAt\":\"2025-05-01T10:00+08:00\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null},{\"poolId\":2,\"chartId\":1002,\"status\":\"PENDING\",\"chart\":{\"id\":1002,\"name\":\"C1002\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1002\",\"composer\":\"comp1002\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1002.png\",\"preview\":null,\"file\":\"https://files.example/1002\",\"uploader\":1,\"tags\":[\"regular\"],\"rating\":0.9,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":1,\"submitters\":[{\"userId\":5,\"name\":\"player5\",\"at\":\"2026-11-15T01:18:04.944623+08:00\"}],\"createdAt\":\"2026-11-15T01:18:04.944606+08:00\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null},{\"poolId\":2,\"chartId\":1003,\"status\":\"APPROVED\",\"chart\":{\"id\":1003,\"name\":\"C1003\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1003\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1003.png\",\"preview\":null,\"file\":\"https://files.example/1003\",\"uploader\":2,\"tags\":[\"plain\"],\"rating\":0.88,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":400},\"submitterCount\":1,\"submitters\":[{\"userId\":4,\"name\":\"player4\",\"at\":\"2025-05-01T11:00:00.500+08:00\"}],\"createdAt\":\"2025-05-01T11:00:00.500+08:00\",\"reviewedAt\":\"2025-05-02T10:00Z\",\"reviewerId\":1,\"reason\":null},{\"poolId\":2,\"chartId\":900007,\"status\":\"PENDING\",\"chart\":null,\"submitterCount\":1,\"submitters\":[{\"userId\":2,\"name\":\"player2\",\"at\":\"2025-05-04T08:00Z\"}],\"createdAt\":\"2025-05-04T08:00Z\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "pool list pending",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/2/submissions?status=pending",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "2653"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"submissions\":[{\"poolId\":2,\"chartId\":1000,\"status\":\"PENDING\",\"chart\":{\"id\":1000,\"name\":\"Spe\\u003cc\\u003eial \\u0026 \\u0027q\\u0027 \\u003d \\\"x\\\" 测试曲\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1000\",\"composer\":\"comp1000\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1000.png\",\"preview\":null,\"file\":\"https://files.example/1000\",\"uploader\":6,\"tags\":[\"regular\"],\"rating\":0.95,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":1,\"submitters\":[{\"userId\":2,\"name\":\"player2\",\"at\":\"2026-11-15T01:18:04.544313+08:00\"}],\"createdAt\":\"2026-11-15T01:18:04.544180+08:00\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null},{\"poolId\":2,\"chartId\":1001,\"status\":\"PENDING\",\"chart\":{\"id\":1001,\"name\":\"C1001\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1001\",\"composer\":null,\"illustrator\":null,\"description\":\"line1\\nline2\",\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1001.png\",\"preview\":null,\"file\":\"https://files.example/1001\",\"uploader\":0,\"tags\":[\"plain\"],\"rating\":0.93,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":2,\"submitters\":[{\"userId\":3,\"name\":\"player3\",\"at\":\"2025-05-01T10:00+08:00\"},{\"userId\":2,\"name\":\"player2\",\"at\":\"2026-11-15T01:18:04.544682+08:00\"}],\"createdAt\":\"2025-05-01T10:00+08:00\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null},{\"poolId\":2,\"chartId\":1002,\"status\":\"PENDING\",\"chart\":{\"id\":1002,\"name\":\"C1002\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1002\",\"composer\":\"comp1002\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1002.png\",\"preview\":null,\"file\":\"https://files.example/1002\",\"uploader\":1,\"tags\":[\"regular\"],\"rating\":0.9,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":1,\"submitters\":[{\"userId\":5,\"name\":\"player5\",\"at\":\"2026-11-15T01:18:04.944623+08:00\"}],\"createdAt\":\"2026-11-15T01:18:04.944606+08:00\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null},{\"poolId\":2,\"chartId\":900007,\"status\":\"PENDING\",\"chart\":null,\"submitterCount\":1,\"submitters\":[{\"userId\":2,\"name\":\"player2\",\"at\":\"2025-05-04T08:00Z\"}],\"createdAt\":\"2025-05-04T08:00Z\",\"reviewedAt\":null,\"reviewerId\":null,\"reason\":null}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "pool list approved",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/2/submissions?status=%20APPROVED%20",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "787"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"submissions\":[{\"poolId\":2,\"chartId\":1003,\"status\":\"APPROVED\",\"chart\":{\"id\":1003,\"name\":\"C1003\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1003\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1003.png\",\"preview\":null,\"file\":\"https://files.example/1003\",\"uploader\":2,\"tags\":[\"plain\"],\"rating\":0.88,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":400},\"submitterCount\":1,\"submitters\":[{\"userId\":4,\"name\":\"player4\",\"at\":\"2025-05-01T11:00:00.500+08:00\"}],\"createdAt\":\"2025-05-01T11:00:00.500+08:00\",\"reviewedAt\":\"2025-05-02T10:00Z\",\"reviewerId\":1,\"reason\":null}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "pool list bogus",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/2/submissions?status=bogus",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "44"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"未知状态：bogus\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "pool list blank",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/1/submissions?status=",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "779"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"submissions\":[{\"poolId\":1,\"chartId\":1005,\"status\":\"REJECTED\",\"chart\":{\"id\":1005,\"name\":\"C1005\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1005\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1005.png\",\"preview\":null,\"file\":\"https://files.example/1005\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.97,\"ratingCount\":3,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":1,\"submitters\":[{\"userId\":3,\"name\":\"player3\",\"at\":\"2025-05-01T10:00+08:00\"}],\"createdAt\":\"2025-05-01T10:00+08:00\",\"reviewedAt\":\"2025-05-03T09:30Z\",\"reviewerId\":1,\"reason\":\"too easy\"}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "pool list as player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/2/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"需要权限\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "withdraw: ok",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/pool/2/submissions/1000",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "withdraw: again",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/pool/2/submissions/1000",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "90"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"无法撤回：没有投过这张谱面，或它已经通过审核\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "withdraw: approved",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/pool/2/submissions/1003",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "90"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"无法撤回：没有投过这张谱面，或它已经通过审核\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "withdraw: bad id",
+      "request": {
+        "method": "DELETE",
+        "target": "/api/v1/pool/2/submissions/x",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "42"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"参数格式错误\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "reject: reason",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/submission/2/1001/reject",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"reason\":\"dup <x>\"}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP submission rejected: pool 2 chart 1001 by 1"
+      ]
+    },
+    {
+      "name": "reject: no body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/submission/1/1005/reject",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP submission rejected: pool 1 chart 1005 by 1"
+      ]
+    },
+    {
+      "name": "reject: bad body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/submission/2/1001/reject",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "["
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "reject: unknown",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/submission/2/9999/reject",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "39"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"投稿不存在\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "reject: as player",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/submission/2/1001/reject",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{}"
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"需要权限\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "approve: ok",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/submission/2/1002/approve",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "11"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: HTTP submission approved: pool 2 chart 1002 by 1"
+      ]
+    },
+    {
+      "name": "approve: unknown",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/submission/2/9999/approve",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 404,
+        "reason": "Not Found",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "39"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"投稿不存在\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "approve: upstream fails",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/submission/2/900007/approve",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "102"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"已标记通过，但加入谱池失败：HTTP 404: {\\\"detail\\\":\\\"Not found\\\"}\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "approve: bad id",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/submission/abc/1/approve",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "42"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"参数格式错误\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "pending after",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/submission/pending",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "28"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"submissions\":[]}"
+      },
+      "log": []
+    },
+    {
+      "name": "pool list after",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/2/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "2693"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"submissions\":[{\"poolId\":2,\"chartId\":1001,\"status\":\"REJECTED\",\"chart\":{\"id\":1001,\"name\":\"C1001\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1001\",\"composer\":null,\"illustrator\":null,\"description\":\"line1\\nline2\",\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1001.png\",\"preview\":null,\"file\":\"https://files.example/1001\",\"uploader\":0,\"tags\":[\"plain\"],\"rating\":0.93,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":2,\"submitters\":[{\"userId\":3,\"name\":\"player3\",\"at\":\"2025-05-01T10:00+08:00\"},{\"userId\":2,\"name\":\"player2\",\"at\":\"2026-11-15T01:18:04.544682+08:00\"}],\"createdAt\":\"2025-05-01T10:00+08:00\",\"reviewedAt\":\"2026-11-15T01:18:05.558452+08:00\",\"reviewerId\":1,\"reason\":\"dup \\u003cx\\u003e\"},{\"poolId\":2,\"chartId\":1002,\"status\":\"APPROVED\",\"chart\":{\"id\":1002,\"name\":\"C1002\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1002\",\"composer\":\"comp1002\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1002.png\",\"preview\":null,\"file\":\"https://files.example/1002\",\"uploader\":1,\"tags\":[\"regular\"],\"rating\":0.9,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},\"submitterCount\":1,\"submitters\":[{\"userId\":5,\"name\":\"player5\",\"at\":\"2026-11-15T01:18:04.944623+08:00\"}],\"createdAt\":\"2026-11-15T01:18:04.944606+08:00\",\"reviewedAt\":\"2026-11-15T01:18:05.767504+08:00\",\"reviewerId\":1,\"reason\":null},{\"poolId\":2,\"chartId\":1003,\"status\":\"APPROVED\",\"chart\":{\"id\":1003,\"name\":\"C1003\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1003\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1003.png\",\"preview\":null,\"file\":\"https://files.example/1003\",\"uploader\":2,\"tags\":[\"plain\"],\"rating\":0.88,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":400},\"submitterCount\":1,\"submitters\":[{\"userId\":4,\"name\":\"player4\",\"at\":\"2025-05-01T11:00:00.500+08:00\"}],\"createdAt\":\"2025-05-01T11:00:00.500+08:00\",\"reviewedAt\":\"2025-05-02T10:00Z\",\"reviewerId\":1,\"reason\":null},{\"poolId\":2,\"chartId\":900007,\"status\":\"APPROVED\",\"chart\":null,\"submitterCount\":1,\"submitters\":[{\"userId\":2,\"name\":\"player2\",\"at\":\"2025-05-04T08:00Z\"}],\"createdAt\":\"2025-05-04T08:00Z\",\"reviewedAt\":\"2026-11-15T01:18:05.852309+08:00\",\"reviewerId\":1,\"reason\":null}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "pool 2 after",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "486"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"pools\":[{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},{\"id\":1,\"favoriteId\":42,\"default\":false,\"chartIds\":[1001],\"category\":\"CONFIGURED\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":20,\"submissionOpen\":false},{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003,1002],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "resubmit approved-failed",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/2/submissions",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {user5}"
+          ]
+        ],
+        "body": "{\"chartIds\":[900007]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "77"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"这些谱面不在索引里，无法投稿：[900007]\"}"
+      },
+      "log": []
+    }
+  ]
+}

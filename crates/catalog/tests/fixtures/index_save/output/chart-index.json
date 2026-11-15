@@ -1,0 +1,99 @@
+{
+  "-5": {
+    "id": -5,
+    "name": "Neg",
+    "level": "AT Lv.17",
+    "difficulty": 1.0,
+    "charter": "ch-5",
+    "ranked": false,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/-5",
+    "uploader": -5,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.1,
+    "ratingCount": 1,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z",
+    "duration_seconds": 12
+  },
+  "7": {
+    "id": 7,
+    "difficulty": 0.0,
+    "ranked": false,
+    "reviewed": false,
+    "stable": false,
+    "stableRequest": false,
+    "uploader": 0,
+    "rating": 0.0,
+    "ratingCount": 0
+  },
+  "1000": {
+    "id": 1000,
+    "name": "A\u0000\u001f",
+    "level": "AT Lv.17",
+    "difficulty": 17.5,
+    "charter": "ch1000",
+    "ranked": true,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/1000",
+    "uploader": 6,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.94,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z",
+    "duration_seconds": 400
+  },
+  "1002": {
+    "id": 1002,
+    "name": "B",
+    "level": "AT Lv.17",
+    "difficulty": 3.0,
+    "charter": "ch1002",
+    "ranked": true,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/1002",
+    "uploader": 1,
+    "tags": [
+      "plain"
+    ],
+    "rating": 0.9,
+    "ratingCount": 5,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  },
+  "30474": {
+    "id": 30474,
+    "name": "Spe\u003cc\u003eial \u0026 \u0027q\u0027 \u003d \"x\" 测试曲",
+    "level": "AT Lv.17",
+    "difficulty": 17.5,
+    "charter": "ch30474",
+    "ranked": true,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/30474",
+    "uploader": 3,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.93999,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  }
+}

@@ -1,0 +1,21 @@
+si	{"a":1,"b":2}	OK {"a":1,"b":2}
+si	{"a":1,"a":2}	ERR com.google.gson.JsonSyntaxException: duplicate key: a
+si	{"a":null,"a":2}	OK {"a":2}
+si	{"a":"3","b":4.0}	OK {"a":3,"b":4}
+si	[["a",1],["b",2]]	OK {"a":1,"b":2}
+si	[["a",1,2]]	ERR com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected END_ARRAY but was NUMBER at line 1 column 10 path $[0][2]\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#unexpected-json-structure
+si	[["a"]]	ERR com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected an int but was END_ARRAY at line 1 column 7 path $[0][1]\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#unexpected-json-structure
+si	["a"]	ERR com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_ARRAY but was STRING at line 1 column 3 path $[0]\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#unexpected-json-structure
+si	[[1,2]]	OK {"1":2}
+si	{}	OK {}
+si	[]	OK {}
+si	"x"	ERR com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_OBJECT but was STRING at line 1 column 2 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#unexpected-json-structure
+is	{"1":"a","2":"b"}	OK {"1":"a","2":"b"}
+is	{"1.0":"a"}	OK {"1":"a"}
+is	{"x":"a"}	ERR com.google.gson.JsonSyntaxException: java.lang.NumberFormatException: For input string: "x"
+is	{"1":"a","01":"b"}	ERR com.google.gson.JsonSyntaxException: duplicate key: 1
+is	{"1":1}	OK {"1":"1"}
+is	{"1":true}	OK {"1":"true"}
+is	[[1,"a"],["2","b"]]	OK {"1":"a","2":"b"}
+ii	{"5":{"id":5,"label":"x"},"6":{}}	OK {"5":{"id":5,"label":"x"},"6":{"id":0,"label":null}}
+ii	{"5":null}	OK {"5":null}

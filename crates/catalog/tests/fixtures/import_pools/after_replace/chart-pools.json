@@ -1,0 +1,22 @@
+{
+  "pools": [
+    {
+      "id": 3,
+      "default_flag": true,
+      "chart_ids": [
+        33530
+      ],
+      "category": "MANUAL",
+      "order": 0,
+      "submission_open": false
+    },
+    {
+      "id": 4,
+      "default_flag": false,
+      "chart_ids": [],
+      "category": "MANUAL",
+      "order": 0,
+      "submission_open": false
+    }
+  ]
+}

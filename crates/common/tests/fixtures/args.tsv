@@ -1,0 +1,152 @@
+0	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+1	--help	HELP
+1	-help	HELP
+1	--he	HELP
+1	--help=foo	HELP
+3	--help	--port	abc	HELP
+2	--help	--bogus	PARSE_ERROR	bogus is not a recognized option
+1	-h	PARSE_ERROR	h is not a recognized option
+1	-?	PARSE_ERROR	? is not a recognized option
+2	--port	1234	OK	1234	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+1	--port=1234	OK	1234	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	-port	1234	OK	1234	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+1	-port=1234	OK	1234	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--po	1234	OK	1234	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--p	1	PARSE_ERROR	p is not a recognized option
+1	--port	PARSE_ERROR	Option port requires an argument
+1	--port=	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument '' of option port | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "" | java.lang.NumberFormatException: For input string: ""
+2	--port	abc	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument 'abc' of option port | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "abc" | java.lang.NumberFormatException: For input string: "abc"
+2	--port		FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument '' of option port | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "" | java.lang.NumberFormatException: For input string: ""
+2	--port	 5	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument ' 5' of option port | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: " 5" | java.lang.NumberFormatException: For input string: " 5"
+2	--port	+5	OK	5	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--port	-5	OK	1	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--port	0	OK	1	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--port	70000	OK	65535	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--port	99999999999	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument '99999999999' of option port | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "99999999999" | java.lang.NumberFormatException: For input string: "99999999999"
+2	--port	٥٥	OK	55	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+4	--port	1	--port	2	FATAL		joptsimple.MultipleArgumentsForOptionException: Found multiple arguments for option port, but you asked for only one
+4	--port	1	--port	abc	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument 'abc' of option port | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "abc" | java.lang.NumberFormatException: For input string: "abc"
+4	--port	abc	--port	1	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument 'abc' of option port | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "abc" | java.lang.NumberFormatException: For input string: "abc"
+2	--port	--host	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument '--host' of option port | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "--host" | java.lang.NumberFormatException: For input string: "--host"
+2	--host	--port	OK	12346	--port	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+3	--port	5	extra	OK	5	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+3	extra	--port	5	OK	5	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+1	--port==5	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument '=5' of option port | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "=5" | java.lang.NumberFormatException: For input string: "=5"
+1	--=5	PARSE_ERROR	 is not a recognized option
+1	--	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+3	--	--port	5	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+1	-	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+3	-	--port	5	OK	5	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+1	--bogus	PARSE_ERROR	bogus is not a recognized option
+1	--bogus=1	PARSE_ERROR	bogus is not a recognized option
+1	-x	PARSE_ERROR	x is not a recognized option
+1	-=x	PARSE_ERROR	= is not a recognized option
+2	--PORT	1	PARSE_ERROR	PORT is not a recognized option
+1	--proxy-protocol	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--proxy-protocol	true	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	true	zh-CN	3600	1000	200	60	50	30	
+2	--proxy-protocol	TRUE	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	true	zh-CN	3600	1000	200	60	50	30	
+1	--proxy-protocol=true	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	true	zh-CN	3600	1000	200	60	50	30	
+1	--proxy-protocol=True	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	true	zh-CN	3600	1000	200	60	50	30	
+2	--proxy-protocol	false	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--proxy-protocol	yes	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--proxy-protocol	1	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+1	--proxy-protocol=	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+3	--proxy-protocol	--port	5	OK	5	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--proxy-protocol	-	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--proxy-protocol	--	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--proxy-protocol	-x	PARSE_ERROR	x is not a recognized option
+2	--proxy-protocol	--proxy-protocol	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+3	--proxy-protocol	true	--proxy-protocol	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	true	zh-CN	3600	1000	200	60	50	30	
+3	--proxy-protocol	--proxy-protocol	true	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	true	zh-CN	3600	1000	200	60	50	30	
+4	--proxy-protocol	true	--proxy-protocol	false	FATAL		joptsimple.MultipleArgumentsForOptionException: Found multiple arguments for option proxy-protocol, but you asked for only one
+1	--pr	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--pr	true	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	true	zh-CN	3600	1000	200	60	50	30	
+1	-pr	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+1	--proxy	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--proxy-protocol	extra	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--host	127.0.0.1	OK	12346	127.0.0.1	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--ho	::1	OK	12346	::1	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--h	x	PARSE_ERROR	h is not a recognized option
+2	--http-host	1.2.3.4	OK	12346	0.0.0.0	1.2.3.4	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--http-	x	PARSE_ERROR	http- is not a recognized option
+2	--http-port	9090	OK	12346	0.0.0.0	0.0.0.0	9090	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--http-port	0	OK	12346	0.0.0.0	0.0.0.0	1	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--http-port	x	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument 'x' of option http-port | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "x" | java.lang.NumberFormatException: For input string: "x"
+2	--ht	1	PARSE_ERROR	ht is not a recognized option
+2	--plugins	p2	OK	12346	0.0.0.0	0.0.0.0	8080	p2	false	zh-CN	3600	1000	200	60	50	30	
+2	--plugins		OK	12346	0.0.0.0	0.0.0.0	8080		false	zh-CN	3600	1000	200	60	50	30	
+2	--pl	dir/sub	OK	12346	0.0.0.0	0.0.0.0	8080	dir/sub	false	zh-CN	3600	1000	200	60	50	30	
+4	--plugins	a	--plugins	b	FATAL		joptsimple.MultipleArgumentsForOptionException: Found multiple arguments for option plugins, but you asked for only one
+2	--language	en-US	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	en-US	3600	1000	200	60	50	30	
+1	--language=	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false		3600	1000	200	60	50	30	
+2	-l	ja-JP	PARSE_ERROR	l is not a recognized option
+1	-lja-JP	PARSE_ERROR	l is not a recognized option
+2	--l	x	PARSE_ERROR	l is not a recognized option
+2	--read-timeout	4	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	5	1000	200	60	50	30	Value 4 is below the minimum 5, using 5
+2	--read-timeout	5	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	5	1000	200	60	50	30	
+2	--read-timeout	0	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	5	1000	200	60	50	30	Value 0 is below the minimum 5, using 5
+2	--read-timeout	-1	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	5	1000	200	60	50	30	Value -1 is below the minimum 5, using 5
+2	-r	4	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	5	1000	200	60	50	30	Value 4 is below the minimum 5, using 5
+1	-r10	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	10	1000	200	60	50	30	
+4	--read-timeout	4	--max-rooms	abc	FATAL	Value 4 is below the minimum 5, using 5	joptsimple.OptionArgumentConversionException: Cannot parse argument 'abc' of option max-rooms | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "abc" | java.lang.NumberFormatException: For input string: "abc"
+2	--max-connections	0	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1	200	60	50	30	Value 0 is below the minimum 1, using 1
+2	--max-connections	1	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1	200	60	50	30	
+2	--max-rooms	0	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	1	60	50	30	Value 0 is below the minimum 1, using 1
+2	--max-rooms	-5	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	1	60	50	30	Value -5 is below the minimum 1, using 1
+2	--max-r	3	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	3	60	50	30	
+2	--max-c	3	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	3	200	60	50	30	
+2	--max	3	PARSE_ERROR	max is not a recognized option
+2	--m	3	PARSE_ERROR	m is not a recognized option
+1	--max-rooms	PARSE_ERROR	Option max-rooms requires an argument
+2	--empty-room-ttl	0	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	0	50	30	
+2	--empty-room-ttl	-5	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	0	50	30	
+2	--empty-room-ttl	15	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	15	50	30	
+1	-e5	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	5	50	30	
+2	-e	5	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	5	50	30	
+1	-ee	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument 'e' of option empty-room-ttl | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "e" | java.lang.NumberFormatException: For input string: "e"
+2	--empty-room-ttl	1.5	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument '1.5' of option empty-room-ttl | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "1.5" | java.lang.NumberFormatException: For input string: "1.5"
+8	--read-timeout	1	--max-connections	0	--max-rooms	0	--empty-room-ttl	-1	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	5	1	1	0	50	30	Value 1 is below the minimum 5, using 5 | Value 0 is below the minimum 1, using 1 | Value 0 is below the minimum 1, using 1
+4	--read-timeout	1	--max-connections	x	FATAL	Value 1 is below the minimum 5, using 5	joptsimple.OptionArgumentConversionException: Cannot parse argument 'x' of option max-connections | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "x" | java.lang.NumberFormatException: For input string: "x"
+1	--[arguments]	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+1	--[	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+1	-[	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+1	-[x	PARSE_ERROR	x is not a recognized option
+1	--[arguments]=x	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--max-pending-submissions	-1	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	none	30	
+2	--max-pending-submissions	1	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	1	30	
+2	--max-pending-submissions	50	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--max-pending-submissions	1000	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	1000	30	
+2	--max-pending-submissions	0	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	Value 0 is not valid for --max-pending-submissions, using 50
+2	--max-pending-submissions	-2	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	Value -2 is not valid for --max-pending-submissions, using 50
+2	--max-pending-submissions	-2147483648	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	Value -2147483648 is not valid for --max-pending-submissions, using 50
+2	--max-pending-submissions	abc	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument 'abc' of option max-pending-submissions | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "abc" | java.lang.NumberFormatException: For input string: "abc"
+1	--max-pending-submissions	PARSE_ERROR	Option max-pending-submissions requires an argument
+1	--max-pending-submissions=-1	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	none	30	
+1	--max-pending-submissions=	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument '' of option max-pending-submissions | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "" | java.lang.NumberFormatException: For input string: ""
+2	--max-p	7	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	7	30	
+2	--max-pe	7	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	7	30	
+2	-max-p	7	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	7	30	
+4	--max-pending-submissions	1	--max-pending-submissions	2	FATAL		joptsimple.MultipleArgumentsForOptionException: Found multiple arguments for option max-pending-submissions, but you asked for only one
+2	--login-rate-limit	-1	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	none	
+2	--login-rate-limit	1	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	1	
+2	--login-rate-limit	30	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	
+2	--login-rate-limit	120	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	120	
+2	--login-rate-limit	0	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	Value 0 is not valid for --login-rate-limit, using 30
+2	--login-rate-limit	-5	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	Value -5 is not valid for --login-rate-limit, using 30
+2	--login-rate-limit	x	FATAL		joptsimple.OptionArgumentConversionException: Cannot parse argument 'x' of option login-rate-limit | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "x" | java.lang.NumberFormatException: For input string: "x"
+1	--login-rate-limit	PARSE_ERROR	Option login-rate-limit requires an argument
+1	--login-rate-limit=-1	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	none	
+2	--lo	9	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	9	
+2	--log	9	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	9	
+2	--la	en-US	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	en-US	3600	1000	200	60	50	30	
+2	--lang	en-US	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	en-US	3600	1000	200	60	50	30	
+2	--l	x	PARSE_ERROR	l is not a recognized option
+2	-l	x	PARSE_ERROR	l is not a recognized option
+2	-lo	9	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	9	
+2	--max-c	3	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	3	200	60	50	30	
+2	--max-r	3	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	3	60	50	30	
+2	--ma	3	PARSE_ERROR	ma is not a recognized option
+4	--max-pending-submissions	0	--login-rate-limit	0	OK	12346	0.0.0.0	0.0.0.0	8080	plugins	false	zh-CN	3600	1000	200	60	50	30	Value 0 is not valid for --max-pending-submissions, using 50 | Value 0 is not valid for --login-rate-limit, using 30
+6	--read-timeout	1	--max-pending-submissions	0	--login-rate-limit	abc	FATAL	Value 1 is below the minimum 5, using 5 | Value 0 is not valid for --max-pending-submissions, using 50	joptsimple.OptionArgumentConversionException: Cannot parse argument 'abc' of option login-rate-limit | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "abc" | java.lang.NumberFormatException: For input string: "abc"
+4	--max-pending-submissions	abc	--read-timeout	1	FATAL	Value 1 is below the minimum 5, using 5	joptsimple.OptionArgumentConversionException: Cannot parse argument 'abc' of option max-pending-submissions | joptsimple.internal.ReflectionException: java.lang.NumberFormatException: For input string: "abc" | java.lang.NumberFormatException: For input string: "abc"
+26	--port	1	--http-port	2	--host	h	--http-host	hh	--plugins	pp	--language	fr	--read-timeout	60	--max-connections	10	--max-rooms	3	--empty-room-ttl	7	--proxy-protocol	true	--max-pending-submissions	10	--login-rate-limit	60	OK	1	h	hh	2	pp	true	fr	60	10	3	7	10	60	

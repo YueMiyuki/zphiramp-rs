@@ -1,0 +1,21 @@
+[package]
+name = "zphira-common"
+description = "Java/Gson compatibility helpers, configuration, logging and i18n shared by the server crates"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+chrono = { version = "0.4.45", default-features = false, features = ["clock", "std"] }
+flate2 = "1.1.11"
+indexmap = { version = "2.14.2", features = ["serde"] }
+serde = { version = "1.0.229", features = ["derive"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", default-features = false, features = ["registry", "std"] }
+
+[dev-dependencies]
+tempfile = "3.27.0"

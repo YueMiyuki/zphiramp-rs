@@ -1,0 +1,17 @@
+{
+  "scenario": "bind",
+  "exchanges": [
+    {
+      "name": "bind failure",
+      "port": 52938,
+      "awaitStarted": "java.lang.IllegalStateException: HTTP API server failed to bind 127.0.0.1:{port}; the game port is up but the web manager is unreachable. Free the port or pass a different --http-port.",
+      "log": [
+        "INFO io.javalin.Javalin: Starting Javalin ...",
+        "INFO org.eclipse.jetty.server.Server: jetty-12.1.12; built: 2026-08-03T22:37:55.389Z; git: 10dd3948f37767b84cc2c62358364f042e51dbbe; jvm 27",
+        "ERROR io.javalin.Javalin: Failed to start Javalin",
+        "INFO org.eclipse.jetty.server.Server: Stopped oejs.Server@753f6964{STOPPING}[12.1.12,sto=0]",
+        "ERROR Server: HTTP API server failed to bind 127.0.0.1:{port}\n  io.javalin.util.JavalinBindException: Port already in use. Make sure no other process is using port {port} and try again."
+      ]
+    }
+  ]
+}

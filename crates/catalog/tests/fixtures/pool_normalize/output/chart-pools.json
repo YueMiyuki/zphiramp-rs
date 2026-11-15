@@ -1,0 +1,46 @@
+{
+  "pools": [
+    {
+      "id": 5,
+      "default_flag": false,
+      "chart_ids": [],
+      "category": "MANUAL",
+      "order": 0,
+      "submission_open": false
+    },
+    {
+      "id": 7,
+      "favorite_id": 3,
+      "default_flag": true,
+      "chart_ids": [
+        30474,
+        42058
+      ],
+      "category": "MANUAL",
+      "size_limit": 15,
+      "rounds_per_stay": 2,
+      "order": 20,
+      "submission_open": true
+    },
+    {
+      "id": 8,
+      "default_flag": false,
+      "chart_ids": [
+        33530
+      ],
+      "category": "TB",
+      "order": 20,
+      "submission_open": false
+    },
+    {
+      "id": 2,
+      "default_flag": false,
+      "chart_ids": [
+        52087
+      ],
+      "category": "MANUAL",
+      "order": -5,
+      "submission_open": false
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+WARN Chart index cache is unreadable (java.io.EOFException: End of input at line 1 column 19 path $.), starting empty; run a refresh to rebuild it

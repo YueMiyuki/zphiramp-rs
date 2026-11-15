@@ -1,0 +1,5 @@
+refresh	ok 125
+requests	chart?page=1&division=plain chart?page=2&division=plain chart?page=1 chart?page=2 chart?page=3 chart?page=4 chart?page=5 chart?page=6 chart?page=7 chart?page=8 chart?page=9 chart?page=10 chart?page=11 chart?page=12 chart?page=13 chart?page=14 chart?page=15 chart?page=16 chart?page=17 chart?page=18 chart?page=19 chart?page=20 chart?page=21 chart?page=22 chart?page=23 chart?page=24 chart?page=25 chart?page=26 chart?page=27 chart?page=28 chart?page=29 chart?page=30 chart?page=31 chart?page=32 chart?page=33 chart?page=34 chart?page=35 chart?page=36 chart?page=37 chart?page=38 chart?page=39 chart?page=40
+indexed	125
+remote	150
+refreshing	false

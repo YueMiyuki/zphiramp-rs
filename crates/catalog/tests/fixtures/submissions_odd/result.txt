@@ -1,0 +1,6 @@
+byPool1	1/5/null/[3=X]/null/null 1/6/null/[]/null/null 1/7/PENDING/[4=null]/null/null
+byPool0	0/9/REJECTED/[4=Y]/null/later row wins
+pending	1/7/PENDING/[4=null]/null/null
+bySubmitter4	1/7/PENDING/[4=null]/null/null 0/9/REJECTED/[4=Y]/null/later row wins
+withdraw	false
+withdrawReal	true

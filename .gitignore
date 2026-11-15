@@ -1,0 +1,17 @@
+# build output
+target/
+
+# runtime directories of a server started from the checkout
+/data/
+/logs/
+/frontend/
+
+# local working documents and tooling, not part of the repository
+/DESIGN.md
+/FLAWS.md
+/audit/
+/difftest/
+.codegraph/
+
+__pycache__/
+.DS_Store

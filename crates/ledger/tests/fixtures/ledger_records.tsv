@@ -1,0 +1,145 @@
+next_ids	room-a-1700000000000-1,room-b-1700000100000-2,room-a-1700000200000-3,room-a-1700000300000-4,room-c-1700000400000-5
+file_after_flush	[\n  {\n    "id": "room-a-1700000000000-1",\n    "room_id": "room-a",\n    "chart_id": 101,\n    "chart_name": "Spasmodic \\u003cLv.15\\u003e \\u0026 \\u0027co\\u0027 é",\n    "started_at": 1699999990000,\n    "finished_at": 1700000000000,\n    "results": [\n      {\n        "player_id": 3,\n        "player_name": "Alice",\n        "rank": 1,\n        "score": 990000,\n        "accuracy": 0.9876000285148621,\n        "std": 0.012299999594688416,\n        "gained_points": 100,\n        "total_points": 100\n      },\n      {\n        "player_id": 4,\n        "player_name": "Bob 中文😀",\n        "rank": 2,\n        "score": 950000,\n        "accuracy": 0.949999988079071,\n        "std": 0.019999999552965164,\n        "gained_points": 75,\n        "total_points": 175\n      }\n    ]\n  },\n  {\n    "id": "room-b-1700000100000-2",\n    "room_id": "room-b",\n    "chart_id": 102,\n    "started_at": 1700000050000,\n    "finished_at": 1700000100000,\n    "results": [\n      {\n        "player_id": 5,\n        "player_name": "Eve",\n        "rank": 1,\n        "score": 1000000,\n        "accuracy": 1.0,\n        "std": 0.0,\n        "gained_points": 100,\n        "total_points": 300\n      }\n    ]\n  },\n  {\n    "id": "room-a-1700000200000-3",\n    "room_id": "room-a",\n    "chart_id": 101,\n    "chart_name": "Spasmodic \\u003cLv.15\\u003e \\u0026 \\u0027co\\u0027 é",\n    "started_at": 1700000150000,\n    "finished_at": 1700000200000,\n    "results": []\n  },\n  {\n    "id": "room-a-1700000300000-4",\n    "room_id": "room-a",\n    "chart_id": 103,\n    "chart_name": "Tiny",\n    "started_at": 1700000250000,\n    "finished_at": 1700000300000,\n    "results": [\n      {\n        "player_id": 3,\n        "player_name": "Alice",\n        "rank": 1,\n        "score": 123456,\n        "accuracy": 0.9999999403953552,\n        "std": 9.999999747378752E-5,\n        "gained_points": 100,\n        "total_points": 200\n      },\n      {\n        "player_id": 6,\n        "player_name": "Dan",\n        "rank": 1,\n        "score": 123456,\n        "accuracy": 0.9999999403953552,\n        "std": 9.999999747378752E-5,\n        "gained_points": 100,\n        "total_points": 100\n      },\n      {\n        "player_id": 7,\n        "player_name": "Fay",\n        "rank": 3,\n        "score": 1,\n        "accuracy": 0.0,\n        "std": 1.2345678E7,\n        "gained_points": 50,\n        "total_points": 50\n      }\n    ]\n  },\n  {\n    "id": "room-c-1700000400000-5",\n    "room_id": "room-c",\n    "chart_id": 104,\n    "chart_name": "Long \\"quoted\\" name\\nline",\n    "started_at": 1700000350000,\n    "finished_at": 1700000400000,\n    "results": [\n      {\n        "player_id": 3,\n        "player_name": "Alice",\n        "rank": 2,\n        "score": 500000,\n        "accuracy": 0.5,\n        "std": 0.12345679104328156,\n        "gained_points": 75,\n        "total_points": 275\n      },\n      {\n        "player_id": 5,\n        "player_name": "Eve",\n        "rank": 1,\n        "score": 600000,\n        "accuracy": 0.8765432238578796,\n        "std": 1.5,\n        "gained_points": 100,\n        "total_points": 400\n      }\n    ]\n  }\n]
+size	5
+query	10,0,null,null	room-c-1700000400000-5,room-a-1700000300000-4,room-a-1700000200000-3,room-b-1700000100000-2,room-a-1700000000000-1
+query	10,0,null,3	room-c-1700000400000-5,room-a-1700000300000-4,room-a-1700000000000-1
+query	10,0,null,5	room-c-1700000400000-5,room-b-1700000100000-2
+query	10,0,null,99	
+query	10,0,room-a,null	room-a-1700000300000-4,room-a-1700000200000-3,room-a-1700000000000-1
+query	10,0,room-a,3	room-a-1700000300000-4,room-a-1700000000000-1
+query	10,0,room-a,5	
+query	10,0,room-a,99	
+query	10,0,room-c,null	room-c-1700000400000-5
+query	10,0,room-c,3	room-c-1700000400000-5
+query	10,0,room-c,5	room-c-1700000400000-5
+query	10,0,room-c,99	
+query	10,0,nope,null	
+query	10,0,nope,3	
+query	10,0,nope,5	
+query	10,0,nope,99	
+query	2,1,null,null	room-a-1700000300000-4,room-a-1700000200000-3
+query	2,1,null,3	room-a-1700000300000-4,room-a-1700000000000-1
+query	2,1,null,5	room-b-1700000100000-2
+query	2,1,null,99	
+query	2,1,room-a,null	room-a-1700000200000-3,room-a-1700000000000-1
+query	2,1,room-a,3	room-a-1700000000000-1
+query	2,1,room-a,5	
+query	2,1,room-a,99	
+query	2,1,room-c,null	
+query	2,1,room-c,3	
+query	2,1,room-c,5	
+query	2,1,room-c,99	
+query	2,1,nope,null	
+query	2,1,nope,3	
+query	2,1,nope,5	
+query	2,1,nope,99	
+query	0,0,null,null	room-c-1700000400000-5
+query	0,0,null,3	room-c-1700000400000-5
+query	0,0,null,5	room-c-1700000400000-5
+query	0,0,null,99	
+query	0,0,room-a,null	room-a-1700000300000-4
+query	0,0,room-a,3	room-a-1700000300000-4
+query	0,0,room-a,5	
+query	0,0,room-a,99	
+query	0,0,room-c,null	room-c-1700000400000-5
+query	0,0,room-c,3	room-c-1700000400000-5
+query	0,0,room-c,5	room-c-1700000400000-5
+query	0,0,room-c,99	
+query	0,0,nope,null	
+query	0,0,nope,3	
+query	0,0,nope,5	
+query	0,0,nope,99	
+query	10,99,null,null	
+query	10,99,null,3	
+query	10,99,null,5	
+query	10,99,null,99	
+query	10,99,room-a,null	
+query	10,99,room-a,3	
+query	10,99,room-a,5	
+query	10,99,room-a,99	
+query	10,99,room-c,null	
+query	10,99,room-c,3	
+query	10,99,room-c,5	
+query	10,99,room-c,99	
+query	10,99,nope,null	
+query	10,99,nope,3	
+query	10,99,nope,5	
+query	10,99,nope,99	
+query	1,4,null,null	room-a-1700000000000-1
+query	1,4,null,3	
+query	1,4,null,5	
+query	1,4,null,99	
+query	1,4,room-a,null	
+query	1,4,room-a,3	
+query	1,4,room-a,5	
+query	1,4,room-a,99	
+query	1,4,room-c,null	
+query	1,4,room-c,3	
+query	1,4,room-c,5	
+query	1,4,room-c,99	
+query	1,4,nope,null	
+query	1,4,nope,3	
+query	1,4,nope,5	
+query	1,4,nope,99	
+by_player	3,10	room-c-1700000400000-5|room-c|104|Long "quoted" name\nline|1700000400000|3|2;room-a-1700000300000-4|room-a|103|Tiny|1700000300000|3|1;room-a-1700000000000-1|room-a|101|Spasmodic <Lv.15> & 'co' é|1700000000000|3|1
+by_player	3,2	room-c-1700000400000-5|room-c|104|Long "quoted" name\nline|1700000400000|3|2;room-a-1700000300000-4|room-a|103|Tiny|1700000300000|3|1
+by_player	3,1	room-c-1700000400000-5|room-c|104|Long "quoted" name\nline|1700000400000|3|2
+by_player	3,0	room-c-1700000400000-5|room-c|104|Long "quoted" name\nline|1700000400000|3|2
+by_player	5,10	room-c-1700000400000-5|room-c|104|Long "quoted" name\nline|1700000400000|5|1;room-b-1700000100000-2|room-b|102|null|1700000100000|5|1
+by_player	5,2	room-c-1700000400000-5|room-c|104|Long "quoted" name\nline|1700000400000|5|1;room-b-1700000100000-2|room-b|102|null|1700000100000|5|1
+by_player	5,1	room-c-1700000400000-5|room-c|104|Long "quoted" name\nline|1700000400000|5|1
+by_player	5,0	room-c-1700000400000-5|room-c|104|Long "quoted" name\nline|1700000400000|5|1
+by_player	99,10	
+by_player	99,2	
+by_player	99,1	
+by_player	99,0	
+find	room-a-1700000000000-1	101
+find	room-b-1700000100000-2	102
+find	room-a-1700000200000-3	101
+find	room-a-1700000300000-4	103
+find	room-c-1700000400000-5	104
+find	nope	none
+next_id_after	zz-5-6
+import_base	records replace	[{"id":"i1","room_id":"x","chart_id":1,"chart_name":"One","started_at":10,"finished_at":20,"results":[{"player_id":1,"player_name":"A","rank":1,"score":5,"accuracy":0.5,"std":0.25,"gained_points":100,"total_points":100}]},{"id":"i2","room_id":"x","chart_id":2,"started_at":30,"finished_at":40,"results":[]},{"id":"i3","room_id":"y","chart_id":3,"started_at":50,"finished_at":60,"results":[]}]	OK	3	3
+state_base	i3,i2,i1
+import_merge_overlap	records merge	[{"id":"i2","room_id":"z","chart_id":22,"started_at":300,"finished_at":400,"results":[]},{"id":"i9","room_id":"x","chart_id":9,"started_at":1,"finished_at":2,"results":[]}]	OK	4	4
+state_merge_overlap	i3,i1,i9,i2
+size_merge_overlap	4
+import_replace_small	records replace	[{"id":"i9","room_id":"x","chart_id":9,"started_at":1,"finished_at":2,"results":[]}]	OK	1	1
+state_replace_small	i9
+import_replace_empty	records replace	[]	OK	0	0
+state_replace_empty	
+import_merge_into_empty	records merge	[{"id":"i3","room_id":"y","chart_id":3,"started_at":50,"finished_at":60,"results":[]},{"id":"i1","room_id":"x","chart_id":1,"chart_name":"One","started_at":10,"finished_at":20,"results":[{"player_id":1,"player_name":"A","rank":1,"score":5,"accuracy":0.5,"std":0.25,"gained_points":100,"total_points":100}]}]	OK	2	2
+state_merge_into_empty	i1,i3
+import_replace_dups	records replace	[{"id":"i1","room_id":"x","chart_id":1,"chart_name":"One","started_at":10,"finished_at":20,"results":[{"player_id":1,"player_name":"A","rank":1,"score":5,"accuracy":0.5,"std":0.25,"gained_points":100,"total_points":100}]},{"id":"i1","room_id":"x","chart_id":1,"chart_name":"One","started_at":10,"finished_at":20,"results":[{"player_id":1,"player_name":"A","rank":1,"score":5,"accuracy":0.5,"std":0.25,"gained_points":100,"total_points":100}]}]	OK	2	2
+state_replace_dups	i1,i1
+import_merge_dups	records merge	[{"id":"i9","room_id":"x","chart_id":9,"started_at":1,"finished_at":2,"results":[]},{"id":"i9","room_id":"x","chart_id":9,"started_at":1,"finished_at":2,"results":[]}]	OK	3	3
+state_merge_dups	i1,i9,i9
+import_over_cap	records replace	<generated 88950 chars>	OK	1003	1003
+size_over_cap	1003
+size_after_append	1000
+newest_after_append	after-cap
+oldest_after_append	m4
+load_empty_file		OK 0 
+load_null_doc	null	OK 0 
+load_empty_arr	[]	OK 0 
+load_ok_full	[{"id":"a","room_id":"r","chart_id":7,"chart_name":"c","started_at":5,"finished_at":6,"results":[{"player_id":3,"player_name":"p","rank":1,"score":10,"accuracy":0.5,"std":0.25,"gained_points":100,"total_points":100}]}]	OK 1 a
+load_missing_fields	[{"id":"a"}]	OK 1 a
+load_empty_row	[{}]	OK 1 null
+load_null_primitive	[{"id":"a","chart_id":null}]	ERR com.google.gson.JsonParseException: null is not allowed as value for record component 'chartId' of primitive type; at path $[0].chart_id
+load_null_string	[{"id":null,"room_id":null,"chart_name":null}]	OK 1 null
+load_string_ints	[{"id":"a","chart_id":"7","started_at":"5","results":[{"player_id":"3","score":"10","accuracy":"0.5"}]}]	OK 1 a
+load_float_int	[{"id":"a","chart_id":7.0}]	OK 1 a
+load_float_frac	[{"id":"a","chart_id":7.5}]	ERR com.google.gson.JsonSyntaxException: java.lang.NumberFormatException: Expected an int but was 7.5 at line 1 column 26 path $[0].chart_id
+load_element_null	[null]	ERR java.lang.NullPointerException: null
+load_object_top	{}	ERR com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_ARRAY but was BEGIN_OBJECT at line 1 column 2 path $\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#unexpected-json-structure
+load_results_not_list	[{"id":"a","results":{}}]	ERR com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_ARRAY but was BEGIN_OBJECT at line 1 column 23 path $[0].results\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#unexpected-json-structure
+load_results_null	[{"id":"a","results":null}]	OK 1 a
+load_results_null_element	[{"id":"a","results":[null]}]	OK 1 a
+load_results_null_primitive	[{"id":"a","results":[{"player_id":null}]}]	ERR com.google.gson.JsonParseException: null is not allowed as value for record component 'playerId' of primitive type; at path $[0].results[0].player_id
+load_dup_ids	[{"id":"a","chart_id":1},{"id":"a","chart_id":2}]	OK 2 a,a
+load_unknown_fields	[{"id":"a","zzz":{"q":1},"results":[{"player_id":3,"q":[]}]}]	OK 1 a
+load_camel_case_keys	[{"id":"a","roomId":"r","chartId":7}]	OK 1 a
+load_doubles	[{"id":"a","results":[{"player_id":1,"accuracy":1,"std":1e-5},{"player_id":2,"accuracy":"0.1","std":123456789.5}]}]	OK 1 a
+load_truncated	[{"id":"a"	ERR com.google.gson.JsonSyntaxException: java.io.EOFException: End of input at line 1 column 11 path $[0].id
+load_trailing_garbage	[] x	ERR com.google.gson.JsonSyntaxException: JSON document was not fully consumed.

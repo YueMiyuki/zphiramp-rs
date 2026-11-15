@@ -1,0 +1,49 @@
+addPool10	ok 
+addPoolDup	IllegalArgumentException: Pool already exists: 10
+addPoolEmpty	ok 
+emptyPools	ok [21, 22]
+emptyPoolsNull	ok [23]
+emptyPools0	IllegalArgumentException: Pool count must be between 1 and 50
+emptyPools51	IllegalArgumentException: Pool count must be between 1 and 50
+update10	ok
+update10b	ok
+update1	ok
+updateMissing	IllegalArgumentException: Pool not found: 99
+favorite0	ok
+favorite10	ok
+default1	ok
+removeChart	ok
+removeChartAbsent	ok
+removeChartMissing	IllegalArgumentException: Pool not found: 99
+addCharts	ok 2
+addChartsNone	ok 0
+addChartsMissingPool	IllegalArgumentException: Pool not found: 99
+addCharts501	IllegalArgumentException: Too many charts in one batch: 501 (max 500)
+generateBad	IllegalArgumentException: Pool size limit must be positive
+generate	ok [24, 25, 26, 27]
+generateTb	ok [28]
+generateNone	ok []
+byCategory	[24, 25, 26, 27]
+open	10:0:CONFIGURED:false:[30474, 42058]
+isOpen10	ok true
+isOpenMissing	IllegalArgumentException: Pool not found: 99
+removePoolMissing	IllegalArgumentException: Pool not found: 99
+removePool20	ok
+default1off	ok
+removeLastDefault0	IllegalArgumentException: Cannot remove the last default pool
+default1on	ok
+removeDefault0	ok
+default1unchanged	ok
+listPools	1:0:MANUAL:true:[33530, 52087, 30474, 42058] 10:0:CONFIGURED:false:[30474, 42058] 21:30:TB:false:[] 22:40:TB:false:[] 23:50:MANUAL:false:[] 24:60:REGULAR:false:[1000, 1001] 25:70:REGULAR:false:[30474, 1002] 26:80:REGULAR:false:[1003, 1004] 27:90:REGULAR:false:[1005, 1006] 28:100:TB:false:[30474, 1003]
+defaultPools	1:0:MANUAL:true:[33530, 52087, 30474, 42058]
+removeRest10	ok
+removeRest21	ok
+removeRest22	ok
+removeRest23	ok
+removeRest24	ok
+removeRest25	ok
+removeRest26	ok
+removeRest27	ok
+removeRest28	ok
+removeLast	IllegalArgumentException: Cannot remove the last pool
+finalPools	1:0:MANUAL:true:[33530, 52087, 30474, 42058]

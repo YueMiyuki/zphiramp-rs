@@ -1,0 +1,191 @@
+{
+  "103": {
+    "id": 103,
+    "name": "C103",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch103",
+    "ranked": false,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/103",
+    "uploader": 5,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  },
+  "104": {
+    "id": 104,
+    "name": "C104",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch104",
+    "ranked": true,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/104",
+    "uploader": 6,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  },
+  "105": {
+    "id": 105,
+    "name": "C105",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch105",
+    "ranked": false,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/105",
+    "uploader": 0,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  },
+  "106": {
+    "id": 106,
+    "name": "C106",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch106",
+    "ranked": true,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/106",
+    "uploader": 1,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  },
+  "107": {
+    "id": 107,
+    "name": "C107",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch107",
+    "ranked": false,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/107",
+    "uploader": 2,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  },
+  "108": {
+    "id": 108,
+    "name": "C108",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch108",
+    "ranked": true,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/108",
+    "uploader": 3,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  },
+  "109": {
+    "id": 109,
+    "name": "C109",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch109",
+    "ranked": false,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/109",
+    "uploader": 4,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  },
+  "110": {
+    "id": 110,
+    "name": "C110",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch110",
+    "ranked": true,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/110",
+    "uploader": 5,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  },
+  "111": {
+    "id": 111,
+    "name": "C111",
+    "level": "AT Lv.17",
+    "difficulty": 17.0,
+    "charter": "ch111",
+    "ranked": false,
+    "reviewed": false,
+    "stable": true,
+    "stableRequest": false,
+    "file": "https://files.example/111",
+    "uploader": 6,
+    "tags": [
+      "regular"
+    ],
+    "rating": 0.9,
+    "ratingCount": 10,
+    "created": "2025-01-02T03:04:05.123456+08:00",
+    "updated": "2025-03-04T05:06:07Z",
+    "chartUpdated": "2025-03-04T05:06Z"
+  }
+}

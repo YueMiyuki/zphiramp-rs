@@ -1,0 +1,28 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/protocol",
+    "crates/common",
+    "crates/phira",
+    "crates/ledger",
+    "crates/catalog",
+    "crates/game",
+    "crates/http",
+    "crates/server",
+]
+
+[workspace.package]
+version = "1.0.0"
+edition = "2024"
+license = "LGPL-3.0-only"
+publish = false
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[profile.release]
+lto = "thin"
+codegen-units = 4

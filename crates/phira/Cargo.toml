@@ -1,0 +1,30 @@
+[package]
+name = "zphira-phira"
+description = "Upstream Phira API client, models, caches and chart duration probing."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+flate2 = "1.1.11"
+http-body-util = "0.1"
+hyper = { version = "1", default-features = false, features = ["client", "http1", "http2"] }
+hyper-rustls = { version = "0.27", default-features = false, features = ["http1", "http2", "tls12"] }
+hyper-util = { version = "0.1", default-features = false, features = ["client-legacy", "http1", "http2", "tokio"] }
+moka = { version = "0.12.16", features = ["sync"] }
+reqwest = { version = "0.13.5", default-features = false, features = ["rustls", "http2"] }
+rustls = { version = "0.23", default-features = false, features = ["aws_lc_rs", "std", "tls12"] }
+rustls-platform-verifier = "0.7"
+serde = { version = "1.0.229", features = ["derive", "rc"] }
+tokio = { version = "1.54.1", features = ["rt", "time"] }
+tracing = "0.1.44"
+zphira-common = { path = "../common" }
+
+[dev-dependencies]
+hyper = { version = "1", default-features = false, features = ["server", "http1", "http2"] }
+tokio = { version = "1.54.1", features = ["rt-multi-thread", "macros", "net", "io-util", "time", "sync"] }
+tokio-rustls = "0.26"

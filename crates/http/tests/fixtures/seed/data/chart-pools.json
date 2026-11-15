@@ -1,0 +1,38 @@
+{
+  "pools": [
+    {
+      "id": 0,
+      "default_flag": true,
+      "chart_ids": [
+        1000,
+        1002
+      ],
+      "category": "REGULAR",
+      "size_limit": 15,
+      "rounds_per_stay": 3,
+      "order": 10,
+      "submission_open": false
+    },
+    {
+      "id": 1,
+      "favorite_id": 42,
+      "default_flag": false,
+      "chart_ids": [
+        1001
+      ],
+      "category": "CONFIGURED",
+      "order": 20,
+      "submission_open": false
+    },
+    {
+      "id": 2,
+      "default_flag": false,
+      "chart_ids": [
+        1003
+      ],
+      "category": "MANUAL",
+      "order": 30,
+      "submission_open": true
+    }
+  ]
+}

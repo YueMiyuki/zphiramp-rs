@@ -1,0 +1,2480 @@
+{
+  "scenario": "data",
+  "exchanges": [
+    {
+      "name": "export: bogus",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/data/bogus/export",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "50"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"未知数据类型：bogus\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "export: as player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/data/admins/export",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要权限\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "export: admins",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/data/admins/export",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Content-Disposition",
+            "attachment; filename=\"admins.json\""
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "7"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "[\n  1\n]"
+      },
+      "log": [
+        "INFO Server: HTTP export admins"
+      ]
+    },
+    {
+      "name": "export: pools",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/data/pools/export",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Content-Disposition",
+            "attachment; filename=\"pools.json\""
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "647"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\n  \"pools\": [\n    {\n      \"id\": 0,\n      \"default_flag\": true,\n      \"chart_ids\": [\n        1000,\n        1002\n      ],\n      \"category\": \"REGULAR\",\n      \"size_limit\": 15,\n      \"rounds_per_stay\": 3,\n      \"order\": 10,\n      \"submission_open\": false\n    },\n    {\n      \"id\": 1,\n      \"favorite_id\": 42,\n      \"default_flag\": false,\n      \"chart_ids\": [\n        1001\n      ],\n      \"category\": \"CONFIGURED\",\n      \"order\": 20,\n      \"submission_open\": false\n    },\n    {\n      \"id\": 2,\n      \"default_flag\": false,\n      \"chart_ids\": [\n        1003\n      ],\n      \"category\": \"MANUAL\",\n      \"order\": 30,\n      \"submission_open\": true\n    }\n  ]\n}"
+      },
+      "log": [
+        "INFO Server: HTTP export pools"
+      ]
+    },
+    {
+      "name": "export: points",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/data/points/export",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Content-Disposition",
+            "attachment; filename=\"points.json\""
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "198"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\n  \"101\": {\n    \"name\": \"Alice\",\n    \"points\": 120\n  },\n  \"102\": {\n    \"name\": \"Bob<&>\",\n    \"points\": 120\n  },\n  \"103\": {\n    \"name\": \"Carol\",\n    \"points\": 7\n  },\n  \"104\": {\n    \"points\": 0\n  }\n}"
+      },
+      "log": [
+        "INFO Server: HTTP export points"
+      ]
+    },
+    {
+      "name": "export: records",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/data/records/export",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Content-Disposition",
+            "attachment; filename=\"records.json\""
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1710"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "[\n  {\n    \"id\": \"r1-1735689600000-1\",\n    \"room_id\": \"r1\",\n    \"chart_id\": 1000,\n    \"chart_name\": \"C1000\",\n    \"started_at\": 1735689500000,\n    \"finished_at\": 1735689600000,\n    \"results\": [\n      {\n        \"player_id\": 101,\n        \"player_name\": \"Alice\",\n        \"rank\": 1,\n        \"score\": 998765,\n        \"accuracy\": 0.9876543,\n        \"std\": 0.012,\n        \"gained_points\": 100,\n        \"total_points\": 100\n      },\n      {\n        \"player_id\": 102,\n        \"player_name\": \"Bob<&>\",\n        \"rank\": 2,\n        \"score\": 900000,\n        \"accuracy\": 0.95,\n        \"std\": 0.0,\n        \"gained_points\": 20,\n        \"total_points\": 20\n      }\n    ]\n  },\n  {\n    \"id\": \"r2-1735689700000-2\",\n    \"room_id\": \"r2\",\n    \"chart_id\": 1002,\n    \"started_at\": 1735689650000,\n    \"finished_at\": 1735689700000,\n    \"results\": [\n      {\n        \"player_id\": 103,\n        \"player_name\": \"Carol\",\n        \"rank\": 1,\n        \"score\": 500000,\n        \"accuracy\": 0.5,\n        \"std\": 1.0E-4,\n        \"gained_points\": 7,\n        \"total_points\": 7\n      }\n    ]\n  },\n  {\n    \"id\": \"r1-1735689800000-3\",\n    \"room_id\": \"r1\",\n    \"chart_id\": 1003,\n    \"chart_name\": \"C1003\",\n    \"started_at\": 1735689750000,\n    \"finished_at\": 1735689800000,\n    \"results\": [\n      {\n        \"player_id\": 102,\n        \"player_name\": \"Bob<&>\",\n        \"rank\": 1,\n        \"score\": 999999,\n        \"accuracy\": 1.0,\n        \"std\": 0.005,\n        \"gained_points\": 100,\n        \"total_points\": 120\n      },\n      {\n        \"player_id\": 101,\n        \"player_name\": \"Alice\",\n        \"rank\": 2,\n        \"score\": 800000,\n        \"accuracy\": 0.8999999761581421,\n        \"std\": 0.25,\n        \"gained_points\": 20,\n        \"total_points\": 120\n      }\n    ]\n  }\n]"
+      },
+      "log": [
+        "INFO Server: HTTP export records"
+      ]
+    },
+    {
+      "name": "export: submissions",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/data/submissions/export",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Content-Disposition",
+            "attachment; filename=\"submissions.json\""
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1309"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\n  \"submissions\": [\n    {\n      \"pool_id\": 1,\n      \"chart_id\": 1005,\n      \"status\": \"REJECTED\",\n      \"submitters\": [\n        {\n          \"user_id\": 3,\n          \"name\": \"player3\",\n          \"at\": \"2025-05-01T10:00:00+08:00\"\n        }\n      ],\n      \"created_at\": \"2025-05-01T10:00:00+08:00\",\n      \"reviewed_at\": \"2025-05-03T09:30:00Z\",\n      \"reviewer_id\": 1,\n      \"reason\": \"too easy\"\n    },\n    {\n      \"pool_id\": 2,\n      \"chart_id\": 1001,\n      \"status\": \"PENDING\",\n      \"submitters\": [\n        {\n          \"user_id\": 3,\n          \"name\": \"player3\",\n          \"at\": \"2025-05-01T10:00:00+08:00\"\n        }\n      ],\n      \"created_at\": \"2025-05-01T10:00:00+08:00\"\n    },\n    {\n      \"pool_id\": 2,\n      \"chart_id\": 1003,\n      \"status\": \"APPROVED\",\n      \"submitters\": [\n        {\n          \"user_id\": 4,\n          \"name\": \"player4\",\n          \"at\": \"2025-05-01T11:00:00.5+08:00\"\n        }\n      ],\n      \"created_at\": \"2025-05-01T11:00:00.5+08:00\",\n      \"reviewed_at\": \"2025-05-02T10:00:00Z\",\n      \"reviewer_id\": 1\n    },\n    {\n      \"pool_id\": 2,\n      \"chart_id\": 900007,\n      \"status\": \"PENDING\",\n      \"submitters\": [\n        {\n          \"user_id\": 2,\n          \"name\": \"player2\",\n          \"at\": \"2025-05-04T08:00:00Z\"\n        }\n      ],\n      \"created_at\": \"2025-05-04T08:00:00Z\"\n    }\n  ]\n}"
+      },
+      "log": [
+        "INFO Server: HTTP export submissions"
+      ]
+    },
+    {
+      "name": "backups: none yet",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/data/admins/backups",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "24"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"backups\":[],\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "backups: bogus",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/data/bogus/backups",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "50"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"未知数据类型：bogus\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: admins merge",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "[5]"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "90"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"imported\":2,\"ok\":true,\"backup\":\"data/backups/admins-20261115-011815-585.json\",\"total\":2}"
+      },
+      "log": [
+        "INFO Server: Imported admins (2 rows, merge=true), previous copy at data/backups/admins-20261115-011815-585.json"
+      ]
+    },
+    {
+      "name": "import: admins replace",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/import?mode=replace",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "[1,6]"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "90"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"imported\":2,\"ok\":true,\"backup\":\"data/backups/admins-20261115-011815-632.json\",\"total\":2}"
+      },
+      "log": [
+        "INFO Server: Imported admins (2 rows, merge=false), previous copy at data/backups/admins-20261115-011815-632.json"
+      ]
+    },
+    {
+      "name": "import: admins merge=true",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/import?merge=TRUE",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "[7]"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "90"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"imported\":3,\"ok\":true,\"backup\":\"data/backups/admins-20261115-011815-679.json\",\"total\":3}"
+      },
+      "log": [
+        "INFO Server: Imported admins (3 rows, merge=true), previous copy at data/backups/admins-20261115-011815-679.json"
+      ]
+    },
+    {
+      "name": "import: admins default replace",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/import",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "[1]"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "90"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"imported\":1,\"ok\":true,\"backup\":\"data/backups/admins-20261115-011815-724.json\",\"total\":1}"
+      },
+      "log": [
+        "INFO Server: Imported admins (1 rows, merge=false), previous copy at data/backups/admins-20261115-011815-724.json"
+      ]
+    },
+    {
+      "name": "import: blank",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "  "
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"内容为空\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: empty",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"内容为空\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: primitive",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "nope"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "59"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"JSON 顶层必须是对象或数组\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: syntax",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "44"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"不是有效的 JSON\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: null",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "null"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "44"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"不是有效的 JSON\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: admins object",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"a\":1}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "43"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"admins 应为数组\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: pools array",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/pools/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "[]"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "48"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"缺少数组字段 pools\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: points array",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/points/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "[]"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "73"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"玩家积分应为对象（用户 ID 到积分）\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: submissions no field",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/submissions/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"x\":[]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "54"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"缺少数组字段 submissions\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: bogus kind",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/bogus/import",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "[]"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "50"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"未知数据类型：bogus\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: as player",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/import",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "[2]"
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"需要权限\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: points merge",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/points/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"105\":{\"name\":\"Eve\",\"points\":50}}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "90"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"imported\":5,\"ok\":true,\"backup\":\"data/backups/points-20261115-011816-230.json\",\"total\":5}"
+      },
+      "log": [
+        "INFO Server: Imported points (5 rows, merge=true), previous copy at data/backups/points-20261115-011816-230.json"
+      ]
+    },
+    {
+      "name": "import: pools merge",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/pools/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"pools\":[{\"id\":20,\"chart_ids\":[1000],\"category\":\"TB\"},{\"id\":1,\"chart_ids\":[1001,1005]}]}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "89"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"imported\":4,\"ok\":true,\"backup\":\"data/backups/pools-20261115-011816-277.json\",\"total\":4}"
+      },
+      "log": [
+        "INFO Server: Imported pools (4 rows, merge=true), previous copy at data/backups/pools-20261115-011816-277.json"
+      ]
+    },
+    {
+      "name": "import: submissions merge",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/submissions/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"submissions\":[{\"pool_id\":0,\"chart_id\":1008,\"status\":\"PENDING\",\"submitters\":[{\"user_id\":9,\"name\":\"n\",\"at\":\"2025-06-01T00:00:00Z\"}],\"created_at\":\"2025-06-01T00:00:00Z\"}]}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "95"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"imported\":5,\"ok\":true,\"backup\":\"data/backups/submissions-20261115-011816-319.json\",\"total\":5}"
+      },
+      "log": [
+        "INFO Server: Imported submissions (5 rows, merge=true), previous copy at data/backups/submissions-20261115-011816-319.json"
+      ]
+    },
+    {
+      "name": "import: records merge",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/records/import?mode=merge",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "[{\"id\":\"r9-1735689900000-9\",\"room_id\":\"r9\",\"chart_id\":1004,\"chart_name\":\"C1004\",\"started_at\":1735689850000,\"finished_at\":1735689900000,\"results\":[{\"player_id\":105,\"player_name\":\"Eve\",\"rank\":1,\"score\":1000000,\"accuracy\":1.0,\"std\":0.0,\"gained_points\":50,\"total_points\":50}]}]"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "91"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"imported\":4,\"ok\":true,\"backup\":\"data/backups/records-20261115-011816-363.json\",\"total\":4}"
+      },
+      "log": [
+        "INFO Server: Imported records (4 rows, merge=true), previous copy at data/backups/records-20261115-011816-363.json"
+      ]
+    },
+    {
+      "name": "export after: points",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/data/points/export",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Content-Disposition",
+            "attachment; filename=\"points.json\""
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "265"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\n  \"101\": {\n    \"name\": \"Alice\",\n    \"points\": 120\n  },\n  \"102\": {\n    \"name\": \"Bob\\u003c\\u0026\\u003e\",\n    \"points\": 120\n  },\n  \"103\": {\n    \"name\": \"Carol\",\n    \"points\": 7\n  },\n  \"104\": {\n    \"points\": 0\n  },\n  \"105\": {\n    \"name\": \"Eve\",\n    \"points\": 50\n  }\n}"
+      },
+      "log": [
+        "INFO Server: HTTP export points"
+      ]
+    },
+    {
+      "name": "export after: records",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/data/records/export",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Content-Disposition",
+            "attachment; filename=\"records.json\""
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "2159"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "[\n  {\n    \"id\": \"r9-1735689900000-9\",\n    \"room_id\": \"r9\",\n    \"chart_id\": 1004,\n    \"chart_name\": \"C1004\",\n    \"started_at\": 1735689850000,\n    \"finished_at\": 1735689900000,\n    \"results\": [\n      {\n        \"player_id\": 105,\n        \"player_name\": \"Eve\",\n        \"rank\": 1,\n        \"score\": 1000000,\n        \"accuracy\": 1.0,\n        \"std\": 0.0,\n        \"gained_points\": 50,\n        \"total_points\": 50\n      }\n    ]\n  },\n  {\n    \"id\": \"r1-1735689600000-1\",\n    \"room_id\": \"r1\",\n    \"chart_id\": 1000,\n    \"chart_name\": \"C1000\",\n    \"started_at\": 1735689500000,\n    \"finished_at\": 1735689600000,\n    \"results\": [\n      {\n        \"player_id\": 101,\n        \"player_name\": \"Alice\",\n        \"rank\": 1,\n        \"score\": 998765,\n        \"accuracy\": 0.9876543,\n        \"std\": 0.012,\n        \"gained_points\": 100,\n        \"total_points\": 100\n      },\n      {\n        \"player_id\": 102,\n        \"player_name\": \"Bob\\u003c\\u0026\\u003e\",\n        \"rank\": 2,\n        \"score\": 900000,\n        \"accuracy\": 0.95,\n        \"std\": 0.0,\n        \"gained_points\": 20,\n        \"total_points\": 20\n      }\n    ]\n  },\n  {\n    \"id\": \"r2-1735689700000-2\",\n    \"room_id\": \"r2\",\n    \"chart_id\": 1002,\n    \"started_at\": 1735689650000,\n    \"finished_at\": 1735689700000,\n    \"results\": [\n      {\n        \"player_id\": 103,\n        \"player_name\": \"Carol\",\n        \"rank\": 1,\n        \"score\": 500000,\n        \"accuracy\": 0.5,\n        \"std\": 1.0E-4,\n        \"gained_points\": 7,\n        \"total_points\": 7\n      }\n    ]\n  },\n  {\n    \"id\": \"r1-1735689800000-3\",\n    \"room_id\": \"r1\",\n    \"chart_id\": 1003,\n    \"chart_name\": \"C1003\",\n    \"started_at\": 1735689750000,\n    \"finished_at\": 1735689800000,\n    \"results\": [\n      {\n        \"player_id\": 102,\n        \"player_name\": \"Bob\\u003c\\u0026\\u003e\",\n        \"rank\": 1,\n        \"score\": 999999,\n        \"accuracy\": 1.0,\n        \"std\": 0.005,\n        \"gained_points\": 100,\n        \"total_points\": 120\n      },\n      {\n        \"player_id\": 101,\n        \"player_name\": \"Alice\",\n        \"rank\": 2,\n        \"score\": 800000,\n        \"accuracy\": 0.8999999761581421,\n        \"std\": 0.25,\n        \"gained_points\": 20,\n        \"total_points\": 120\n      }\n    ]\n  }\n]"
+      },
+      "log": [
+        "INFO Server: HTTP export records"
+      ]
+    },
+    {
+      "name": "ranking after import",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/point/ranking",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "299"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ranking\":[{\"playerId\":101,\"name\":\"Alice\",\"points\":120,\"rank\":1},{\"playerId\":102,\"name\":\"Bob\\u003c\\u0026\\u003e\",\"points\":120,\"rank\":2},{\"playerId\":105,\"name\":\"Eve\",\"points\":50,\"rank\":3},{\"playerId\":103,\"name\":\"Carol\",\"points\":7,\"rank\":4},{\"playerId\":104,\"name\":null,\"points\":0,\"rank\":5}],\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "records after import",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/list?limit=2",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "729"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"result\":{\"total\":4,\"records\":[{\"id\":\"r1-1735689800000-3\",\"roomId\":\"r1\",\"chartId\":1003,\"chartName\":\"C1003\",\"startedAt\":1735689750000,\"finishedAt\":1735689800000,\"results\":[{\"playerId\":102,\"playerName\":\"Bob\\u003c\\u0026\\u003e\",\"rank\":1,\"score\":999999,\"accuracy\":1.0,\"std\":0.005,\"gainedPoints\":100,\"totalPoints\":120},{\"playerId\":101,\"playerName\":\"Alice\",\"rank\":2,\"score\":800000,\"accuracy\":0.8999999761581421,\"std\":0.25,\"gainedPoints\":20,\"totalPoints\":120}]},{\"id\":\"r2-1735689700000-2\",\"roomId\":\"r2\",\"chartId\":1002,\"chartName\":null,\"startedAt\":1735689650000,\"finishedAt\":1735689700000,\"results\":[{\"playerId\":103,\"playerName\":\"Carol\",\"rank\":1,\"score\":500000,\"accuracy\":0.5,\"std\":1.0E-4,\"gainedPoints\":7,\"totalPoints\":7}]}]},\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "pools after import",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "632"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"pools\":[{\"id\":1,\"favoriteId\":null,\"default\":false,\"chartIds\":[1001,1005],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":0,\"submissionOpen\":false},{\"id\":20,\"favoriteId\":null,\"default\":false,\"chartIds\":[1000],\"category\":\"TB\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":0,\"submissionOpen\":false},{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "backups: admins",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/data/admins/backups",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "159"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"backups\":[\"admins-20261115-011815-724.json\",\"admins-20261115-011815-679.json\",\"admins-20261115-011815-632.json\",\"admins-20261115-011815-585.json\"],\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "backups: points",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/data/points/backups",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "57"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"backups\":[\"points-20261115-011816-230.json\"],\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "restore: no body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/restore",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "51"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"请指定要恢复的备份\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "restore: blank name",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/restore",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"backup\":\" \"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "51"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"请指定要恢复的备份\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "restore: missing",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/restore",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"backup\":\"admins-19990101-000000-000.json\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "39"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"备份不存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "restore: wrong kind",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/points/restore",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"backup\":\"{backup:admins:0}\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "39"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"备份不存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "restore: traversal",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/restore",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"backup\":\"../admins.json\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "39"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"备份不存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "restore: traversal with prefix",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/restore",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"backup\":\"admins-/../../admins.json\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "39"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"备份不存在\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "restore: kind prefix bypass",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/points/restore",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"backup\":\"points-/{backup:admins:0}\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "73"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"玩家积分应为对象（用户 ID 到积分）\",\"ok\":false}"
+      },
+      "log": []
+    },
+    {
+      "name": "restore: ok",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/restore",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"backup\":\"{backup:admins:1}\"}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "24"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"imported\":2,\"ok\":true}"
+      },
+      "log": [
+        "INFO Server: Imported admins (2 rows, merge=false), previous copy at data/backups/admins-20261115-011816-992.json"
+      ]
+    },
+    {
+      "name": "admins after restore",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "26"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"admins\":[1,6],\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: records wrong kind",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/records/import?mode=replace",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "[1,2]"
+      },
+      "response": {
+        "status": 500,
+        "reason": "Server Error",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"服务器内部错误\",\"ok\":false}"
+      },
+      "log": [
+        "ERROR Server: HTTP API error on /api/v1/data/records/import\n  com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_OBJECT but was NUMBER at line 1 column 3 path $[0]\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#unexpected-json-structure"
+      ]
+    },
+    {
+      "name": "records after bad import",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/record/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"result\":{\"total\":0,\"records\":[]},\"ok\":true}"
+      },
+      "log": []
+    },
+    {
+      "name": "import: submissions null row",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/submissions/import?mode=replace",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"submissions\":[null]}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "95"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"imported\":1,\"ok\":true,\"backup\":\"data/backups/submissions-20261115-011817-170.json\",\"total\":1}"
+      },
+      "log": [
+        "WARN Server: Submission store is unreadable (Cannot read field \"poolId\" because \"entry\" is null), starting empty",
+        "INFO Server: Imported submissions (1 rows, merge=false), previous copy at data/backups/submissions-20261115-011817-170.json"
+      ]
+    },
+    {
+      "name": "import: pools empty",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/pools/import?mode=replace",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"pools\":[]}"
+      },
+      "response": {
+        "status": 500,
+        "reason": "Server Error",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"reason\":\"服务器内部错误\",\"ok\":false}"
+      },
+      "log": [
+        "ERROR Server: HTTP API error on /api/v1/data/pools/import\n  java.lang.IllegalStateException: No chart pools configured"
+      ]
+    },
+    {
+      "name": "import: admins wrong rows",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/data/admins/import?mode=replace",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "[{\"id\":\"r1-1-1\",\"room_id\":\"r1\"}]"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "90"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"imported\":1,\"ok\":true,\"backup\":\"data/backups/admins-20261115-011817-256.json\",\"total\":1}"
+      },
+      "log": [
+        "ERROR Server: admins.json is unreadable, keeping the current admin list\n  com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected an int but was BEGIN_OBJECT at line 1 column 3 path $[0]\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#unexpected-json-structure",
+        "INFO Server: Imported admins (1 rows, merge=false), previous copy at data/backups/admins-20261115-011817-256.json"
+      ]
+    },
+    {
+      "name": "admins after wrong rows",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/admin",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "26"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"admins\":[1,6],\"ok\":true}"
+      },
+      "log": []
+    }
+  ]
+}

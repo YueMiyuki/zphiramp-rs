@@ -1,0 +1,5 @@
+refresh	ok 5
+requests	chart?page=1 chart?page=2
+indexed	5
+remote	500
+refreshing	false

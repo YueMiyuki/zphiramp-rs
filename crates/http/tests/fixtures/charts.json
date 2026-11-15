@@ -1,0 +1,1895 @@
+{
+  "scenario": "charts",
+  "exchanges": [
+    {
+      "name": "search: default",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "6697"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":13,\"pendingDuration\":false,\"charts\":[{\"id\":1008,\"name\":\"C1008\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1008\",\"composer\":\"comp1008\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1008.png\",\"preview\":null,\"file\":\"https://files.example/1008\",\"uploader\":0,\"tags\":[\"regular\"],\"rating\":0.99,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1005,\"name\":\"C1005\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1005\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1005.png\",\"preview\":null,\"file\":\"https://files.example/1005\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.97,\"ratingCount\":3,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1000,\"name\":\"Spe\\u003cc\\u003eial \\u0026 \\u0027q\\u0027 \\u003d \\\"x\\\" 测试曲\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1000\",\"composer\":\"comp1000\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1000.png\",\"preview\":null,\"file\":\"https://files.example/1000\",\"uploader\":6,\"tags\":[\"regular\"],\"rating\":0.95,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1001,\"name\":\"C1001\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1001\",\"composer\":null,\"illustrator\":null,\"description\":\"line1\\nline2\",\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1001.png\",\"preview\":null,\"file\":\"https://files.example/1001\",\"uploader\":0,\"tags\":[\"plain\"],\"rating\":0.93,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1061,\"name\":\"C1061\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1061\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1061.png\",\"preview\":null,\"file\":\"https://files.example/1061\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.92,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1060,\"name\":\"C1060\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1060\",\"composer\":\"comp1060\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1060.png\",\"preview\":null,\"file\":\"https://files.example/1060\",\"uploader\":3,\"tags\":[\"regular\"],\"rating\":0.91,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1002,\"name\":\"C1002\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1002\",\"composer\":\"comp1002\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1002.png\",\"preview\":null,\"file\":\"https://files.example/1002\",\"uploader\":1,\"tags\":[\"regular\"],\"rating\":0.9,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1003,\"name\":\"C1003\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1003\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1003.png\",\"preview\":null,\"file\":\"https://files.example/1003\",\"uploader\":2,\"tags\":[\"plain\"],\"rating\":0.88,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":400},{\"id\":1004,\"name\":\"C1004\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1004\",\"composer\":\"comp1004\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1004.png\",\"preview\":null,\"file\":\"https://files.example/1004\",\"uploader\":3,\"tags\":[\"regular\"],\"rating\":0.86,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":200},{\"id\":1006,\"name\":\"C1006\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1006\",\"composer\":\"comp1006\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1006.png\",\"preview\":null,\"file\":\"https://files.example/1006\",\"uploader\":5,\"tags\":[\"regular\"],\"rating\":0.85,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":361},{\"id\":1007,\"name\":\"C1007\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1007\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1007.png\",\"preview\":null,\"file\":\"https://files.example/1007\",\"uploader\":6,\"tags\":[\"plain\"],\"rating\":0.84,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1062,\"name\":\"C1062\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1062\",\"composer\":\"comp1062\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1062.png\",\"preview\":null,\"file\":\"https://files.example/1062\",\"uploader\":5,\"tags\":[\"regular\"],\"rating\":0.83,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1009,\"name\":\"C1009\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1009\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1009.png\",\"preview\":null,\"file\":\"https://files.example/1009\",\"uploader\":1,\"tags\":[],\"rating\":0.7,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: as player",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {player}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 403,
+        "reason": "Forbidden",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "36"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"需要权限\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: regular",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?category=REGULAR",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "2194"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":4,\"pendingDuration\":false,\"charts\":[{\"id\":1000,\"name\":\"Spe\\u003cc\\u003eial \\u0026 \\u0027q\\u0027 \\u003d \\\"x\\\" 测试曲\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1000\",\"composer\":\"comp1000\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1000.png\",\"preview\":null,\"file\":\"https://files.example/1000\",\"uploader\":6,\"tags\":[\"regular\"],\"rating\":0.95,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1060,\"name\":\"C1060\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1060\",\"composer\":\"comp1060\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1060.png\",\"preview\":null,\"file\":\"https://files.example/1060\",\"uploader\":3,\"tags\":[\"regular\"],\"rating\":0.91,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1004,\"name\":\"C1004\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1004\",\"composer\":\"comp1004\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1004.png\",\"preview\":null,\"file\":\"https://files.example/1004\",\"uploader\":3,\"tags\":[\"regular\"],\"rating\":0.86,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":200},{\"id\":1006,\"name\":\"C1006\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1006\",\"composer\":\"comp1006\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1006.png\",\"preview\":null,\"file\":\"https://files.example/1006\",\"uploader\":5,\"tags\":[\"regular\"],\"rating\":0.85,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":361}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: configured lower",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?category=configured",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "2119"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":4,\"pendingDuration\":false,\"charts\":[{\"id\":1001,\"name\":\"C1001\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1001\",\"composer\":null,\"illustrator\":null,\"description\":\"line1\\nline2\",\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1001.png\",\"preview\":null,\"file\":\"https://files.example/1001\",\"uploader\":0,\"tags\":[\"plain\"],\"rating\":0.93,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1061,\"name\":\"C1061\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1061\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1061.png\",\"preview\":null,\"file\":\"https://files.example/1061\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.92,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1003,\"name\":\"C1003\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1003\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1003.png\",\"preview\":null,\"file\":\"https://files.example/1003\",\"uploader\":2,\"tags\":[\"plain\"],\"rating\":0.88,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":400},{\"id\":1007,\"name\":\"C1007\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1007\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1007.png\",\"preview\":null,\"file\":\"https://files.example/1007\",\"uploader\":6,\"tags\":[\"plain\"],\"rating\":0.84,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: tb",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?category=%20tb%20",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1118"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":2,\"pendingDuration\":true,\"charts\":[{\"id\":1003,\"name\":\"C1003\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1003\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1003.png\",\"preview\":null,\"file\":\"https://files.example/1003\",\"uploader\":2,\"tags\":[\"plain\"],\"rating\":0.88,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":400},{\"id\":1006,\"name\":\"C1006\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1006\",\"composer\":\"comp1006\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1006.png\",\"preview\":null,\"file\":\"https://files.example/1006\",\"uploader\":5,\"tags\":[\"regular\"],\"rating\":0.85,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":361}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: manual",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?category=MANUAL&limit=2",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1121"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":13,\"pendingDuration\":false,\"charts\":[{\"id\":1008,\"name\":\"C1008\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1008\",\"composer\":\"comp1008\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1008.png\",\"preview\":null,\"file\":\"https://files.example/1008\",\"uploader\":0,\"tags\":[\"regular\"],\"rating\":0.99,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1005,\"name\":\"C1005\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1005\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1005.png\",\"preview\":null,\"file\":\"https://files.example/1005\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.97,\"ratingCount\":3,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: bogus category",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?category=bogus&minRating=x",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "44"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"未知类别：bogus\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: tag",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?tag=plain",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "2616"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":5,\"pendingDuration\":false,\"charts\":[{\"id\":1005,\"name\":\"C1005\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1005\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1005.png\",\"preview\":null,\"file\":\"https://files.example/1005\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.97,\"ratingCount\":3,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1001,\"name\":\"C1001\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1001\",\"composer\":null,\"illustrator\":null,\"description\":\"line1\\nline2\",\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1001.png\",\"preview\":null,\"file\":\"https://files.example/1001\",\"uploader\":0,\"tags\":[\"plain\"],\"rating\":0.93,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1061,\"name\":\"C1061\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1061\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1061.png\",\"preview\":null,\"file\":\"https://files.example/1061\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.92,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1003,\"name\":\"C1003\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1003\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1003.png\",\"preview\":null,\"file\":\"https://files.example/1003\",\"uploader\":2,\"tags\":[\"plain\"],\"rating\":0.88,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":400},{\"id\":1007,\"name\":\"C1007\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1007\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1007.png\",\"preview\":null,\"file\":\"https://files.example/1007\",\"uploader\":6,\"tags\":[\"plain\"],\"rating\":0.84,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: tags",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?tag=plain,regular&minRating=0.9",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "3194"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":6,\"pendingDuration\":false,\"charts\":[{\"id\":1008,\"name\":\"C1008\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1008\",\"composer\":\"comp1008\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1008.png\",\"preview\":null,\"file\":\"https://files.example/1008\",\"uploader\":0,\"tags\":[\"regular\"],\"rating\":0.99,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1005,\"name\":\"C1005\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1005\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1005.png\",\"preview\":null,\"file\":\"https://files.example/1005\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.97,\"ratingCount\":3,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1000,\"name\":\"Spe\\u003cc\\u003eial \\u0026 \\u0027q\\u0027 \\u003d \\\"x\\\" 测试曲\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1000\",\"composer\":\"comp1000\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1000.png\",\"preview\":null,\"file\":\"https://files.example/1000\",\"uploader\":6,\"tags\":[\"regular\"],\"rating\":0.95,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1001,\"name\":\"C1001\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1001\",\"composer\":null,\"illustrator\":null,\"description\":\"line1\\nline2\",\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1001.png\",\"preview\":null,\"file\":\"https://files.example/1001\",\"uploader\":0,\"tags\":[\"plain\"],\"rating\":0.93,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1061,\"name\":\"C1061\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1061\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1061.png\",\"preview\":null,\"file\":\"https://files.example/1061\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.92,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1060,\"name\":\"C1060\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1060\",\"composer\":\"comp1060\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1060.png\",\"preview\":null,\"file\":\"https://files.example/1060\",\"uploader\":3,\"tags\":[\"regular\"],\"rating\":0.91,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: tag empty item",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?tag=,plain",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "2616"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":5,\"pendingDuration\":false,\"charts\":[{\"id\":1005,\"name\":\"C1005\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1005\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1005.png\",\"preview\":null,\"file\":\"https://files.example/1005\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.97,\"ratingCount\":3,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1001,\"name\":\"C1001\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1001\",\"composer\":null,\"illustrator\":null,\"description\":\"line1\\nline2\",\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1001.png\",\"preview\":null,\"file\":\"https://files.example/1001\",\"uploader\":0,\"tags\":[\"plain\"],\"rating\":0.93,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1061,\"name\":\"C1061\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1061\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1061.png\",\"preview\":null,\"file\":\"https://files.example/1061\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.92,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1003,\"name\":\"C1003\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1003\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1003.png\",\"preview\":null,\"file\":\"https://files.example/1003\",\"uploader\":2,\"tags\":[\"plain\"],\"rating\":0.88,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":400},{\"id\":1007,\"name\":\"C1007\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1007\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1007.png\",\"preview\":null,\"file\":\"https://files.example/1007\",\"uploader\":6,\"tags\":[\"plain\"],\"rating\":0.84,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: tag only comma",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?tag=,",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "6697"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":13,\"pendingDuration\":false,\"charts\":[{\"id\":1008,\"name\":\"C1008\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1008\",\"composer\":\"comp1008\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1008.png\",\"preview\":null,\"file\":\"https://files.example/1008\",\"uploader\":0,\"tags\":[\"regular\"],\"rating\":0.99,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1005,\"name\":\"C1005\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1005\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1005.png\",\"preview\":null,\"file\":\"https://files.example/1005\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.97,\"ratingCount\":3,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1000,\"name\":\"Spe\\u003cc\\u003eial \\u0026 \\u0027q\\u0027 \\u003d \\\"x\\\" 测试曲\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1000\",\"composer\":\"comp1000\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1000.png\",\"preview\":null,\"file\":\"https://files.example/1000\",\"uploader\":6,\"tags\":[\"regular\"],\"rating\":0.95,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1001,\"name\":\"C1001\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1001\",\"composer\":null,\"illustrator\":null,\"description\":\"line1\\nline2\",\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1001.png\",\"preview\":null,\"file\":\"https://files.example/1001\",\"uploader\":0,\"tags\":[\"plain\"],\"rating\":0.93,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1061,\"name\":\"C1061\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1061\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1061.png\",\"preview\":null,\"file\":\"https://files.example/1061\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.92,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1060,\"name\":\"C1060\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1060\",\"composer\":\"comp1060\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1060.png\",\"preview\":null,\"file\":\"https://files.example/1060\",\"uploader\":3,\"tags\":[\"regular\"],\"rating\":0.91,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1002,\"name\":\"C1002\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1002\",\"composer\":\"comp1002\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1002.png\",\"preview\":null,\"file\":\"https://files.example/1002\",\"uploader\":1,\"tags\":[\"regular\"],\"rating\":0.9,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1003,\"name\":\"C1003\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1003\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1003.png\",\"preview\":null,\"file\":\"https://files.example/1003\",\"uploader\":2,\"tags\":[\"plain\"],\"rating\":0.88,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":400},{\"id\":1004,\"name\":\"C1004\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1004\",\"composer\":\"comp1004\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1004.png\",\"preview\":null,\"file\":\"https://files.example/1004\",\"uploader\":3,\"tags\":[\"regular\"],\"rating\":0.86,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":200},{\"id\":1006,\"name\":\"C1006\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1006\",\"composer\":\"comp1006\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1006.png\",\"preview\":null,\"file\":\"https://files.example/1006\",\"uploader\":5,\"tags\":[\"regular\"],\"rating\":0.85,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":361},{\"id\":1007,\"name\":\"C1007\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1007\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1007.png\",\"preview\":null,\"file\":\"https://files.example/1007\",\"uploader\":6,\"tags\":[\"plain\"],\"rating\":0.84,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1062,\"name\":\"C1062\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1062\",\"composer\":\"comp1062\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1062.png\",\"preview\":null,\"file\":\"https://files.example/1062\",\"uploader\":5,\"tags\":[\"regular\"],\"rating\":0.83,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1009,\"name\":\"C1009\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1009\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1009.png\",\"preview\":null,\"file\":\"https://files.example/1009\",\"uploader\":1,\"tags\":[],\"rating\":0.7,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: tag duplicate",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?tag=plain,plain",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 500,
+        "reason": "Server Error",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"服务器内部错误\"}"
+      },
+      "log": [
+        "ERROR Server: HTTP API error on /api/v1/chart/search\n  java.lang.IllegalArgumentException: duplicate element: plain"
+      ]
+    },
+    {
+      "name": "search: tag blank",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?category=REGULAR&tag=%20",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "2194"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":4,\"pendingDuration\":false,\"charts\":[{\"id\":1000,\"name\":\"Spe\\u003cc\\u003eial \\u0026 \\u0027q\\u0027 \\u003d \\\"x\\\" 测试曲\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1000\",\"composer\":\"comp1000\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1000.png\",\"preview\":null,\"file\":\"https://files.example/1000\",\"uploader\":6,\"tags\":[\"regular\"],\"rating\":0.95,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1060,\"name\":\"C1060\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1060\",\"composer\":\"comp1060\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1060.png\",\"preview\":null,\"file\":\"https://files.example/1060\",\"uploader\":3,\"tags\":[\"regular\"],\"rating\":0.91,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1004,\"name\":\"C1004\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1004\",\"composer\":\"comp1004\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1004.png\",\"preview\":null,\"file\":\"https://files.example/1004\",\"uploader\":3,\"tags\":[\"regular\"],\"rating\":0.86,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":200},{\"id\":1006,\"name\":\"C1006\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1006\",\"composer\":\"comp1006\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1006.png\",\"preview\":null,\"file\":\"https://files.example/1006\",\"uploader\":5,\"tags\":[\"regular\"],\"rating\":0.85,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":361}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: min rating",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?minRating=0.95",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1120"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":2,\"pendingDuration\":false,\"charts\":[{\"id\":1008,\"name\":\"C1008\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1008\",\"composer\":\"comp1008\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1008.png\",\"preview\":null,\"file\":\"https://files.example/1008\",\"uploader\":0,\"tags\":[\"regular\"],\"rating\":0.99,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1005,\"name\":\"C1005\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1005\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1005.png\",\"preview\":null,\"file\":\"https://files.example/1005\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.97,\"ratingCount\":3,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: min rating count",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?minRatingCount=4&category=REGULAR&minRating=0",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "2194"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":4,\"pendingDuration\":false,\"charts\":[{\"id\":1000,\"name\":\"Spe\\u003cc\\u003eial \\u0026 \\u0027q\\u0027 \\u003d \\\"x\\\" 测试曲\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1000\",\"composer\":\"comp1000\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1000.png\",\"preview\":null,\"file\":\"https://files.example/1000\",\"uploader\":6,\"tags\":[\"regular\"],\"rating\":0.95,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1060,\"name\":\"C1060\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1060\",\"composer\":\"comp1060\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1060.png\",\"preview\":null,\"file\":\"https://files.example/1060\",\"uploader\":3,\"tags\":[\"regular\"],\"rating\":0.91,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1004,\"name\":\"C1004\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1004\",\"composer\":\"comp1004\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1004.png\",\"preview\":null,\"file\":\"https://files.example/1004\",\"uploader\":3,\"tags\":[\"regular\"],\"rating\":0.86,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":200},{\"id\":1006,\"name\":\"C1006\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1006\",\"composer\":\"comp1006\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1006.png\",\"preview\":null,\"file\":\"https://files.example/1006\",\"uploader\":5,\"tags\":[\"regular\"],\"rating\":0.85,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":361}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: min difficulty",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?minDifficulty=17&limit=3",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1687"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":9,\"pendingDuration\":false,\"charts\":[{\"id\":1000,\"name\":\"Spe\\u003cc\\u003eial \\u0026 \\u0027q\\u0027 \\u003d \\\"x\\\" 测试曲\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1000\",\"composer\":\"comp1000\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1000.png\",\"preview\":null,\"file\":\"https://files.example/1000\",\"uploader\":6,\"tags\":[\"regular\"],\"rating\":0.95,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1001,\"name\":\"C1001\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1001\",\"composer\":null,\"illustrator\":null,\"description\":\"line1\\nline2\",\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1001.png\",\"preview\":null,\"file\":\"https://files.example/1001\",\"uploader\":0,\"tags\":[\"plain\"],\"rating\":0.93,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1061,\"name\":\"C1061\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1061\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1061.png\",\"preview\":null,\"file\":\"https://files.example/1061\",\"uploader\":4,\"tags\":[\"plain\"],\"rating\":0.92,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: min duration",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?minDuration=300.9",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1118"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":2,\"pendingDuration\":true,\"charts\":[{\"id\":1003,\"name\":\"C1003\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1003\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1003.png\",\"preview\":null,\"file\":\"https://files.example/1003\",\"uploader\":2,\"tags\":[\"plain\"],\"rating\":0.88,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":400},{\"id\":1006,\"name\":\"C1006\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1006\",\"composer\":\"comp1006\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1006.png\",\"preview\":null,\"file\":\"https://files.example/1006\",\"uploader\":5,\"tags\":[\"regular\"],\"rating\":0.85,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":361}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: limit NaN",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?limit=NaN",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "120"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":13,\"pendingDuration\":false,\"charts\":[]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: limit huge",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?limit=1e9&tag=regular",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "3708"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":7,\"pendingDuration\":false,\"charts\":[{\"id\":1008,\"name\":\"C1008\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1008\",\"composer\":\"comp1008\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1008.png\",\"preview\":null,\"file\":\"https://files.example/1008\",\"uploader\":0,\"tags\":[\"regular\"],\"rating\":0.99,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1000,\"name\":\"Spe\\u003cc\\u003eial \\u0026 \\u0027q\\u0027 \\u003d \\\"x\\\" 测试曲\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1000\",\"composer\":\"comp1000\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1000.png\",\"preview\":null,\"file\":\"https://files.example/1000\",\"uploader\":6,\"tags\":[\"regular\"],\"rating\":0.95,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1060,\"name\":\"C1060\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1060\",\"composer\":\"comp1060\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1060.png\",\"preview\":null,\"file\":\"https://files.example/1060\",\"uploader\":3,\"tags\":[\"regular\"],\"rating\":0.91,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1002,\"name\":\"C1002\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1002\",\"composer\":\"comp1002\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1002.png\",\"preview\":null,\"file\":\"https://files.example/1002\",\"uploader\":1,\"tags\":[\"regular\"],\"rating\":0.9,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null},{\"id\":1004,\"name\":\"C1004\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1004\",\"composer\":\"comp1004\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1004.png\",\"preview\":null,\"file\":\"https://files.example/1004\",\"uploader\":3,\"tags\":[\"regular\"],\"rating\":0.86,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":200},{\"id\":1006,\"name\":\"C1006\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1006\",\"composer\":\"comp1006\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1006.png\",\"preview\":null,\"file\":\"https://files.example/1006\",\"uploader\":5,\"tags\":[\"regular\"],\"rating\":0.85,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":361},{\"id\":1062,\"name\":\"C1062\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1062\",\"composer\":\"comp1062\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1062.png\",\"preview\":null,\"file\":\"https://files.example/1062\",\"uploader\":5,\"tags\":[\"regular\"],\"rating\":0.83,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":null}]}}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: bad numbers order",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?minRating=a&minDifficulty=b&minDuration=c",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "58"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"参数格式错误：minDifficulty\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: bad limit",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?limit=a",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "50"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"参数格式错误：limit\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: bad probe",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?probeDuration=a",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "58"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"参数格式错误：probeDuration\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: tb probe",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?category=TB&probeDuration=2",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1118"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":2,\"pendingDuration\":true,\"charts\":[{\"id\":1003,\"name\":\"C1003\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1003\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1003.png\",\"preview\":null,\"file\":\"https://files.example/1003\",\"uploader\":2,\"tags\":[\"plain\"],\"rating\":0.88,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":400},{\"id\":1006,\"name\":\"C1006\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1006\",\"composer\":\"comp1006\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1006.png\",\"preview\":null,\"file\":\"https://files.example/1006\",\"uploader\":5,\"tags\":[\"regular\"],\"rating\":0.85,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":361}]}}"
+      },
+      "log": [
+        "INFO Server: Duration probe finished: 2/2 resolved, 0 failed",
+        "INFO Server: Probed 2 durations for TB (budget 2)"
+      ]
+    },
+    {
+      "name": "search: tb probe again",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?category=TB&probeDuration=1.9",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1118"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":2,\"pendingDuration\":true,\"charts\":[{\"id\":1003,\"name\":\"C1003\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1003\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1003.png\",\"preview\":null,\"file\":\"https://files.example/1003\",\"uploader\":2,\"tags\":[\"plain\"],\"rating\":0.88,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":400},{\"id\":1006,\"name\":\"C1006\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1006\",\"composer\":\"comp1006\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1006.png\",\"preview\":null,\"file\":\"https://files.example/1006\",\"uploader\":5,\"tags\":[\"regular\"],\"rating\":0.85,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":361}]}}"
+      },
+      "log": [
+        "INFO Server: Duration probe finished: 1/1 resolved, 0 failed",
+        "INFO Server: Probed 1 durations for TB (budget 1)"
+      ]
+    },
+    {
+      "name": "duration: ok",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/chart/duration",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[1000,1003,999999]}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1092"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"probed\":0,\"charts\":[{\"id\":1000,\"name\":\"Spe\\u003cc\\u003eial \\u0026 \\u0027q\\u0027 \\u003d \\\"x\\\" 测试曲\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1000\",\"composer\":\"comp1000\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1000.png\",\"preview\":null,\"file\":\"https://files.example/1000\",\"uploader\":6,\"tags\":[\"regular\"],\"rating\":0.95,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":300},{\"id\":1003,\"name\":\"C1003\",\"level\":\"AT Lv.17\",\"difficulty\":17.5,\"charter\":\"ch1003\",\"composer\":null,\"illustrator\":null,\"description\":null,\"ranked\":false,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1003.png\",\"preview\":null,\"file\":\"https://files.example/1003\",\"uploader\":2,\"tags\":[\"plain\"],\"rating\":0.88,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":400}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "duration: empty",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/chart/duration",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "duration: no body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/chart/duration",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "duration: too many",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/chart/duration",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"chartIds\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "55"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"一次最多探测 20 张谱面\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "generate: no body",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/generate",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": ""
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "generate: no category",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/generate",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"sizeLimit\":3}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "generate: manual",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/generate",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"category\":\"MANUAL\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "54"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"该类别不支持规则生成\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "generate: probe 200",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/generate",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"category\":\"TB\",\"sizeLimit\":15,\"roundsPerStay\":1,\"probeDuration\":200}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "55"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"一次最多探测 20 张谱面\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "generate: manual probe 200",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/generate",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"category\":\"MANUAL\",\"probeDuration\":200}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "55"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"一次最多探测 20 张谱面\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "generate: size zero",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/generate",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"category\":\"CONFIGURED\",\"sizeLimit\":0}"
+      },
+      "response": {
+        "status": 500,
+        "reason": "Server Error",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "45"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"服务器内部错误\"}"
+      },
+      "log": [
+        "ERROR Server: HTTP API error on /api/v1/pool/generate\n  java.lang.IllegalArgumentException: Pool size limit must be positive"
+      ]
+    },
+    {
+      "name": "generate: regular",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/generate",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"category\":\"REGULAR\",\"sizeLimit\":2,\"roundsPerStay\":3}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "27"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"poolIds\":[3,4]}"
+      },
+      "log": [
+        "INFO Server: Generated 2 REGULAR pools from 4 charts (sizeLimit=2)"
+      ]
+    },
+    {
+      "name": "generate: regular again",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/generate",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"category\":\"REGULAR\",\"sizeLimit\":2,\"roundsPerStay\":3}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "27"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"poolIds\":[5,6]}"
+      },
+      "log": [
+        "INFO Server: Generated 2 REGULAR pools from 4 charts (sizeLimit=2)"
+      ]
+    },
+    {
+      "name": "generate: tb probe 20",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/generate",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"category\":\"TB\",\"probeDuration\":20}"
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "25"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"poolIds\":[7]}"
+      },
+      "log": [
+        "INFO Server: Duration probe finished: 3/3 resolved, 0 failed",
+        "INFO Server: Probed 3 durations for TB (budget 20)",
+        "INFO Server: Generated 1 TB pools from 4 charts (sizeLimit=15)"
+      ]
+    },
+    {
+      "name": "generate: lower-case",
+      "request": {
+        "method": "POST",
+        "target": "/api/v1/pool/generate",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ]
+        ],
+        "body": "{\"category\":\"configured\"}"
+      },
+      "response": {
+        "status": 400,
+        "reason": "Bad Request",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "63"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":false,\"reason\":\"请检查是否传入了错误的格式\"}"
+      },
+      "log": []
+    },
+    {
+      "name": "pools after generate",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/pool/list",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "1255"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"pools\":[{\"id\":0,\"favoriteId\":null,\"default\":true,\"chartIds\":[1000,1002],\"category\":\"REGULAR\",\"sizeLimit\":15,\"roundsPerStay\":3,\"order\":10,\"submissionOpen\":false},{\"id\":1,\"favoriteId\":42,\"default\":false,\"chartIds\":[1001],\"category\":\"CONFIGURED\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":20,\"submissionOpen\":false},{\"id\":2,\"favoriteId\":null,\"default\":false,\"chartIds\":[1003],\"category\":\"MANUAL\",\"sizeLimit\":null,\"roundsPerStay\":null,\"order\":30,\"submissionOpen\":true},{\"id\":3,\"favoriteId\":null,\"default\":false,\"chartIds\":[1000,1060],\"category\":\"REGULAR\",\"sizeLimit\":2,\"roundsPerStay\":3,\"order\":40,\"submissionOpen\":false},{\"id\":4,\"favoriteId\":null,\"default\":false,\"chartIds\":[1004,1006],\"category\":\"REGULAR\",\"sizeLimit\":2,\"roundsPerStay\":3,\"order\":50,\"submissionOpen\":false},{\"id\":5,\"favoriteId\":null,\"default\":false,\"chartIds\":[1000,1060],\"category\":\"REGULAR\",\"sizeLimit\":2,\"roundsPerStay\":3,\"order\":60,\"submissionOpen\":false},{\"id\":6,\"favoriteId\":null,\"default\":false,\"chartIds\":[1004,1006],\"category\":\"REGULAR\",\"sizeLimit\":2,\"roundsPerStay\":3,\"order\":70,\"submissionOpen\":false},{\"id\":7,\"favoriteId\":null,\"default\":false,\"chartIds\":[1061,1060,1003,1006],\"category\":\"TB\",\"sizeLimit\":15,\"roundsPerStay\":null,\"order\":80,\"submissionOpen\":false}]}"
+      },
+      "log": []
+    },
+    {
+      "name": "search: refresh",
+      "request": {
+        "method": "GET",
+        "target": "/api/v1/chart/search?refresh&division=plain&limit=1",
+        "headers": [
+          [
+            "Authorization",
+            "Bearer {admin}"
+          ]
+        ]
+      },
+      "response": {
+        "status": 200,
+        "reason": "OK",
+        "headers": [
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Access-Control-Allow-Origin",
+            "*"
+          ],
+          [
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+          ],
+          [
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization"
+          ],
+          [
+            "Content-Length",
+            "623"
+          ],
+          [
+            "Connection",
+            "close"
+          ]
+        ],
+        "body": "{\"ok\":true,\"result\":{\"indexed\":13,\"remoteTotal\":-1,\"refreshing\":false,\"matched\":13,\"pendingDuration\":false,\"charts\":[{\"id\":1008,\"name\":\"C1008\",\"level\":\"AT Lv.17\",\"difficulty\":16.0,\"charter\":\"ch1008\",\"composer\":\"comp1008\",\"illustrator\":null,\"description\":null,\"ranked\":true,\"reviewed\":true,\"stable\":true,\"stableRequest\":false,\"illustration\":\"https://img.example/1008.png\",\"preview\":null,\"file\":\"https://files.example/1008\",\"uploader\":0,\"tags\":[\"regular\"],\"rating\":0.99,\"ratingCount\":10,\"created\":\"2025-01-02T03:04:05.123456+08:00\",\"updated\":\"2025-03-04T05:06:07Z\",\"chartUpdated\":\"2025-03-04T05:06Z\",\"durationSeconds\":308}]}}"
+      },
+      "log": [
+        "INFO Server: Chart index refreshed: 13 charts (division=plain)"
+      ]
+    }
+  ]
+}
